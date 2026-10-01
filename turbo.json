@@ -8,7 +8,7 @@
       "dependsOn": ["^build", "db:generate"],
       "inputs": ["$TURBO_DEFAULT$", "!.env*", ".env.example"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "env": ["DATABASE_URL", "APP_URL", "SESSION_SECRET", "ANTHROPIC_API_KEY"]
+      "env": ["DATABASE_URL", "APP_URL", "TOTP_ENCRYPTION_KEY", "ANTHROPIC_API_KEY"]
     },
     "db:generate": {
       "inputs": ["prisma/**", "prisma.config.ts"],
