@@ -4,7 +4,8 @@ import { Button, Field } from "@medassist/ui";
 import { useFormular } from "@/lib/forms/use-formular";
 import { anmelden } from "./actions";
 
-export function AnmeldeFormular() {
+/** `zweiFaAktiv` kommt vom Server (REQ-021) und steuert nur den Hinweistext. */
+export function AnmeldeFormular({ zweiFaAktiv }: { zweiFaAktiv: boolean }) {
   const { state, onSubmit, laeuft } = useFormular(anmelden);
   return (
     <form onSubmit={onSubmit} className="panel stack">
@@ -20,7 +21,9 @@ export function AnmeldeFormular() {
           {laeuft ? "Wird geprüft …" : "Weiter"}
         </Button>
       </div>
-      <p className="text-soft">Im nächsten Schritt geben Sie den Code aus Ihrer Authenticator-App ein.</p>
+      {zweiFaAktiv && (
+        <p className="text-soft">Im nächsten Schritt geben Sie den Code aus Ihrer Authenticator-App ein.</p>
+      )}
     </form>
   );
 }

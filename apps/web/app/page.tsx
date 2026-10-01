@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { aktuelleSitzung } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
+import { hatVollenZugang } from "@/lib/auth/guards";
 
 export default async function Startseite() {
-  const sitzung = await aktuelleSitzung();
-  if (sitzung?.zweiterFaktorAm) redirect("/start");
+  if (await hatVollenZugang()) redirect("/start");
 
   return (
     <section className="stack">

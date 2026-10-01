@@ -40,9 +40,14 @@ jobs:
         run: pnpm turbo run test
 
   e2e:
-    name: Web-Abläufe (Playwright)
+    name: Web-Abläufe (Playwright, 2FA ${{ matrix.zwei_fa_aktiv == 'true' && 'an' || 'aus' }})
     runs-on: ubuntu-latest
     needs: checks
+    # REQ-021: Beide Pfade bleiben getestet – Testphase (2FA aus, Standard) und Pflicht-2FA.
+    strategy:
+      fail-fast: false
+      matrix:
+        zwei_fa_aktiv: ["false", "true"]
     services:
       postgres:
         image: postgres:16
@@ -60,6 +65,7 @@ jobs:
       # Nur für die kurzlebige CI-Datenbank – kein Secret.
       DATABASE_URL: postgresql://medassist:medassist@localhost:5432/medassist
       APP_URL: http://localhost:3000
+      ZWEI_FA_AKTIV: ${{ matrix.zwei_fa_aktiv }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -81,6 +87,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-2fa-${{ matrix.zwei_fa_aktiv }}
           path: apps/web/test-results
           retention-days: 7

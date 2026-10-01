@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { zweiFaAktiv } from "@/lib/env";
 import { AnmeldeFormular } from "./formular";
 
 const HINWEISE: Record<string, string> = {
@@ -17,7 +18,7 @@ export default async function AnmeldenSeite({ searchParams }: { searchParams: Pr
           {text}
         </div>
       )}
-      <AnmeldeFormular />
+      <AnmeldeFormular zweiFaAktiv={zweiFaAktiv()} />
       <p>
         Noch kein Konto? <Link href="/registrieren">Registrieren</Link>
       </p>

@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { db } from "../db";
+import { zweiFaAktiv } from "../env";
 import { hashToken, neuesToken } from "./tokens";
 
 /** REQ-017: Sitzungsdauer nach vollständiger Anmeldung. */
@@ -20,10 +21,21 @@ async function setzeCookie(token: string, laeuftAbAm: Date) {
   });
 }
 
-/** Legt nach erfolgreicher Passwortprüfung eine Teilsitzung an (zweiter Faktor ausstehend). */
-export async function erstelleTeilsitzung(nutzerId: string): Promise<void> {
+/**
+ * Legt nach erfolgreicher Passwortprüfung eine Sitzung an.
+ * - `voll: false` – Teilsitzung (10 min), zweiter Faktor steht noch aus (2FA aktiv).
+ * - `voll: true` – vollständige Sitzung (12 h) ohne zweiten Faktor; nur zulässig,
+ *   wenn die 2FA per `ZWEI_FA_AKTIV=false` abgeschaltet ist (Testphase, REQ-021).
+ *   `zweiterFaktorAm` bleibt leer – schaltet man die 2FA wieder ein, verlangt
+ *   `pruefeZugang` für solche Sitzungen sofort den zweiten Faktor.
+ */
+export async function erstelleSitzung(nutzerId: string, { voll }: { voll: boolean }): Promise<void> {
+  // Defensiv: Bei aktiver 2FA darf eine volle Sitzung nur über `bestaetigeZweitenFaktor` entstehen.
+  if (voll && zweiFaAktiv()) {
+    throw new Error("Volle Sitzung ohne zweiten Faktor ist bei aktiver Zwei-Faktor-Anmeldung nicht zulässig.");
+  }
   const token = neuesToken();
-  const laeuftAbAm = new Date(Date.now() + TEILSITZUNG_DAUER_MS);
+  const laeuftAbAm = new Date(Date.now() + (voll ? SITZUNG_DAUER_MS : TEILSITZUNG_DAUER_MS));
   await db().sitzung.create({ data: { nutzerId, tokenHash: hashToken(token), laeuftAbAm } });
   await setzeCookie(token, laeuftAbAm);
 }

@@ -2,6 +2,7 @@ import { BERECHTIGUNGEN, ROLLEN_BEZEICHNUNG, hatBerechtigung, type Berechtigung 
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/guards";
 import { db } from "@/lib/db";
+import { zweiFaAktiv } from "@/lib/env";
 import { abmelden } from "../(auth)/anmelden/actions";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +37,13 @@ export default async function Uebersicht() {
       <p>
         Angemeldet als <strong>{nutzer.email}</strong> · Rolle: <strong>{ROLLEN_BEZEICHNUNG[nutzer.rolle]}</strong>
       </p>
+      {!zweiFaAktiv() && (
+        // Neutrales Panel: Rosé ist Markenfarbe, nie Warn-/Sicherheitshinweis (CLAUDE.md §13).
+        <div className="panel" role="note">
+          <strong>Testphase: Zwei-Faktor-Anmeldung deaktiviert.</strong> Vor der Verarbeitung echter Daten wird sie
+          wieder verpflichtend (REQ-021).
+        </div>
+      )}
       {approbation?.status === "SIMULIERT" && (
         <div className="panel panel-rose" role="note">
           Approbationsnachweis: <strong>simuliert</strong> (Prototyp – keine echte Prüfung).

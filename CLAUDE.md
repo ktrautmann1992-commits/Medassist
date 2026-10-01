@@ -122,7 +122,9 @@ Hinweise:
 ## 7. Architektur (hybrid)
 
 - **Regel-Engine** (versionierte JSON/YAML-Regeln): Red Flags, Kontraindikationen, Wechselwirkungen, Rollenfilter, Dosisgrenzen. **Regeln haben immer Vorrang vor der KI.**
-- **KI-Schicht** (Claude API):
+- **KI-Schicht** (Google Gemini):
+  - Zugriff über **Vertex AI in der EU-Region `europe-west3` (Frankfurt)**, nicht über die Consumer-Gemini-API (Datenresidenz, Auftragsverarbeitungsvertrag mit Google). Konfiguration über `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`, `GEMINI_MODEL` (Modellname nicht im Code festlegen), Zugangsdaten über `GOOGLE_APPLICATION_CREDENTIALS_JSON`.
+  - Strukturierte Ausgabe über `responseSchema` / JSON-Mode; die Antwort wird zusätzlich serverseitig mit zod validiert.
   - strukturiert Freitext/Transkripte in Symptome,
   - beschreibt Fotos (Morphologie, Lokalisation, Ausdehnung) als zusätzlichen Hinweis,
   - erzeugt Diagnose-Hypothesen, Begründungen und Rückfragen.
@@ -142,7 +144,7 @@ Hinweise:
 - **Datenbank:** PostgreSQL mit Prisma, Anbieter mit EU-Region Frankfurt (z. B. Neon über den Vercel Marketplace oder Supabase); Verschlüsselung at rest und in transit
 - **Dateien (Fotos, Audio, PDFs):** privater Objektspeicher in der EU, Zugriff nur über kurzlebige signierte URLs
 - **PDF:** serverseitige Erzeugung (z. B. React-PDF oder Puppeteer) mit Vorlagen
-- **Auth:** E-Mail + Passwort mit Pflicht-2FA; rollenbasierte Rechte; Einwilligungsverwaltung (DSGVO Art. 9)
+- **Auth:** E-Mail + Passwort mit Pflicht-2FA; in der Testphase per `ZWEI_FA_AKTIV` abschaltbar (Standard: aus; vor echten Daten zwingend `true`, REQ-021); rollenbasierte Rechte; Einwilligungsverwaltung (DSGVO Art. 9)
 - **Hosting:** Vercel (Web + API), Functions-Region `fra1` (Frankfurt); Datenbank und Speicher in derselben Region
 - **Tests:** Vitest/Jest für Logik, Playwright für Web-Abläufe, Detox/Maestro für Mobile; Regeltests mit klinischen Testfällen
 
@@ -152,7 +154,7 @@ Hinweise:
 - **Vercel** ist mit GitHub verbunden: jeder Push auf `main` → Produktions-Deployment, jeder Pull Request → Preview-Deployment.
 - Vercel-Projekt zeigt auf `apps/web` (Root Directory), Build über Turborepo.
 - **Preview- und Produktions-Deployments mit Zugriffsschutz** (Vercel Deployment Protection bzw. Login), solange es eine Demo ist – keine öffentlich erreichbare Diagnose-Funktion.
-- **Secrets** (Anthropic API Key, Datenbank-URL, Speicher-Keys) ausschließlich als Vercel Environment Variables, getrennt nach Production / Preview / Development. Niemals im Repository; `.env.example` ohne Werte pflegen.
+- **Secrets** (Google-Cloud-Service-Account für Vertex AI/Gemini, Datenbank-URL, Speicher-Keys) ausschließlich als Vercel Environment Variables, getrennt nach Production / Preview / Development. Niemals im Repository; `.env.example` ohne Werte pflegen.
 - **GitHub Actions** bei jedem Pull Request: Lint, Typecheck, Tests (inkl. Regel-Engine-Testfälle). Merge nur bei grünen Checks.
 - **Vercel-Grenzen beachten:**
   - Request-Body bei Functions ist begrenzt (ca. 4,5 MB) → Fotos und Sprachaufnahmen **direkt vom Client in den Objektspeicher** hochladen (signierte Upload-URL), die API bekommt nur die Referenz.
@@ -160,6 +162,7 @@ Hinweise:
   - `maxDuration` und `regions` pro Route explizit setzen.
 - **Datenbank-Migrationen** mit Prisma Migrate; Produktion wird nur über die Pipeline migriert, nie manuell.
 - **Mobile App** (Expo) wird **nicht** über Vercel ausgeliefert, sondern über Expo EAS Build in App Store / Google Play; sie nutzt die API unter der Vercel-Domain.
+- **KI-Anbieter:** Gemini über Vertex AI, Region `europe-west3` (Frankfurt); Service-Account-JSON nur als Vercel Environment Variable. Vor echten Daten AVV mit Google Cloud und Datenverarbeitungsbedingungen (u. a. keine Nutzung zum Training, Logging/Caching) prüfen.
 - **Datenschutz-Hinweis:** Vercel ist ein US-Anbieter. Für den Prototyp mit Testdaten unkritisch. Vor echten Gesundheitsdaten (DSGVO Art. 9) prüfen: Auftragsverarbeitungsvertrag, Datenübermittlung in Drittländer, Verschlüsselung, ggf. Wechsel auf rein europäisches Hosting. Die Architektur bleibt dafür anbieterneutral (keine harte Bindung an Vercel-spezifische Dienste in `packages/core`).
 
 ## 9. Datenquellen (Lizenzen vor Marktreife klären)
@@ -168,6 +171,7 @@ Hinweise:
 - **Leitlinien:** AWMF; Nutzung und Urheberrecht klären, Quellenangabe pro Empfehlung
 - **Arzneimitteldaten:** kommerzielle Datenbanken (z. B. ABDA, ifap, MMI) – kostenpflichtig
 - **Im Prototyp:** kleiner, selbst erstellter Demo-Datensatz, klar als solcher gekennzeichnet
+- Architektur der Wissensdatenbank, Quellen, Lizenzstatus und Importpfad: [`docs/medizinische-daten.md`](./docs/medizinische-daten.md)
 
 ## 10. Nicht im Prototyp
 

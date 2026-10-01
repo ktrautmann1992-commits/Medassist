@@ -1,10 +1,11 @@
 "use server";
 
-import { istGesperrt, loginSchema, nachFehlversuch } from "@medassist/core";
+import { istGesperrt, loginSchema, nachErfolg, nachFehlversuch } from "@medassist/core";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { dummyPasswortHash, pruefePasswort } from "@/lib/auth/password";
-import { beendeSitzung, erstelleTeilsitzung } from "@/lib/auth/session";
+import { beendeSitzung, erstelleSitzung } from "@/lib/auth/session";
+import { zweiFaAktiv } from "@/lib/env";
 import type { FormState } from "@/lib/forms/state";
 
 /** REQ-019: Gleiche Meldung für unbekannte E-Mail, falsches Passwort und Sperre. */
@@ -26,7 +27,8 @@ export async function anmelden(_vorher: FormState, formData: FormData): Promise<
   if (istGesperrt(nutzer, jetzt)) return { fehler: ANMELDUNG_FEHLGESCHLAGEN };
 
   if (!(await pruefePasswort(nutzer.passwortHash, passwort))) {
-    // REQ-020: Fehlversuch zählen. Zurückgesetzt wird erst nach bestätigtem zweitem Faktor.
+    // REQ-020: Fehlversuch zählen. Zurückgesetzt wird erst nach vollständiger Anmeldung
+    // (mit 2FA: nach bestätigtem zweitem Faktor; ohne 2FA: nach korrektem Passwort).
     await db().nutzer.update({ where: { id: nutzer.id }, data: nachFehlversuch(nutzer, jetzt) });
     return { fehler: ANMELDUNG_FEHLGESCHLAGEN };
   }
@@ -36,7 +38,14 @@ export async function anmelden(_vorher: FormState, formData: FormData): Promise<
     return { fehler: "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse über den Bestätigungslink." };
   }
 
-  await erstelleTeilsitzung(nutzer.id);
+  if (!zweiFaAktiv()) {
+    // REQ-021: Testphase ohne 2FA – Passwort und bestätigte E-Mail genügen für eine volle Sitzung.
+    await db().nutzer.update({ where: { id: nutzer.id }, data: nachErfolg() });
+    await erstelleSitzung(nutzer.id, { voll: true });
+    redirect("/start");
+  }
+
+  await erstelleSitzung(nutzer.id, { voll: false });
   redirect(nutzer.totpAktiviertAm ? "/2fa/bestaetigen" : "/2fa/einrichten");
 }
 

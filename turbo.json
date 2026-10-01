@@ -8,7 +8,16 @@
       "dependsOn": ["^build", "db:generate"],
       "inputs": ["$TURBO_DEFAULT$", "!.env*", ".env.example"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "env": ["DATABASE_URL", "APP_URL", "TOTP_ENCRYPTION_KEY", "ANTHROPIC_API_KEY"]
+      "env": [
+        "DATABASE_URL",
+        "APP_URL",
+        "TOTP_ENCRYPTION_KEY",
+        "ZWEI_FA_AKTIV",
+        "GOOGLE_CLOUD_PROJECT",
+        "GOOGLE_CLOUD_LOCATION",
+        "GEMINI_MODEL",
+        "GOOGLE_APPLICATION_CREDENTIALS_JSON"
+      ]
     },
     "db:generate": {
       "inputs": ["prisma/**", "prisma.config.ts"],
