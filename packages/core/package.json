@@ -1,0 +1,25 @@
+{
+  "name": "@medassist/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Regel-Engine, Typen und Schemas – ohne Abhängigkeit zu Hosting-Anbietern (REQ-003).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "eslint": "^9.39.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^5.0.3"
+  }
+}
