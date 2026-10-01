@@ -1,0 +1,307 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MedAssist – Design-Vorschau</title><style>
+/* ==========================================================================
+   MedAssist – style.css
+   Gestaltung: klinisch-ruhig mit Rosé als Markenfarbe.
+   Regel: Rosé ist Marke und Navigation – NIE Warnfarbe.
+   Notfall/Dringlichkeit haben eigene, klar abgesetzte Farben + Symbol + Text.
+   Schrift: Atkinson Hyperlegible (entwickelt für maximale Lesbarkeit).
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap");
+
+:root {
+  /* --- Marke: Rosé ----------------------------------------------------- */
+  --rose-900: #6E1F3D;   /* Überschriften auf Rosé-Flächen            */
+  --rose-700: #A8325E;   /* Primärfarbe: Buttons, Links, aktive Navi   */
+  --rose-500: #D06A92;   /* Fokus-Ring, Akzentlinien                    */
+  --rose-200: #F2C9D6;   /* Ränder auf Rosé-Flächen                     */
+  --rose-50:  #FBEFF3;   /* zarte Hintergründe, ausgewählte Elemente    */
+
+  /* --- Klinische Neutrale (kühl, kein Creme) --------------------------- */
+  --ink:       #23303B;  /* Fließtext                                   */
+  --ink-soft:  #55636F;  /* Sekundärtext                                */
+  --line:      #DCE1E6;  /* Trennlinien, Feldränder                     */
+  --surface:   #FFFFFF;  /* Karten, Formulare                           */
+  --page:      #F5F7F9;  /* Seitenhintergrund                           */
+
+  /* --- Daten / Befunde (Wearables, Messwerte) -------------------------- */
+  --data-700:  #2F5F80;
+  --data-50:   #EAF2F8;
+
+  /* --- Status (unabhängig von der Marke) ------------------------------- */
+  --emergency:     #B42318;  --emergency-bg: #FDECEA;  /* 112 / sofort      */
+  --urgent:        #B54708;  --urgent-bg:    #FEF3E6;  /* heute zum Arzt    */
+  --routine:       #2F5F80;  --routine-bg:   #EAF2F8;  /* in den nächsten Tagen */
+  --ok:            #2E7D57;  --ok-bg:        #E9F5EE;  /* Selbstbeobachtung */
+
+  /* --- Typografie ------------------------------------------------------ */
+  --font: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --fs-xs: 0.8125rem;   /* 13 px */
+  --fs-sm: 0.9375rem;   /* 15 px */
+  --fs-md: 1.0625rem;   /* 17 px – Grundgröße, bewusst etwas größer  */
+  --fs-lg: 1.375rem;    /* 22 px */
+  --fs-xl: 1.75rem;     /* 28 px */
+  --fs-2xl: 2.25rem;    /* 36 px */
+  --lh-body: 1.6;
+  --lh-tight: 1.2;
+
+  /* --- Abstände & Formen ----------------------------------------------- */
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+  --space-4: 1rem;    --space-5: 1.5rem; --space-6: 2rem; --space-7: 3rem;
+  --radius-field: 8px;    /* Eingaben, Buttons      */
+  --radius-panel: 14px;   /* Karten, Panels         */
+  --radius-pill: 999px;   /* Profil-Chips, Badges   */
+  --shadow-panel: 0 1px 2px rgba(35, 48, 59, 0.06), 0 4px 16px rgba(35, 48, 59, 0.05);
+  --measure: 68ch;
+}
+
+/* --- Basis --------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  color: var(--ink);
+  background: var(--page);
+}
+h1, h2, h3 { line-height: var(--lh-tight); margin: 0 0 var(--space-3); color: var(--ink); }
+h1 { font-size: var(--fs-2xl); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: var(--fs-xl);  font-weight: 700; }
+h3 { font-size: var(--fs-lg);  font-weight: 700; }
+p  { margin: 0 0 var(--space-4); max-width: var(--measure); }
+small, .text-soft { color: var(--ink-soft); font-size: var(--fs-sm); }
+a { color: var(--rose-700); text-underline-offset: 3px; }
+a:hover { color: var(--rose-900); }
+.num { font-variant-numeric: tabular-nums; }   /* Messwerte, Dosierungen */
+.term { font-style: italic; }                   /* Fachbegriff neben Alltagssprache */
+
+:focus-visible { outline: 3px solid var(--rose-500); outline-offset: 2px; }
+
+/* --- Layout -------------------------------------------------------------- */
+.container { width: min(1120px, 100% - 2 * var(--space-4)); margin-inline: auto; }
+.stack > * + * { margin-top: var(--space-4); }
+.grid { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+/* --- Kopfzeile ----------------------------------------------------------- */
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  border-top: 4px solid var(--rose-700);
+}
+.app-header .container {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-4); min-height: 64px;
+}
+.brand { display: flex; align-items: center; gap: var(--space-2); font-weight: 700; font-size: var(--fs-lg); color: var(--rose-900); text-decoration: none; }
+.brand-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--rose-700); position: relative; }
+.brand-mark::before, .brand-mark::after { content: ""; position: absolute; background: #fff; border-radius: 2px; }
+.brand-mark::before { width: 14px; height: 4px; left: 7px; top: 12px; }
+.brand-mark::after  { width: 4px; height: 14px; left: 12px; top: 7px; }
+.demo-flag { font-size: var(--fs-xs); color: var(--urgent); background: var(--urgent-bg); padding: 2px 10px; border-radius: var(--radius-pill); }
+
+/* --- Buttons ------------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  min-height: 48px; padding: 0 var(--space-5);
+  font: inherit; font-weight: 700; border-radius: var(--radius-field);
+  border: 2px solid transparent; cursor: pointer; text-decoration: none;
+}
+.btn-primary   { background: var(--rose-700); color: #fff; }
+.btn-primary:hover { background: var(--rose-900); }
+.btn-secondary { background: var(--surface); color: var(--rose-700); border-color: var(--rose-200); }
+.btn-secondary:hover { border-color: var(--rose-700); }
+.btn-emergency { background: var(--emergency); color: #fff; }
+.btn:disabled  { opacity: 0.5; cursor: not-allowed; }
+
+/* --- Formulare ----------------------------------------------------------- */
+.field { display: grid; gap: var(--space-1); }
+.field label { font-weight: 700; font-size: var(--fs-sm); }
+.field .hint { font-size: var(--fs-xs); color: var(--ink-soft); }
+input, select, textarea {
+  font: inherit; color: var(--ink); background: var(--surface);
+  border: 1.5px solid var(--line); border-radius: var(--radius-field);
+  padding: var(--space-3); min-height: 48px; width: 100%;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--rose-700); outline: none; box-shadow: 0 0 0 3px var(--rose-50); }
+.field.has-error input { border-color: var(--emergency); }
+.field .error { color: var(--emergency); font-size: var(--fs-sm); }
+
+/* --- Panels -------------------------------------------------------------- */
+.panel {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius-panel); padding: var(--space-5);
+  box-shadow: var(--shadow-panel);
+}
+.panel-rose { background: var(--rose-50); border-color: var(--rose-200); box-shadow: none; }
+.panel-data { background: var(--data-50); border-color: #CFE0EC; box-shadow: none; }
+
+/* --- Profil-Auswahl (eigenes Profil + Kinder) ---------------------------- */
+.profile-switch { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.profile-chip {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  border-radius: var(--radius-pill); border: 1.5px solid var(--line);
+  background: var(--surface); font: inherit; cursor: pointer;
+}
+.profile-chip[aria-pressed="true"] { border-color: var(--rose-700); background: var(--rose-50); }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 700;
+  background: var(--rose-200); color: var(--rose-900);
+}
+.avatar.child { background: var(--data-50); color: var(--data-700); }
+
+/* --- Einstieg Diagnose: zwei Wege ---------------------------------------- */
+.entry-option {
+  display: grid; gap: var(--space-2); text-align: left;
+  padding: var(--space-5); border-radius: var(--radius-panel);
+  border: 2px solid var(--line); background: var(--surface);
+  font: inherit; color: inherit; cursor: pointer;
+}
+.entry-option:hover, .entry-option[aria-pressed="true"] { border-color: var(--rose-700); }
+.entry-option .methods { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.method-tag { font-size: var(--fs-xs); padding: 2px 10px; border-radius: var(--radius-pill); background: var(--rose-50); color: var(--rose-900); }
+
+/* --- Dringlichkeit: Leiste links + Symbol + Text (nie nur Farbe) --------- */
+.urgency {
+  display: grid; grid-template-columns: auto 1fr; gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-field);
+  border-left: 8px solid currentColor;
+}
+.urgency strong { display: block; font-size: var(--fs-lg); }
+.urgency p { margin: var(--space-1) 0 0; color: var(--ink); }
+.urgency-emergency { color: var(--emergency); background: var(--emergency-bg); }
+.urgency-urgent    { color: var(--urgent);    background: var(--urgent-bg); }
+.urgency-routine   { color: var(--routine);   background: var(--routine-bg); }
+.urgency-ok        { color: var(--ok);        background: var(--ok-bg); }
+.urgency .icon { font-size: 1.5rem; line-height: 1; }
+
+/* --- Diagnosesicherheit (V / G / A / Z) ---------------------------------- */
+.certainty {
+  display: inline-grid; place-items: center; width: 28px; height: 28px;
+  border-radius: 6px; font-weight: 700; font-size: var(--fs-sm);
+  border: 1.5px solid currentColor;
+}
+.certainty-v { color: var(--urgent); }
+.certainty-g { color: var(--ok); }
+.certainty-a { color: var(--ink-soft); }
+.certainty-z { color: var(--data-700); }
+
+/* --- Differentialdiagnosen-Liste ----------------------------------------- */
+.ddx { list-style: none; margin: 0; padding: 0; }
+.ddx li {
+  display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: start;
+  padding: var(--space-3) 0; border-bottom: 1px solid var(--line);
+}
+.ddx .code { font-variant-numeric: tabular-nums; color: var(--ink-soft); font-size: var(--fs-sm); }
+.likelihood { width: 72px; height: 6px; border-radius: 3px; background: var(--line); margin-top: 10px; overflow: hidden; }
+.likelihood span { display: block; height: 100%; background: var(--rose-700); }
+
+/* --- Messwerte (Wearables) ----------------------------------------------- */
+.vital { display: grid; gap: 2px; }
+.vital .value { font-size: var(--fs-xl); font-weight: 700; color: var(--data-700); font-variant-numeric: tabular-nums; }
+.vital .unit  { font-size: var(--fs-sm); color: var(--ink-soft); font-weight: 400; }
+
+/* --- Bewegung ------------------------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  .btn, .entry-option, .profile-chip, input { transition: border-color .15s, background-color .15s; }
+}
+
+/* --- Mobil --------------------------------------------------------------- */
+@media (max-width: 600px) {
+  :root { --fs-2xl: 1.75rem; --fs-xl: 1.5rem; }
+  .panel { padding: var(--space-4); }
+  .btn { width: 100%; }
+}
+
+/* --- Druck / PDF-Bericht ------------------------------------------------- */
+@media print {
+  body { background: #fff; font-size: 10.5pt; }
+  .app-header, .btn, .profile-switch { display: none; }
+  .panel { box-shadow: none; border: none; padding: 0; }
+  .urgency { border-left-width: 4px; }
+  h1 { font-size: 18pt; } h2 { font-size: 14pt; } h3 { font-size: 12pt; }
+  a { color: var(--ink); text-decoration: none; }
+}
+</style></head><body>
+<header class="app-header">
+  <div class="container">
+    <a class="brand" href="#"><span class="brand-mark" aria-hidden="true"></span>MedAssist</a>
+    <span class="demo-flag">Demo – nicht für den klinischen Einsatz</span>
+  </div>
+</header>
+
+<main class="container stack" style="padding-block: var(--space-6);">
+
+  <section class="stack">
+    <h1>Für wen ist die Untersuchung?</h1>
+    <div class="profile-switch" role="group" aria-label="Profil wählen">
+      <button class="profile-chip" aria-pressed="false"><span class="avatar">KM</span>Karsten M.</button>
+      <button class="profile-chip" aria-pressed="true"><span class="avatar child">LM</span>Lena, 4 Jahre</button>
+      <button class="profile-chip" aria-pressed="false"><span class="avatar child">+</span>Kind hinzufügen</button>
+    </div>
+  </section>
+
+  <section class="grid">
+    <button class="entry-option" aria-pressed="true">
+      <h3>Beschwerden beschreiben</h3>
+      <span class="text-soft">Erzählen Sie in eigenen Worten, was los ist. Ein Foto hilft bei Hautveränderungen.</span>
+      <span class="methods"><span class="method-tag">Text</span><span class="method-tag">Sprachaufnahme</span><span class="method-tag">Foto</span></span>
+    </button>
+    <button class="entry-option">
+      <h3>Schritt für Schritt eingrenzen</h3>
+      <span class="text-soft">Körperlich oder seelisch? Wählen Sie die Körperstelle, dann folgen kurze Fragen.</span>
+      <span class="methods"><span class="method-tag">Körperkarte</span><span class="method-tag">Fragen</span></span>
+    </button>
+    <button class="entry-option">
+      <h3>Entwicklung prüfen</h3>
+      <span class="text-soft">Sprache, Bewegung, Verhalten: Was in Lenas Alter typisch ist und wann eine Abklärung sinnvoll ist.</span>
+      <span class="methods"><span class="method-tag">Logopädie</span><span class="method-tag">Ergotherapie</span><span class="method-tag">Psychologie</span></span>
+    </button>
+  </section>
+
+  <section class="stack">
+    <h2>Einschätzung der Dringlichkeit</h2>
+    <div class="urgency urgency-emergency"><span class="icon" aria-hidden="true">⚠</span><div><strong>Sofort Notruf 112</strong><p>Atemnot mit bläulichen Lippen ist ein Notfall.</p></div></div>
+    <div class="urgency urgency-urgent"><span class="icon" aria-hidden="true">!</span><div><strong>Heute ärztlich abklären</strong><p>Kinderarztpraxis oder Bereitschaftsdienst 116117.</p></div></div>
+    <div class="urgency urgency-routine"><span class="icon" aria-hidden="true">i</span><div><strong>In den nächsten Tagen</strong><p>Termin bei der Kinderarztpraxis vereinbaren und den Bericht mitnehmen.</p></div></div>
+    <div class="urgency urgency-ok"><span class="icon" aria-hidden="true">✓</span><div><strong>Beobachten</strong><p>Kein Hinweis auf eine dringende Abklärung. Bei Verschlechterung erneut prüfen.</p></div></div>
+  </section>
+
+  <section class="grid">
+    <div class="panel stack">
+      <h3>Differentialdiagnosen</h3>
+      <ul class="ddx">
+        <li><span class="certainty certainty-v" title="Verdacht">V</span><div>Atopische Dermatitis<br><span class="code">L20.8</span></div><div class="likelihood" aria-label="hoch"><span style="width:80%"></span></div></li>
+        <li><span class="certainty certainty-v" title="Verdacht">V</span><div>Kontaktdermatitis<br><span class="code">L25.9</span></div><div class="likelihood" aria-label="mittel"><span style="width:45%"></span></div></li>
+        <li><span class="certainty certainty-a" title="Ausschluss">A</span><div>Skabies<br><span class="code">B86</span></div><div class="likelihood" aria-label="niedrig"><span style="width:10%"></span></div></li>
+      </ul>
+    </div>
+    <div class="panel panel-data stack">
+      <h3>Smartwatch, letzte 7 Tage</h3>
+      <div class="grid">
+        <div class="vital"><span class="text-soft">Ruhepuls</span><span class="value">64 <span class="unit">bpm</span></span></div>
+        <div class="vital"><span class="text-soft">SpO₂</span><span class="value">97 <span class="unit">%</span></span></div>
+        <div class="vital"><span class="text-soft">Schlaf</span><span class="value">6,4 <span class="unit">h</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel stack">
+    <h3>Patientenprofil anlegen</h3>
+    <div class="grid">
+      <div class="field"><label for="n">Vorname</label><input id="n" value="Lena"></div>
+      <div class="field"><label for="g">Geburtsdatum</label><input id="g" value="12.03.2022"></div>
+      <div class="field has-error"><label for="w">Gewicht in kg</label><input id="w" value="1,6"><span class="error">Bitte prüfen: 1,6 kg ist für 4 Jahre ungewöhnlich niedrig.</span></div>
+    </div>
+    <div style="display:flex; gap:var(--space-3); flex-wrap:wrap;">
+      <button class="btn btn-primary">Profil speichern</button>
+      <button class="btn btn-secondary">Abbrechen</button>
+    </div>
+  </section>
+
+</main>
+</body></html>
