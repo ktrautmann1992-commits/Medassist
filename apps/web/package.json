@@ -13,7 +13,8 @@
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@medassist/core": "workspace:*",
@@ -30,6 +31,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "@types/node": "^22.15.0",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.2.0",

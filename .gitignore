@@ -18,3 +18,5 @@ apps/web/generated/
 .vercel
 .DS_Store
 *.log
+playwright-report/
+test-results/
