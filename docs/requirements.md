@@ -31,7 +31,7 @@ Sicherheitsrelevante Logik (Red Flags, Krisenpfad, Dosierung, Rollen) wird nie a
 | REQ-004 | Alle Web-Komponenten verwenden die Design-Variablen aus `/styles/style.css`; die Datei ist die einzige Quelle und wird global in `apps/web` eingebunden. | M | R | umgesetzt | – | `apps/web/app/layout.tsx` |
 | REQ-005 | Secrets werden nie im Repository gespeichert. `.env.example` listet alle Variablen ohne Werte. | M | R, T (CI) | umgesetzt | RISK-008 | `.env.example`, `.gitignore` |
 | REQ-006 | Serverfunktionen laufen in der Vercel-Region `fra1` (Frankfurt), festgelegt über `regions` in `vercel.json` (das frühere `preferredRegion` ist ab Next.js 16 veraltet). `maxDuration` wird pro Segment/Route explizit gesetzt. | M | R | umgesetzt | RISK-009 | `apps/web/vercel.json`, `export const maxDuration` |
-| REQ-007 | Bei jedem Pull Request laufen automatisiert Lint, Typecheck und Tests; Merge nur bei grünen Checks. | M | R | umgesetzt | RISK-011 | `.github/workflows/ci.yml` |
+| REQ-007 | Bei jedem Pull Request laufen automatisiert Lint, Typecheck und Tests (Unit-Tests und Playwright-Web-Abläufe); Merge nur bei grünen Checks. | M | R | umgesetzt | RISK-011 | `.github/workflows/ci.yml`, `apps/web/e2e/` |
 
 ### Registrierung, Rollen, Authentifizierung
 
