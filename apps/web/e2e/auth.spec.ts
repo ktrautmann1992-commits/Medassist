@@ -1,13 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { generate } from "otplib";
-
-const PASSWORT = "sicheres-Passwort-1";
-
-/**
- * REQ-021: Der Modus muss zum gestarteten Server passen – der webServer in
- * playwright.config.ts erbt dieselbe Umgebung (`ZWEI_FA_AKTIV`).
- */
-const ZWEI_FA_AKTIV = process.env.ZWEI_FA_AKTIV === "true";
+import { PASSWORT, ZWEI_FA_AKTIV, passwortSchritt } from "./helfer";
 
 async function registrieren(page: Page, rolle: "Patient" | "Arzt", email: string) {
   await page.goto("/registrieren");
@@ -30,13 +23,6 @@ async function registrieren(page: Page, rolle: "Patient" | "Arzt", email: string
   const link = page.getByRole("link", { name: "E-Mail-Adresse bestätigen" });
   await expect(link).toBeVisible();
   return (await link.getAttribute("href"))!;
-}
-
-async function passwortSchritt(page: Page, email: string, passwort = PASSWORT) {
-  await page.goto("/anmelden");
-  await page.getByLabel("E-Mail-Adresse").fill(email);
-  await page.getByLabel("Passwort").fill(passwort);
-  await page.getByRole("button", { name: "Weiter" }).click();
 }
 
 /** Gemeinsamer Anfang: Startseite, Registrierung, E-Mail-Bestätigung, falsches Passwort. */

@@ -103,5 +103,6 @@ describe("REQ-013 Basis-URL für Bestätigungslinks (APP_URL nur in Production n
     expect(envSchema.safeParse({ ...basis, APP_URL: "javascript:alert(1)" }).success).toBe(false);
     expect(envSchema.safeParse({ ...basis, APP_URL: "ftp://x.example" }).success).toBe(false);
     expect(envSchema.safeParse({ ...basis, APP_URL: "https://x.example" }).success).toBe(true);
+    expect(envSchema.safeParse({ ...basis, APP_URL: "http://localhost:3000" }).success).toBe(true);
   });
 });

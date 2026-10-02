@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { AppHeader } from "@medassist/ui";
 // REQ-004: einzige Quelle für Farben, Schrift und Komponenten-Styles.
 import "../../../styles/style.css";
+import { kopfNavigation } from "./kopf-navigation";
 
 export const metadata: Metadata = {
   title: "MedAssist – Demo",
@@ -14,12 +15,13 @@ export const metadata: Metadata = {
 // die Laufzeit wird pro Segment explizit begrenzt.
 export const maxDuration = 10;
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const navigation = await kopfNavigation();
   return (
     <html lang="de">
       <body>
-        {/* REQ-001: Demo-Hinweis in jeder Ansicht */}
-        <AppHeader />
+        {/* REQ-001: Demo-Hinweis in jeder Ansicht; REQ-118: Navigation für angemeldete Nutzer */}
+        <AppHeader navigation={navigation} />
         <main className="container stack" style={{ paddingBlock: "var(--space-6)" }}>
           {children}
         </main>

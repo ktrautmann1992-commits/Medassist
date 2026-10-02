@@ -25,7 +25,7 @@ export const envSchema = z
      * Öffentliche Basis-URL (Bestätigungslinks). Optional – nur in Production
      * nötig; sonst ermittelt `basisUrl()` sie aus den Vercel-Systemvariablen.
      */
-    APP_URL: z.preprocess((v) => (v === "" ? undefined : v), z.httpUrl().optional()),
+    APP_URL: z.preprocess((v) => (v === "" ? undefined : v), z.url({ protocol: /^https?$/, error: "APP_URL muss eine http(s)-URL sein." }).optional()),
     /**
      * REQ-015, REQ-021: Schalter für die Zwei-Faktor-Anmeldung. Standard in der
      * Testphase: aus (auch bei leerem Wert wie in `.env.example`). Andere Werte als

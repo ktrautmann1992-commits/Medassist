@@ -1,25 +1,33 @@
-import { BERECHTIGUNGEN, ROLLEN_BEZEICHNUNG, hatBerechtigung, type Berechtigung } from "@medassist/core";
+import {
+  BERECHTIGUNGEN,
+  ROLLEN_BEZEICHNUNG,
+  hatBerechtigung,
+  initialen,
+  profilKurzname,
+  sicheresAlter,
+  type Berechtigung,
+} from "@medassist/core";
+import { Panel, ProfilAuswahl, ProfilChip } from "@medassist/ui";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/guards";
 import { db } from "@/lib/db";
 import { zweiFaAktiv } from "@/lib/env";
-import { abmelden } from "../(auth)/anmelden/actions";
+import { stichtagHeute } from "@/lib/profile/format";
+import { profilFilter } from "@/lib/profile/filter";
+import { ladeZugaenglicheProfile } from "@/lib/profile/zugriff";
 
 export const dynamic = "force-dynamic";
 
 const FUNKTIONEN: Partial<Record<Berechtigung, string>> = {
-  "profil:eigenes:verwalten": "Eigenes Profil verwalten",
-  "profil:kinder:verwalten": "Kinderprofile anlegen",
   "fall:teilen": "Fall mit Ärztin oder Arzt teilen",
   "diagnose:verdacht": "Mögliche Ursachen („Verdacht – ärztlich abzuklären“)",
-  "patienten:verwalten": "Patienten verwalten",
   "fall:geteilte:einsehen": "Geteilte Fälle einsehen",
   "diagnose:differential": "Differentialdiagnosen mit ICD-10-GM",
   "therapieplan:voll": "Vollständiger Therapieplan",
   "medikation:empfehlen": "Medikationsplan mit Sicherheitsprüfungen",
 };
 
-export default async function Uebersicht() {
+export default async function Uebersicht({ searchParams }: { searchParams: Promise<{ profil?: string | string[] }> }) {
   // REQ-018: Rolle kommt aus der serverseitigen Sitzung, nicht aus dem Client.
   const { nutzer } = await requireUser();
   const approbation =
@@ -49,21 +57,92 @@ export default async function Uebersicht() {
           Approbationsnachweis: <strong>simuliert</strong> (Prototyp – keine echte Prüfung).
         </div>
       )}
-      <div className="panel stack">
-        <h2>Ihre Funktionen</h2>
+
+      {nutzer.rolle === "PATIENT" ? (
+        <ProfilWahl nutzer={nutzer} gewaehlt={(await searchParams).profil} />
+      ) : (
+        <ArztEinstieg nutzer={nutzer} />
+      )}
+
+      <Panel titel="Weitere Funktionen">
         <p className="text-soft">Folgen in den nächsten Meilensteinen.</p>
         <ul>
           {funktionen.map((b) => (
             <li key={b}>{FUNKTIONEN[b]}</li>
           ))}
         </ul>
-        {nutzer.rolle === "ARZT" && <Link href="/arzt/patienten">Zur Patientenliste</Link>}
-      </div>
-      <form action={abmelden}>
-        <button type="submit" className="btn btn-secondary">
-          Abmelden
-        </button>
-      </form>
+      </Panel>
     </section>
+  );
+}
+
+type Nutzer = Awaited<ReturnType<typeof requireUser>>["nutzer"];
+
+/** REQ-112: „Für wen ist die Untersuchung?“ – Auswahl nur aus zugänglichen Profilen. */
+async function ProfilWahl({ nutzer, gewaehlt }: { nutzer: Nutzer; gewaehlt: string | string[] | undefined }) {
+  const profile = await ladeZugaenglicheProfile(nutzer);
+  const stichtag = stichtagHeute();
+  const eigenes = profile.find((p) => p.istEigenesProfil);
+  // Die ID aus der URL wird nur übernommen, wenn sie zu einem zugänglichen Profil gehört.
+  const auswahl = profile.find((p) => p.id === gewaehlt) ?? eigenes ?? profile[0] ?? null;
+
+  return (
+    <Panel titel="Für wen ist die Untersuchung?">
+      <form method="get" action="/start">
+        <ProfilAuswahl label="Profil wählen">
+          {profile.map((p) => (
+            <ProfilChip
+              key={p.id}
+              name="profil"
+              value={p.id}
+              initialen={initialen(p.vorname, p.nachname)}
+              kind={p.istKinderprofil}
+              ausgewaehlt={auswahl?.id === p.id}
+              bezeichnung={profilKurzname(p, stichtag)}
+            />
+          ))}
+          {!eigenes && <ProfilChip href="/profile/neu" initialen="+" bezeichnung="Eigenes Profil anlegen" />}
+          <ProfilChip href="/profile/kind/neu" initialen="+" bezeichnung="Kind hinzufügen" kind />
+        </ProfilAuswahl>
+      </form>
+      {auswahl ? (
+        <div className="stack" aria-live="polite">
+          <p style={{ margin: 0 }} data-testid="auswahl">
+            Ausgewählt: <strong>{`${auswahl.vorname} ${auswahl.nachname}`}</strong>
+            {" · "}
+            {sicheresAlter(auswahl.geburtsdatum, stichtag)?.anzeige ?? "Alter unbekannt"}
+            {" · "}
+            {auswahl.istKinderprofil ? "Kinderprofil" : auswahl.istEigenesProfil ? "Eigenes Profil" : "Profil"}
+          </p>
+          <div className="actions">
+            <Link className="btn btn-secondary" href={`/profile/${auswahl.id}`}>
+              Profil ansehen
+            </Link>
+          </div>
+          <p className="text-soft">Beschwerden eingeben und Entwicklungs-Check folgen in den nächsten Meilensteinen.</p>
+        </div>
+      ) : (
+        <p className="text-soft">Legen Sie zuerst Ihr eigenes Profil oder ein Kinderprofil an.</p>
+      )}
+    </Panel>
+  );
+}
+
+async function ArztEinstieg({ nutzer }: { nutzer: Nutzer }) {
+  const anzahl = await db().patientenprofil.count({ where: profilFilter(nutzer) });
+  return (
+    <Panel titel="Patienten">
+      <p>
+        {anzahl === 1 ? "1 Patientenprofil" : `${anzahl} Patientenprofile`} angelegt.
+      </p>
+      <div className="actions">
+        <Link className="btn btn-primary" href="/arzt/patienten">
+          Zur Patientenliste
+        </Link>
+        <Link className="btn btn-secondary" href="/arzt/patienten/neu">
+          Patient anlegen
+        </Link>
+      </div>
+    </Panel>
   );
 }

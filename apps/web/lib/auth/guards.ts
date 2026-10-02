@@ -44,9 +44,14 @@ export async function requireBerechtigung(berechtigung: Berechtigung): Promise<A
  * Startseite, die angemeldete Nutzer direkt weiterleitet).
  */
 export async function hatVollenZugang(): Promise<boolean> {
+  return (await sitzungMitVollemZugang()) !== null;
+}
+
+/** Sitzung mit vollem Zugang oder `null` – ohne Umleitung (z. B. für die Navigation, REQ-118). */
+export async function sitzungMitVollemZugang(): Promise<AktuelleSitzung | null> {
   const sitzung = await aktuelleSitzung();
-  if (!sitzung) return false;
-  return pruefeZugang(sitzung.nutzer, sitzung, { zweiFaktorPflicht: zweiFaAktiv() }).erlaubt;
+  if (!sitzung) return null;
+  return pruefeZugang(sitzung.nutzer, sitzung, { zweiFaktorPflicht: zweiFaAktiv() }).erlaubt ? sitzung : null;
 }
 
 /**

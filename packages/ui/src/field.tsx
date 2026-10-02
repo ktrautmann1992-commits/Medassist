@@ -1,34 +1,21 @@
-import type { InputHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
+import { FeldMeldungen, feldBeschreibung } from "./feld-hilfen";
 
 export interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
   id: string;
-  label: string;
-  hinweis?: string;
+  /** Text oder Text mit Fachbegriff, z. B. `<>Vorerkrankungen (<span className="term">Anamnese</span>)</>`. */
+  label: ReactNode;
+  hinweis?: ReactNode;
   fehler?: string;
 }
 
-/** Formularfeld mit Label, Hinweis und zugänglicher Fehlermeldung. */
+/** Formularfeld mit Label, Hinweis und zugänglicher Fehlermeldung (REQ-103, REQ-117). */
 export function Field({ id, label, hinweis, fehler, ...input }: FieldProps) {
-  const beschreibung = [hinweis && `${id}-hinweis`, fehler && `${id}-fehler`].filter(Boolean).join(" ");
   return (
     <div className={fehler ? "field has-error" : "field"}>
       <label htmlFor={id}>{label}</label>
-      <input
-        id={id}
-        aria-invalid={fehler ? true : undefined}
-        aria-describedby={beschreibung || undefined}
-        {...input}
-      />
-      {hinweis && (
-        <span className="hint" id={`${id}-hinweis`}>
-          {hinweis}
-        </span>
-      )}
-      {fehler && (
-        <span className="error" id={`${id}-fehler`} role="alert">
-          {fehler}
-        </span>
-      )}
+      <input id={id} {...feldBeschreibung(id, hinweis, fehler)} {...input} />
+      <FeldMeldungen id={id} hinweis={hinweis} fehler={fehler} />
     </div>
   );
 }

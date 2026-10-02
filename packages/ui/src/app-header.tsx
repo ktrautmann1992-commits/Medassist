@@ -4,12 +4,14 @@ import { DemoHinweis } from "./demo-hinweis";
 export interface AppHeaderProps {
   /** Ziel des Marken-Links. */
   href?: string;
-  /** Zusätzliche Elemente rechts (z. B. Abmelden). */
+  /** Zusätzliche Elemente rechts neben dem Demo-Hinweis. */
   children?: ReactNode;
+  /** Hauptnavigation (zweite Zeile), nur für angemeldete Nutzer (REQ-118). */
+  navigation?: ReactNode;
 }
 
-/** Kopfzeile mit Marke und Demo-Hinweis (REQ-001). */
-export function AppHeader({ href = "/", children }: AppHeaderProps) {
+/** Kopfzeile mit Marke, Demo-Hinweis (REQ-001) und optionaler Navigation. */
+export function AppHeader({ href = "/", children, navigation }: AppHeaderProps) {
   return (
     <header className="app-header">
       <div className="container">
@@ -22,6 +24,11 @@ export function AppHeader({ href = "/", children }: AppHeaderProps) {
           {children}
         </div>
       </div>
+      {navigation && (
+        <nav className="app-nav" aria-label="Hauptnavigation">
+          <div className="container">{navigation}</div>
+        </nav>
+      )}
     </header>
   );
 }
