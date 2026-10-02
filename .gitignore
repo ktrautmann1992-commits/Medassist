@@ -1,0 +1,22 @@
+node_modules/
+.turbo/
+.next/
+dist/
+coverage/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma-Client (wird generiert)
+apps/web/generated/
+
+# Secrets – niemals committen (REQ-005)
+.env
+.env.*
+!.env.example
+
+.vercel
+.DS_Store
+*.log
+playwright-report/
+test-results/

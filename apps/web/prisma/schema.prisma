@@ -1,0 +1,662 @@
+// MedAssist – Datenmodell Meilenstein 1 (REQ-030 … REQ-039)
+// Demo – nicht für den klinischen Einsatz. Nur Testdaten.
+//
+// Konventionen:
+// - Abgeleitete Werte (Alter, BMI, korrigiertes Alter) werden NICHT gespeichert,
+//   sondern in packages/core berechnet (REQ-032, REQ-033, REQ-036).
+// - Geheimnisse (Passwort, Tokens) werden nur als Hash gespeichert, das TOTP-Secret
+//   verschlüsselt (REQ-012, REQ-013, REQ-017).
+// - Dateien (Fotos) liegen im Objektspeicher; hier steht nur der Schlüssel.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Aufzählungen
+// ---------------------------------------------------------------------------
+
+/// REQ-010: Rolle wird bei der Registrierung gewählt.
+enum Rolle {
+  PATIENT
+  ARZT
+}
+
+/// REQ-014: Im Prototyp ist nur SIMULIERT im Einsatz.
+enum ApprobationsStatus {
+  SIMULIERT
+  AUSSTEHEND
+  GEPRUEFT
+  ABGELEHNT
+}
+
+enum Geschlecht {
+  WEIBLICH
+  MAENNLICH
+  DIVERS
+  UNBEKANNT
+}
+
+enum SchwangerschaftsStatus {
+  NEIN
+  SCHWANGER
+  STILLEND
+  UNBEKANNT
+}
+
+/// Nieren-/Leberfunktion (Arzt-Rolle). Abstufung grob; Details über Laborwerte.
+enum OrganFunktion {
+  NORMAL
+  LEICHT_EINGESCHRAENKT
+  MITTELGRADIG_EINGESCHRAENKT
+  SCHWER_EINGESCHRAENKT
+  UNBEKANNT
+}
+
+enum RauchStatus {
+  NIE
+  EHEMALIG
+  AKTUELL
+  UNBEKANNT
+}
+
+enum AlkoholKonsum {
+  KEIN
+  GELEGENTLICH
+  REGELMAESSIG
+  UNBEKANNT
+}
+
+enum Aktivitaet {
+  KAUM
+  GELEGENTLICH
+  REGELMAESSIG
+  UNBEKANNT
+}
+
+enum AllergieTyp {
+  ALLERGIE
+  UNVERTRAEGLICHKEIT
+}
+
+/// Kinder-Vorsorgeuntersuchungen laut CLAUDE.md §3a (U1–U9, J1).
+/// U7a ist Teil der Kinder-Richtlinie des G-BA und daher mit aufgeführt.
+enum Vorsorge {
+  U1
+  U2
+  U3
+  U4
+  U5
+  U6
+  U7
+  U7A
+  U8
+  U9
+  J1
+}
+
+enum VorsorgeErgebnis {
+  UNAUFFAELLIG
+  AUFFAELLIG
+  UNBEKANNT
+}
+
+enum Einrichtung {
+  KEINE
+  KRIPPE
+  KITA
+  SCHULE
+  SONSTIGE
+}
+
+enum Sprachsituation {
+  EINSPRACHIG
+  MEHRSPRACHIG
+}
+
+/// CLAUDE.md §5: körperlich / seelisch / Entwicklungs-Check (nur Kinder).
+enum FallArt {
+  KOERPERLICH
+  PSYCHISCH
+  ENTWICKLUNG
+}
+
+/// Einstiegsweg: Weg 1 Freitext, Weg 2 geführt, Weg 3 Entwicklungs-Check.
+enum FallWeg {
+  FREITEXT
+  GEFUEHRT
+  ENTWICKLUNG
+}
+
+enum FallStatus {
+  ENTWURF
+  IN_EINGRENZUNG
+  NOTFALLHINWEIS
+  KRISENHINWEIS
+  ABGESCHLOSSEN
+}
+
+/// Dringlichkeit mit eigenen Farben + Symbol + Text (CLAUDE.md §13).
+enum Dringlichkeit {
+  NOTFALL
+  DRINGEND
+  ROUTINE
+  BEOBACHTEN
+}
+
+enum EingabeTyp {
+  TEXT
+  SPRACH_TRANSKRIPT
+  ANTWORT
+  KOERPERREGION
+}
+
+enum BefundTyp {
+  ANAMNESE
+  UNTERSUCHUNG
+  LABOR
+  BILDGEBUNG
+  WEARABLE
+  SONSTIGES
+}
+
+/// Diagnosesicherheit nach ICD-10-GM: V Verdacht, G gesichert, A Ausschluss, Z Zustand nach.
+enum Diagnosesicherheit {
+  V
+  G
+  A
+  Z
+}
+
+/// Herkunft eines Ergebnisses – Regeln haben Vorrang vor der KI (CLAUDE.md §7).
+enum Herkunft {
+  REGEL
+  KI
+  ARZT
+}
+
+enum PlanTyp {
+  VERHALTENSHINWEISE
+  FACHARZT_EMPFEHLUNG
+  THERAPIEPLAN
+  MEDIKATIONSPLAN
+  UEBERWEISUNG
+  KONTROLLE
+  FOERDERIDEEN
+}
+
+/// REQ-038: Einwilligungen je Zweck (DSGVO Art. 9).
+enum EinwilligungsZweck {
+  NUTZUNGSBEDINGUNGEN
+  GESUNDHEITSDATEN
+  KI_VERARBEITUNG
+  FOTO_VERARBEITUNG
+  SPRACH_VERARBEITUNG
+  WEARABLE_DATEN
+  FALL_FREIGABE
+}
+
+// ---------------------------------------------------------------------------
+// Konto, Authentifizierung
+// ---------------------------------------------------------------------------
+
+model Nutzer {
+  id                     String    @id @default(cuid())
+  email                  String    @unique
+  /// REQ-012: Argon2id-Hash, nie Klartext.
+  passwortHash           String
+  /// REQ-010: bei Registrierung gewählt, durch den Nutzer nicht änderbar.
+  rolle                  Rolle
+  emailVerifiziertAm     DateTime?
+  /// REQ-015: TOTP-Secret, AES-256-GCM-verschlüsselt.
+  totpSecretVerschl      String?
+  totpAktiviertAm        DateTime?
+  /// Replay-Schutz: zuletzt akzeptierter TOTP-Zeitschritt.
+  totpLetzterZeitschritt Int?
+  /// REQ-020: Kontosperre.
+  fehlversuche           Int       @default(0)
+  gesperrtBis            DateTime?
+  erstelltAm             DateTime  @default(now())
+  aktualisiertAm         DateTime  @updatedAt
+
+  sitzungen            Sitzung[]
+  emailVerifizierungen EmailVerifizierung[]
+  approbationsnachweis Approbationsnachweis?
+  einwilligungen       Einwilligung[]
+
+  /// Eigenes Profil (Patient) bzw. später Jugendlicher mit eigenem Zugang.
+  eigenesProfil       Patientenprofil?    @relation("Kontoinhaber")
+  angelegteProfile    Patientenprofil[]   @relation("AngelegtVon")
+  sorgeberechtigungen Sorgeberechtigung[]
+  sorgeEinladungen    SorgeEinladung[]    @relation("EingeladenVon")
+
+  erstellteFaelle    Fall[]     @relation("FallErstelltVon")
+  eingaben           Eingabe[]
+  fotos              Foto[]
+  befunde            Befund[]
+  plaene             Plan[]
+  diagnosen          Diagnose[]
+  erteilteFreigaben  Freigabe[] @relation("FreigabeErteiltVon")
+  erhalteneFreigaben Freigabe[] @relation("FreigabeAnArzt")
+}
+
+/// REQ-017: Serverseitige Sitzung; im Cookie steht nur das Token, hier sein SHA-256-Hash.
+model Sitzung {
+  id              String    @id @default(cuid())
+  tokenHash       String    @unique
+  nutzerId        String
+  nutzer          Nutzer    @relation(fields: [nutzerId], references: [id], onDelete: Cascade)
+  /// REQ-016: gesetzt, sobald der TOTP-Code in dieser Sitzung bestätigt wurde.
+  zweiterFaktorAm DateTime?
+  laeuftAbAm      DateTime
+  erstelltAm      DateTime  @default(now())
+
+  @@index([nutzerId])
+}
+
+/// REQ-013: Einmal-Token zur E-Mail-Bestätigung (nur Hash gespeichert).
+model EmailVerifizierung {
+  id          String    @id @default(cuid())
+  tokenHash   String    @unique
+  nutzerId    String
+  nutzer      Nutzer    @relation(fields: [nutzerId], references: [id], onDelete: Cascade)
+  laeuftAbAm  DateTime
+  verwendetAm DateTime?
+  erstelltAm  DateTime  @default(now())
+
+  @@index([nutzerId])
+}
+
+/// REQ-014: Approbationsnachweis (Prototyp: Prüfung simuliert).
+model Approbationsnachweis {
+  id                 String             @id @default(cuid())
+  nutzerId           String             @unique
+  nutzer             Nutzer             @relation(fields: [nutzerId], references: [id], onDelete: Cascade)
+  behoerde           String
+  datum              DateTime           @db.Date
+  status             ApprobationsStatus @default(SIMULIERT)
+  /// Später: Referenz auf hochgeladenes Dokument im Objektspeicher.
+  dokumentSchluessel String?
+  geprueftAm         DateTime?
+  erstelltAm         DateTime           @default(now())
+}
+
+/// REQ-038: Einwilligung je Zweck mit Version, Zeitpunkt und Widerruf.
+model Einwilligung {
+  id           String             @id @default(cuid())
+  nutzerId     String
+  nutzer       Nutzer             @relation(fields: [nutzerId], references: [id], onDelete: Cascade)
+  /// Optional: Einwilligung bezieht sich auf ein bestimmtes (Kinder-)Profil.
+  profilId     String?
+  profil       Patientenprofil?   @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  zweck        EinwilligungsZweck
+  /// Bei WEARABLE_DATEN: Datentyp (z. B. „herzfrequenz“, „spo2“) – Einwilligung je Datentyp.
+  datentyp     String?
+  /// Version des Einwilligungstextes.
+  textVersion  String
+  erteiltAm    DateTime           @default(now())
+  widerrufenAm DateTime?
+
+  @@index([nutzerId, zweck])
+}
+
+// ---------------------------------------------------------------------------
+// Patientenprofil (CLAUDE.md §3) und Kinderprofile (§3a)
+// ---------------------------------------------------------------------------
+
+model Patientenprofil {
+  id              String  @id @default(cuid())
+  /// REQ-034: Konto, dem das Profil gehört. Eigenes Profil eines Patienten;
+  /// bei Kindern zunächst leer, später Jugendlicher mit eigenem Zugang.
+  kontoinhaberId  String? @unique
+  kontoinhaber    Nutzer? @relation("Kontoinhaber", fields: [kontoinhaberId], references: [id], onDelete: SetNull)
+  /// Wer das Profil angelegt hat (Patient für sich/Kind oder Arzt für eigene Patienten).
+  angelegtVonId   String
+  angelegtVon     Nutzer  @relation("AngelegtVon", fields: [angelegtVonId], references: [id], onDelete: Restrict)
+  istKinderprofil Boolean @default(false)
+
+  // --- Stammdaten -----------------------------------------------------------
+  vorname          String
+  nachname         String
+  /// Alter wird berechnet (REQ-032).
+  geburtsdatum     DateTime               @db.Date
+  geschlecht       Geschlecht
+  /// Aktuelle Werte; Verlauf in `Wachstumsmessung`. BMI wird berechnet (REQ-033).
+  groesseCm        Decimal?               @db.Decimal(5, 1)
+  gewichtKg        Decimal?               @db.Decimal(6, 3)
+  schwangerschaft  SchwangerschaftsStatus @default(UNBEKANNT)
+  /// Arzt-Rolle.
+  nierenfunktion   OrganFunktion          @default(UNBEKANNT)
+  leberfunktion    OrganFunktion          @default(UNBEKANNT)
+  familienanamnese String?
+  rauchen          RauchStatus            @default(UNBEKANNT)
+  packungsjahre    Decimal?               @db.Decimal(5, 1)
+  alkohol          AlkoholKonsum          @default(UNBEKANNT)
+  sport            Aktivitaet             @default(UNBEKANNT)
+  impfstatusNotiz  String?
+
+  // --- Kinder (§3a) ---------------------------------------------------------
+  /// Gestationsalter bei Geburt, z. B. 32+4 → Wochen 32, Tage 4. Für korrigiertes Alter (REQ-036).
+  sswBeiGeburtWochen     Int?
+  sswBeiGeburtTage       Int?
+  geburtsgewichtG        Int?
+  einrichtung            Einrichtung?
+  einrichtungName        String?
+  klassenstufe           Int?
+  sprachsituation        Sprachsituation?
+  /// Gesprochene Sprachen (z. B. ["Deutsch", "Türkisch"]).
+  sprachen               String[]
+  /// REQ-034: Bestätigung, sorgeberechtigt zu sein (Prototyp: Checkbox).
+  sorgerechtBestaetigtAm DateTime?
+
+  erstelltAm     DateTime @default(now())
+  aktualisiertAm DateTime @updatedAt
+
+  sorgeberechtigte Sorgeberechtigung[]
+  sorgeEinladungen SorgeEinladung[]
+  vorerkrankungen  Vorerkrankung[]
+  operationen      Operation[]
+  allergien        Allergie[]
+  dauermedikation  Dauermedikation[]
+  laborwerte       Laborwert[]
+  impfungen        Impfung[]
+  vorsorge         Vorsorgeuntersuchung[]
+  wachstum         Wachstumsmessung[]
+  einwilligungen   Einwilligung[]
+  faelle           Fall[]
+
+  @@index([angelegtVonId])
+}
+
+/// REQ-034: `sorgeberechtigte[]` eines Kinderprofils.
+model Sorgeberechtigung {
+  id           String          @id @default(cuid())
+  profilId     String
+  profil       Patientenprofil @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  nutzerId     String
+  nutzer       Nutzer          @relation(fields: [nutzerId], references: [id], onDelete: Cascade)
+  /// Zeitpunkt der Bestätigung des Sorgerechts durch diesen Nutzer.
+  bestaetigtAm DateTime        @default(now())
+
+  @@unique([profilId, nutzerId])
+  @@index([nutzerId])
+}
+
+/// Einladung eines zweiten Sorgeberechtigten (§3a, optional).
+model SorgeEinladung {
+  id              String          @id @default(cuid())
+  profilId        String
+  profil          Patientenprofil @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  email           String
+  tokenHash       String          @unique
+  eingeladenVonId String
+  eingeladenVon   Nutzer          @relation("EingeladenVon", fields: [eingeladenVonId], references: [id], onDelete: Cascade)
+  laeuftAbAm      DateTime
+  angenommenAm    DateTime?
+  erstelltAm      DateTime        @default(now())
+
+  @@index([profilId])
+}
+
+model Vorerkrankung {
+  id          String          @id @default(cuid())
+  profilId    String
+  profil      Patientenprofil @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  /// ICD-10-GM-Code (BfArM), optional – Freitext ist ebenfalls zulässig.
+  icd10Code   String?
+  bezeichnung String
+  freitext    String?
+  seit        DateTime?       @db.Date
+
+  @@index([profilId])
+}
+
+model Operation {
+  id          String          @id @default(cuid())
+  profilId    String
+  profil      Patientenprofil @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  bezeichnung String
+  datum       DateTime?       @db.Date
+  notiz       String?
+
+  @@index([profilId])
+}
+
+model Allergie {
+  id        String          @id @default(cuid())
+  profilId  String
+  profil    Patientenprofil @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  typ       AllergieTyp
+  /// Auslöser, z. B. Wirkstoff („Penicillin“) oder Nahrungsmittel.
+  ausloeser String
+  reaktion  String?
+
+  @@index([profilId])
+}
+
+model Dauermedikation {
+  id        String          @id @default(cuid())
+  profilId  String
+  profil    Patientenprofil @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  wirkstoff String
+  staerke   String?
+  dosierung String?
+  seit      DateTime?       @db.Date
+
+  @@index([profilId])
+}
+
+/// Optionale Laborwerte (z. B. Kreatinin, eGFR) – Arzt-Rolle.
+model Laborwert {
+  id         String          @id @default(cuid())
+  profilId   String
+  profil     Patientenprofil @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  parameter  String
+  wert       Decimal         @db.Decimal(12, 4)
+  einheit    String
+  gemessenAm DateTime
+
+  @@index([profilId, parameter])
+}
+
+model Impfung {
+  id        String          @id @default(cuid())
+  profilId  String
+  profil    Patientenprofil @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  /// Erkrankung/Antigen, z. B. „Masern“.
+  gegen     String
+  impfstoff String?
+  datum     DateTime?       @db.Date
+  dosisNr   Int?
+
+  @@index([profilId])
+}
+
+model Vorsorgeuntersuchung {
+  id              String           @id @default(cuid())
+  profilId        String
+  profil          Patientenprofil  @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  typ             Vorsorge
+  durchgefuehrtAm DateTime?        @db.Date
+  ergebnis        VorsorgeErgebnis @default(UNBEKANNT)
+  notiz           String?
+
+  @@unique([profilId, typ])
+}
+
+/// Größe/Gewicht im Verlauf – Grundlage für Perzentilen (Meilenstein 2).
+model Wachstumsmessung {
+  id           String          @id @default(cuid())
+  profilId     String
+  profil       Patientenprofil @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  gemessenAm   DateTime        @db.Date
+  groesseCm    Decimal?        @db.Decimal(5, 1)
+  gewichtKg    Decimal?        @db.Decimal(6, 3)
+  kopfumfangCm Decimal?        @db.Decimal(4, 1)
+
+  @@index([profilId, gemessenAm])
+}
+
+// ---------------------------------------------------------------------------
+// Fall und Ablauf (CLAUDE.md §5)
+// ---------------------------------------------------------------------------
+
+model Fall {
+  id              String          @id @default(cuid())
+  profilId        String
+  profil          Patientenprofil @relation(fields: [profilId], references: [id], onDelete: Cascade)
+  erstelltVonId   String
+  erstelltVon     Nutzer          @relation("FallErstelltVon", fields: [erstelltVonId], references: [id], onDelete: Restrict)
+  art             FallArt
+  weg             FallWeg
+  status          FallStatus      @default(ENTWURF)
+  dringlichkeit   Dringlichkeit?
+  /// Version des Regelwerks, mit dem zuletzt bewertet wurde.
+  regelVersion    String?
+  erstelltAm      DateTime        @default(now())
+  aktualisiertAm  DateTime        @updatedAt
+  abgeschlossenAm DateTime?
+
+  eingaben  Eingabe[]
+  fotos     Foto[]
+  befunde   Befund[]
+  diagnosen Diagnose[]
+  plaene    Plan[]
+  freigaben Freigabe[]
+
+  @@index([profilId])
+  @@index([erstelltVonId])
+}
+
+model Eingabe {
+  id            String     @id @default(cuid())
+  fallId        String
+  fall          Fall       @relation(fields: [fallId], references: [id], onDelete: Cascade)
+  autorId       String
+  autor         Nutzer     @relation(fields: [autorId], references: [id], onDelete: Restrict)
+  typ           EingabeTyp
+  /// Text, Transkript (ggf. korrigiert) oder Antwort.
+  inhalt        String
+  /// Bei geführten Fragen: Frage-ID aus dem Regelwerk.
+  frageId       String?
+  koerperregion String?
+  /// Bei Sprachaufnahme: wurde das Transkript vor dem Absenden korrigiert?
+  korrigiert    Boolean    @default(false)
+  /// Von der KI strukturierte Symptome (validiertes JSON).
+  strukturiert  Json?
+  erstelltAm    DateTime   @default(now())
+
+  @@index([fallId])
+}
+
+model Foto {
+  id                  String    @id @default(cuid())
+  fallId              String
+  fall                Fall      @relation(fields: [fallId], references: [id], onDelete: Cascade)
+  hochgeladenVonId    String
+  hochgeladenVon      Nutzer    @relation(fields: [hochgeladenVonId], references: [id], onDelete: Restrict)
+  /// Schlüssel im privaten EU-Objektspeicher; Zugriff nur über signierte URLs.
+  speicherSchluessel  String    @unique
+  mimeType            String
+  groesseBytes        Int
+  /// Pseudonymisierung: EXIF/GPS entfernt.
+  metadatenEntferntAm DateTime?
+  koerperregion       String?
+  aufgenommenAm       DateTime?
+  /// KI-Beschreibung (Morphologie, Lokalisation, Ausdehnung) – nur Hinweis.
+  kiBeschreibung      Json?
+  erstelltAm          DateTime  @default(now())
+
+  @@index([fallId])
+}
+
+model Befund {
+  id              String    @id @default(cuid())
+  fallId          String
+  fall            Fall      @relation(fields: [fallId], references: [id], onDelete: Cascade)
+  erfasstVonId    String
+  erfasstVon      Nutzer    @relation(fields: [erfasstVonId], references: [id], onDelete: Restrict)
+  typ             BefundTyp
+  bezeichnung     String
+  wert            String?
+  einheit         String?
+  referenzbereich String?
+  auffaellig      Boolean?
+  /// Datenquelle, z. B. „Apple Watch (HealthKit)“ – im Bericht ausgewiesen.
+  quelle          String?
+  erhobenAm       DateTime  @default(now())
+
+  @@index([fallId])
+}
+
+model Diagnose {
+  id                 String             @id @default(cuid())
+  fallId             String
+  fall               Fall               @relation(fields: [fallId], references: [id], onDelete: Cascade)
+  /// Gesetzt, wenn ein Arzt die Diagnose erfasst oder bestätigt hat.
+  arztId             String?
+  arzt               Nutzer?            @relation(fields: [arztId], references: [id], onDelete: SetNull)
+  icd10Code          String?
+  bezeichnung        String
+  sicherheit         Diagnosesicherheit
+  istArbeitsdiagnose Boolean            @default(false)
+  /// Relative Einschätzung 0–1 (nur Darstellung, keine Wahrscheinlichkeit im statistischen Sinn).
+  einschaetzung      Float?
+  begruendung        String?
+  /// Bei Ausschluss: warum.
+  ausschlussGrund    String?
+  /// Quellen: [{ titel, version, url }] – Leitlinie mit Version.
+  quellen            Json?
+  herkunft           Herkunft
+  regelVersion       String?
+  promptVersion      String?
+  modellVersion      String?
+  erstelltAm         DateTime           @default(now())
+
+  @@index([fallId])
+}
+
+model Plan {
+  id            String   @id @default(cuid())
+  fallId        String
+  fall          Fall     @relation(fields: [fallId], references: [id], onDelete: Cascade)
+  erstelltVonId String
+  erstelltVon   Nutzer   @relation(fields: [erstelltVonId], references: [id], onDelete: Restrict)
+  typ           PlanTyp
+  /// Strukturierter Inhalt (validiertes JSON, Schema je Typ in packages/core).
+  inhalt        Json
+  /// Empfohlene Fachrichtung (Patient) bzw. Überweisungsziel (Arzt).
+  fachrichtung  String?
+  /// Durchgeführte Sicherheitsprüfungen (Wechselwirkungen, Allergien, KI).
+  pruefungen    Json?
+  herkunft      Herkunft
+  regelVersion  String?
+  erstelltAm    DateTime @default(now())
+
+  @@index([fallId])
+}
+
+/// REQ-037: Fall teilen Patient → Arzt; jederzeit widerrufbar.
+model Freigabe {
+  id           String    @id @default(cuid())
+  fallId       String
+  fall         Fall      @relation(fields: [fallId], references: [id], onDelete: Cascade)
+  erteiltVonId String
+  erteiltVon   Nutzer    @relation("FreigabeErteiltVon", fields: [erteiltVonId], references: [id], onDelete: Cascade)
+  arztId       String
+  arzt         Nutzer    @relation("FreigabeAnArzt", fields: [arztId], references: [id], onDelete: Cascade)
+  /// Was geteilt wird.
+  inklFotos    Boolean   @default(true)
+  inklWearable Boolean   @default(true)
+  erteiltAm    DateTime  @default(now())
+  widerrufenAm DateTime?
+
+  @@index([arztId, widerrufenAm])
+  @@index([fallId])
+}

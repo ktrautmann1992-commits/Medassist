@@ -1,0 +1,132 @@
+# Anforderungen – MedAssist (Prototyp)
+
+> Demo – nicht für den klinischen Einsatz. Dieses Dokument ist IEC-62304-orientiert aufgebaut:
+> Jede Anforderung hat eine stabile ID. Code und Tests verweisen auf diese IDs
+> (Kommentar `// REQ-xxx` bzw. Testname mit `REQ-xxx`). Zugehörige Risiken stehen in
+> [`risks.md`](./risks.md).
+
+## Konventionen
+
+| Feld | Bedeutung |
+|---|---|
+| **ID** | `REQ-<Nummer>`, wird nie wiederverwendet |
+| **Priorität** | M = muss, S = soll, K = kann |
+| **Status** | offen · umgesetzt · verifiziert (Test vorhanden und grün) |
+| **Verifikation** | Test (T), Review/Inspektion (R), Demo (D) |
+| **Risiko** | Verweis auf `RISK-xxx` in `risks.md` |
+
+Sicherheitsrelevante Logik (Red Flags, Krisenpfad, Dosierung, Rollen) wird nie ausschließlich in der KI umgesetzt (CLAUDE.md §12).
+
+---
+
+## Meilenstein 1 – Grundgerüst, Datenmodell, Auth
+
+### Allgemein / Plattform
+
+| ID | Anforderung | Prio | Verifikation | Status | Risiko | Umsetzung |
+|---|---|---|---|---|---|---|
+| REQ-001 | Jede Ansicht der Web-App zeigt sichtbar den Hinweis „Demo – nicht für den klinischen Einsatz“. | M | T, D | umgesetzt | RISK-001 | `packages/ui/src/demo-hinweis.tsx`, `apps/web/app/layout.tsx` |
+| REQ-002 | Der Prototyp verarbeitet ausschließlich Testdaten; die Registrierung verlangt die Bestätigung, keine echten Gesundheitsdaten einzugeben. | M | T, R | umgesetzt | RISK-002 | `packages/core/src/auth/schemas.ts` |
+| REQ-003 | Das Projekt ist ein Monorepo (Turborepo, pnpm-Workspaces) mit `apps/web`, `apps/mobile`, `packages/core`, `packages/ui`. `packages/core` hat keine Abhängigkeit zu Vercel-spezifischen Diensten. | M | R | umgesetzt | RISK-010 | Repo-Struktur |
+| REQ-004 | Alle Web-Komponenten verwenden die Design-Variablen aus `/styles/style.css`; die Datei ist die einzige Quelle und wird global in `apps/web` eingebunden. | M | R | umgesetzt | – | `apps/web/app/layout.tsx` |
+| REQ-005 | Secrets werden nie im Repository gespeichert. `.env.example` listet alle Variablen ohne Werte. Serverseitige Variablen werden beim Start validiert (`envSchema`): `DATABASE_URL` ist immer Pflicht; `TOTP_ENCRYPTION_KEY` nur bei `ZWEI_FA_AKTIV=true`, muss aber, wenn gesetzt, in jedem Modus gültig sein (32 Byte, Base64). | M | R, T (CI) | umgesetzt | RISK-008 | `.env.example`, `.gitignore`, `apps/web/lib/env.ts` (Tests `env.test.ts`) |
+| REQ-006 | Serverfunktionen laufen in der Vercel-Region `fra1` (Frankfurt), festgelegt über `regions` in `vercel.json` (das frühere `preferredRegion` ist ab Next.js 16 veraltet). `maxDuration` wird pro Segment/Route explizit gesetzt. | M | R | umgesetzt | RISK-009 | `apps/web/vercel.json`, `export const maxDuration` |
+| REQ-007 | Bei jedem Pull Request laufen automatisiert Lint, Typecheck und Tests (Unit-Tests und Playwright-Web-Abläufe); Merge nur bei grünen Checks. | M | R | umgesetzt | RISK-011 | `.github/workflows/ci.yml`, `apps/web/e2e/` |
+| REQ-022 | Datenbank-Migrationen laufen ausschließlich automatisiert in der Deploy-Pipeline: Jeder Vercel-Build (Production **und** Preview) führt vor `next build` `prisma migrate deploy` aus. Fehlt die Datenbank-URL oder schlägt eine Migration fehl, bricht der Build ab (kein Deployment ohne Migration). Für Migrationen wird die direkte Verbindung `DATABASE_URL_UNPOOLED` bevorzugt, sonst `DATABASE_URL`; die App nutzt zur Laufzeit `DATABASE_URL`. Lokale Builds und der CI-Checks-Job migrieren nicht und brauchen keine Datenbank. | M | T (lokal simuliert, CI-E2E), R | umgesetzt | RISK-014 | `apps/web/vercel.json` (`buildCommand`), `apps/web/scripts/migrate-deploy.mjs`, `apps/web/prisma.config.ts`, `.github/workflows/ci.yml` |
+
+### Registrierung, Rollen, Authentifizierung
+
+| ID | Anforderung | Prio | Verifikation | Status | Risiko | Umsetzung |
+|---|---|---|---|---|---|---|
+| REQ-010 | Bei der Registrierung wählt der Nutzer genau eine Rolle: **Patient** oder **Arzt**. Die Rolle ist danach nicht durch den Nutzer änderbar. | M | T | umgesetzt | RISK-003 | `packages/core/src/auth/schemas.ts`, `apps/web/app/(auth)/registrieren` |
+| REQ-011 | Registrierung erfordert E-Mail, Passwort (min. 12 Zeichen, nicht nur eine Zeichenklasse) und Zustimmung zu Nutzungsbedingungen/Datenschutz (Einwilligung gemäß DSGVO Art. 9 wird als Datensatz `Einwilligung` gespeichert). | M | T | umgesetzt | RISK-004 | `packages/core/src/auth/schemas.ts` |
+| REQ-012 | Passwörter werden ausschließlich als Argon2id-Hash gespeichert. | M | T | umgesetzt | RISK-004 | `apps/web/lib/auth/password.ts` |
+| REQ-013 | Die E-Mail-Adresse muss vor dem ersten Login bestätigt werden (Einmal-Token, 24 h gültig, nur Hash gespeichert). Im Prototyp wird der Bestätigungslink angezeigt statt versendet. Basis-URL des Links: `APP_URL` (Production), sonst in Preview die Vercel-Branch-URL (`VERCEL_BRANCH_URL`, ersatzweise `VERCEL_URL`), lokal `http://localhost:3000` (`basisUrl()`). | M | T | umgesetzt | RISK-004 | `apps/web/lib/auth/tokens.ts`, `apps/web/app/(auth)/verifizieren`, `apps/web/lib/env.ts` (`basisUrl`) |
+| REQ-014 | Nutzer mit Rolle Arzt hinterlegen bei der Registrierung einen Approbationsnachweis (Approbationsbehörde, Datum). Im Prototyp wird die Prüfung **simuliert** und als `SIMULIERT` gekennzeichnet; die Oberfläche weist darauf hin. | M | T, D | umgesetzt | RISK-003 | `packages/core/src/auth/schemas.ts`, Modell `Approbationsnachweis` |
+| REQ-015 | Zwei-Faktor-Authentifizierung (TOTP, RFC 6238). Ist sie aktiv (`ZWEI_FA_AKTIV=true`), erhält ein Konto ohne eingerichtete und bestätigte 2FA keinen Zugriff auf geschützte Bereiche. Der Schalter wird ausschließlich serverseitig ausgewertet (`pruefeZugang` mit `zweiFaktorPflicht`). In der Testphase ist die 2FA per Standard **aus** (Nutzerentscheidung); dann genügen Passwort und bestätigte E-Mail (REQ-013), und die Oberfläche zeigt den Hinweis „Testphase: Zwei-Faktor-Anmeldung deaktiviert“. Vor Verarbeitung echter Daten ist sie Pflicht (REQ-021). | M | T | umgesetzt | RISK-004 | `packages/core/src/auth/permissions.ts`, `apps/web/lib/env.ts`, `apps/web/lib/auth/guards.ts`, `apps/web/lib/auth/totp.ts` |
+| REQ-016 | Bei aktiver 2FA erfolgt der Login zweistufig: Passwort (Teilsitzung, 10 min), danach TOTP-Code. Erst nach beiden Schritten wird die Sitzung als vollständig authentifiziert markiert. Bei abgeschalteter 2FA erzeugt die erfolgreiche Passwortanmeldung direkt eine volle Sitzung (12 h, `zweiterFaktorAm` leer); die 2FA-Seiten leiten dann auf `/start` bzw. `/anmelden` um. Wird die 2FA wieder eingeschaltet, verlangen solche Sitzungen sofort den zweiten Faktor. | M | T | umgesetzt | RISK-004 | `apps/web/app/(auth)/anmelden`, `apps/web/app/(auth)/2fa`, `apps/web/lib/auth/session.ts` |
+| REQ-017 | Sitzungen sind serverseitig gespeichert; das Cookie enthält nur ein zufälliges Token (httpOnly, Secure, SameSite=Lax), in der Datenbank liegt nur dessen SHA-256-Hash. Sitzungen laufen nach 12 h ab; Abmelden löscht die Sitzung. | M | T | umgesetzt | RISK-004 | `apps/web/lib/auth/session.ts` |
+| REQ-018 | Rollen- und Berechtigungsprüfungen erfolgen **serverseitig** (`requireUser`, `requireRole`), nicht nur in der Oberfläche. | M | T | umgesetzt | RISK-003 | `apps/web/lib/auth/guards.ts`, `packages/core/src/auth/permissions.ts` |
+| REQ-019 | Fehlgeschlagene Logins geben keine Auskunft darüber, ob eine E-Mail registriert ist. | S | T | umgesetzt | RISK-004 | `apps/web/app/(auth)/anmelden/actions.ts` |
+| REQ-020 | Nach 5 aufeinanderfolgenden Fehlversuchen (Passwort oder TOTP) wird das Konto für 15 min gesperrt. Der Zähler wird nach vollständiger Anmeldung zurückgesetzt (mit 2FA nach bestätigtem Code, ohne 2FA nach korrektem Passwort). | S | T | umgesetzt | RISK-004 | `packages/core/src/auth/lockout.ts`, `apps/web/app/(auth)/anmelden/actions.ts` |
+| REQ-021 | Vor Verarbeitung echter (Patienten-)Daten muss `ZWEI_FA_AKTIV=true` in allen Umgebungen gesetzt sein, die solche Daten verarbeiten (Production, ggf. Preview). Bei `ZWEI_FA_AKTIV=true` ist `TOTP_ENCRYPTION_KEY` Pflicht (bei abgeschalteter 2FA optional, siehe REQ-005). Ungültige Werte des Schalters (alles außer `true`, `false` oder leer) sowie ein fehlender Schlüssel bei aktiver 2FA lassen den Serverstart scheitern: `instrumentation.ts` prüft die Konfiguration beim Start der Server-Instanz und beendet den Prozess mit Exit-Code 1 (beim `next build` wird nicht geprüft). **Betriebsschritt beim Einschalten der 2FA:** bestehende Sitzungen beenden (z. B. alle Einträge der Tabelle `Sitzung` löschen); zusätzlich verlangt `pruefeZugang` für Sitzungen ohne zweiten Faktor sofort den Code, und `requireTeilsitzung` akzeptiert nur Sitzungen, die jünger als 10 min sind. Beide Modi werden in CI getestet (Playwright-Matrix). | M | T, R | umgesetzt (Schalter, Tests); Freigabeprüfung vor echten Daten offen | RISK-004 | `apps/web/lib/env.ts`, `apps/web/instrumentation.ts`, `apps/web/lib/auth/guards.ts`, `.github/workflows/ci.yml`, `apps/web/e2e/auth.spec.ts` |
+
+### Datenmodell (Abschnitte 3, 3a; Meilenstein 1)
+
+| ID | Anforderung | Prio | Verifikation | Status | Risiko | Umsetzung |
+|---|---|---|---|---|---|---|
+| REQ-030 | Das Datenmodell umfasst: Nutzer, Rolle, Patientenprofil, Fall, Eingabe, Foto, Befund, Diagnose, Plan, Freigabe, Einwilligung. | M | R, T (`prisma validate`) | umgesetzt | – | `apps/web/prisma/schema.prisma` |
+| REQ-031 | Patientenprofil-Stammdaten gemäß CLAUDE.md §3: Name, Geburtsdatum, Geschlecht, Größe, Gewicht, Schwangerschaft/Stillzeit, Vorerkrankungen (ICD-10-GM + Freitext), Operationen, Allergien/Unverträglichkeiten, Dauermedikation, Nieren-/Leberfunktion, Familienanamnese, Lebensstil, Impfstatus. | M | R | umgesetzt | RISK-005 | `schema.prisma` |
+| REQ-032 | Alter wird aus dem Geburtsdatum berechnet (nicht gespeichert), auch für Neugeborene (Tage/Wochen/Monate/Jahre). | M | T | umgesetzt | RISK-005 | `packages/core/src/profile/age.ts` |
+| REQ-033 | BMI wird aus Größe und Gewicht berechnet (nicht gespeichert); unplausible Eingaben werden abgewiesen. | M | T | umgesetzt | RISK-005 | `packages/core/src/profile/bmi.ts` |
+| REQ-034 | Kinderprofile: Datenmodell sieht `kontoinhaber` und `sorgeberechtigte[]` vor; Bestätigung des Sorgerechts wird mit Zeitpunkt gespeichert; Einladung eines zweiten Sorgeberechtigten ist modelliert. | M | R | umgesetzt | RISK-006 | `schema.prisma` (`Patientenprofil`, `Sorgeberechtigung`, `SorgeEinladung`) |
+| REQ-035 | Zusätzliche Kinderdaten: Schwangerschaftswoche bei Geburt, Geburtsgewicht, Vorsorgeuntersuchungen U1–U9/J1 (erledigt/auffällig), Größe/Gewicht im Verlauf, Kita/Schule und Klassenstufe, Ein-/Mehrsprachigkeit. | M | R | umgesetzt | RISK-005 | `schema.prisma` |
+| REQ-036 | Bei Frühgeburt (< 37+0 SSW) wird für Entwicklungsfragen ein **korrigiertes Alter** berechnet. | M | T | umgesetzt | RISK-005 | `packages/core/src/profile/age.ts` |
+| REQ-037 | Fallfreigaben (Patient → Arzt) sind modelliert und jederzeit widerrufbar (`widerrufenAm`). | M | R | umgesetzt | RISK-007 | `schema.prisma` (`Freigabe`) |
+| REQ-038 | Einwilligungen (DSGVO Art. 9) werden je Zweck mit Version, Zeitpunkt und Widerruf gespeichert. | M | R | umgesetzt | RISK-007 | `schema.prisma` (`Einwilligung`) |
+| REQ-039 | Diagnosen speichern ICD-10-GM-Code und Diagnosesicherheit (V/G/A/Z) sowie Quelle (Regel/KI/Arzt) mit Regel- bzw. Prompt-/Modellversion. | M | R | umgesetzt | – | `schema.prisma` (`Diagnose`) |
+
+### Medizinische Wissensdaten (CLAUDE.md §9, Konzept: [`medizinische-daten.md`](./medizinische-daten.md))
+
+| ID | Anforderung | Prio | Verifikation | Status | Risiko | Umsetzung |
+|---|---|---|---|---|---|---|
+| REQ-040 | Die ICD-10-GM (BfArM) wird in einer Wissens-Tabelle der Anwendungsdatenbank bereitgestellt; der Import erfolgt per Skript aus der amtlichen Downloaddatei, je Jahresversion getrennt. | M | T | offen | RISK-013 | geplant: `tools/import`, `packages/core` |
+| REQ-041 | Jeder Wissensdatensatz trägt Quelle, Version/Stand, Lizenz und Importzeitpunkt; Datensätze werden versioniert und nicht überschrieben, sodass jede Diagnose/Regel auf den damals gültigen Stand verweisen kann. | M | T, R | offen | RISK-013 | geplant |
+| REQ-042 | Wissensdatensätze haben den Status `validiert` (ja/nein) und `geprüft von`; ungeprüfte Inhalte (z. B. der Demo-Arzneimitteldatensatz) werden in der Oberfläche und im PDF-Bericht als „ungeprüft“ gekennzeichnet. | M | T, D | offen | RISK-013 | geplant |
+| REQ-043 | Anwendungscode greift auf Wissensdaten ausschließlich über Schnittstellen in `packages/core` zu (anbieterneutral, ohne direkte Kopplung an Datenbank- oder Hostinganbieter). | M | R | offen | RISK-010, RISK-013 | geplant |
+| REQ-044 | Vor Marktreife sind die Lizenzen aller Datenquellen (ICD-10-GM, ATC/DDD, Arzneimitteldatenbank, Leitlinien, Perzentilen, STIKO) geklärt und dokumentiert; ohne geklärte Lizenz wird eine Quelle nicht produktiv genutzt. | M | R | offen | RISK-013 | `docs/medizinische-daten.md` |
+
+---
+
+## Meilenstein 2 – Patientenprofile und Design-Grundlage
+
+Plausibilitätsgrenzen ohne fachliche Quelle sind im Code als `ungeprüft` gekennzeichnet (CLAUDE.md §12) und dienen nur dem Abfangen von Tippfehlern, nicht der klinischen Bewertung.
+
+### Profile (CLAUDE.md §2, §3, §3a)
+
+| ID | Anforderung | Prio | Verifikation | Status | Risiko | Umsetzung |
+|---|---|---|---|---|---|---|
+| REQ-100 | Ein Patient hat genau **ein** eigenes Profil (`kontoinhaberId` = eigenes Konto) und kann es anlegen und bearbeiten: Vor-/Nachname, Geburtsdatum, Geschlecht, Größe, Gewicht, Schwangerschaft/Stillzeit, Familienanamnese, Lebensstil (Rauchen inkl. Packungsjahre, Alkohol, Sport), Impfstatus-Notiz. Ein zweites eigenes Profil wird abgewiesen (Weiterleitung auf das vorhandene). | M | T (E2E) | verifiziert | RISK-005 | `apps/web/app/profile/`, `apps/web/lib/profile/speichern.ts`, `e2e/profile.spec.ts` |
+| REQ-101 | Listen im Profil können im Formular hinzugefügt und entfernt werden: Vorerkrankungen (Bezeichnung, optional ICD-10-GM-Code), Operationen (Bezeichnung, Datum), Allergien/Unverträglichkeiten (Typ, Auslöser, Reaktion), Dauermedikation (Wirkstoff, Stärke, Dosierung), Impfungen (gegen, Impfstoff, Datum, Dosis-Nr.). Vollständig leere Zeilen werden ignoriert; beim Speichern wird die Liste als Ganzes ersetzt. | M | T | verifiziert | RISK-005 | `packages/core/src/profile/schemas.ts`, `apps/web/app/profile/listen-editor.tsx`, `apps/web/lib/profile/persistenz.ts` |
+| REQ-102 | Ein optionaler ICD-10-GM-Code wird nur auf sein **Format** geprüft (`^[A-Z]\d{2}(\.\d{1,2})?[+*!†]?$`, Großschreibung normalisiert). Es gibt im Prototyp **keinen Katalog** und keine Existenzprüfung; die Oberfläche weist darauf hin. Die Prüfung gegen die amtliche ICD-10-GM folgt mit REQ-040. Codes werden nie von der Software ergänzt oder vorgeschlagen. | M | T | verifiziert (Format); Katalogprüfung offen (REQ-040) | RISK-013, RISK-017 | `packages/core/src/profile/icd.ts` |
+| REQ-103 | Profileingaben werden serverseitig mit zod (`packages/core`) validiert; deutsche Fehlermeldungen stehen am jeweiligen Feld (`aria-invalid`, `aria-describedby`), und alle Eingaben bleiben nach einem Fehler erhalten (`useFormular`, kein Auto-Reset). Dezimalwerte dürfen höchstens so viele Nachkommastellen haben wie die Datenbankspalte (Größe/Kopfumfang/Packungsjahre 1, Gewicht 3, Laborwert 4; Laborwert-Betrag < 10⁸) – mehr wird mit Feldmeldung abgewiesen statt still gerundet. Plausibilität: Geburtsdatum nicht in der Zukunft und höchstens 130 Jahre zurück; Größe 30–250 cm und Gewicht 0,3–400 kg (Grenzen aus `bmi.ts`); Datumsangaben in Listen (Operation, Impfung, Vorsorge, Messung, Laborwert) nicht vor der Geburt und nicht in der Zukunft; Packungsjahre 0–200 (`ungeprüft`) und nicht bei „nie geraucht“. „Heute“ bezieht sich auf die Zeitzone Europe/Berlin. Dezimalkomma wird akzeptiert. | M | T | verifiziert | RISK-005, RISK-017 | `packages/core/src/profile/schemas.ts`, `packages/ui/src/field.tsx` |
+| REQ-104 | **Schwangerschaft/Stillzeit:** Das Feld wird bei Geschlecht „männlich“ nicht angezeigt. Der Server weist „schwanger“ oder „stillend“ bei Geschlecht „männlich“ mit einer Feldmeldung ab, statt den Wert stillschweigend zu speichern. Fehlt der Wert (Feld ausgeblendet), wird „unbekannt“ gespeichert. **Bearbeiten:** Ist beim Wechsel auf „männlich“ noch „schwanger“/„stillend“ gespeichert, zeigt das Formular einen Hinweis, dass die Angabe beim Speichern auf „keine Angabe“ zurückgesetzt wird. Bei „weiblich“, „divers“ und „unbekannt“ sind alle Werte zulässig. **Kinderprofile** führen das Feld im Prototyp nicht (weder Formular noch Ansicht); der Server verwirft Eingaben und speichert „unbekannt“. Es gibt bewusst keine Altersgrenze – Jugendliche (eigener Zugang, Einwilligungsfähigkeit) werden mit der rechtlichen Klärung nach CLAUDE.md §3a festgelegt. | M | T | verifiziert | RISK-017 | `packages/core/src/profile/schemas.ts`, `apps/web/app/profile/profil-formular.tsx` |
+| REQ-105 | Die Profilansicht zeigt das aus dem Geburtsdatum berechnete Alter (REQ-032) und – wenn Größe und Gewicht vorliegen – den berechneten BMI (REQ-033). Bei Kinderprofilen steht beim BMI der Hinweis, dass er nur zusammen mit Perzentilen aussagekräftig ist. | M | T (E2E) | verifiziert | RISK-005 | `apps/web/app/profile/[id]/page.tsx`, `packages/core/src/profile/anzeige.ts` |
+| REQ-106 | Ein Patient kann Kinderprofile anlegen. Pflicht ist die Bestätigung „Ich bin sorgeberechtigt“ (Prototyp: Checkbox). Gespeichert werden `sorgerechtBestaetigtAm` (Zeitpunkt) und ein Eintrag `Sorgeberechtigung` für den anlegenden Nutzer; `kontoinhaberId` bleibt leer, `istKinderprofil` = true. Ohne Bestätigung wird nichts gespeichert. | M | T | verifiziert | RISK-006 | `packages/core/src/profile/schemas.ts`, `apps/web/lib/profile/speichern.ts` |
+| REQ-107 | Kinder-Zusatzdaten: Schwangerschaftswoche bei Geburt (Wochen 22–44, Tage 0–6; liegt innerhalb des Rechenbereichs von `age.ts`, 20–44), Geburtsgewicht (300–7000 g, Plausibilitätsgrenze `ungeprüft`), Kita/Schule mit Name und Klassenstufe (1–13, nur bei Schule), Ein-/Mehrsprachigkeit mit Sprachen, Vorsorgeuntersuchungen U1–U9, U7a, J1 (Datum, Ergebnis unauffällig/auffällig), Wachstumsmessungen (Datum, Größe, Gewicht, optional Kopfumfang 20–70 cm, `ungeprüft`; mindestens ein Messwert je Zeile). | M | T | verifiziert | RISK-005 | `packages/core/src/profile/schemas.ts` |
+| REQ-108 | Bei Frühgeburt (< 37+0 SSW) zeigt die Profilansicht neben dem Alter das **korrigierte Alter** (REQ-036) mit der Korrektur in Wochen+Tagen (z. B. „9+4 Wochen“); vor dem errechneten Termin und ab 24 Monaten (Grenze `ungeprüft`) mit entsprechendem Hinweis. | M | T | verifiziert | RISK-005 | `packages/core/src/profile/anzeige.ts`, `apps/web/app/profile/[id]/page.tsx` |
+| REQ-109 | Wachstumsmessungen werden als Verlauf (Tabelle, nach Datum sortiert) angezeigt. | M | T (E2E), D | verifiziert | RISK-018 | `apps/web/app/profile/[id]/page.tsx` |
+| REQ-110 | **Perzentilen** für Größe, Gewicht, BMI und Kopfumfang werden erst berechnet, wenn eine geprüfte, lizenzierte Referenzquelle (z. B. Kromeyer-Hauschild, WHO) eingebunden ist (REQ-041, REQ-044). Bis dahin zeigt die Ansicht den Hinweis „Perzentilen folgen, sobald eine geprüfte Referenzquelle eingebunden ist“. | M | T (E2E: Hinweis) | offen (Hinweis umgesetzt) | RISK-018 | `apps/web/app/profile/[id]/page.tsx` |
+| REQ-111 | Einladung eines zweiten Sorgeberechtigten per E-Mail (Modell `SorgeEinladung`). | K | – | offen | RISK-006 | noch nicht umgesetzt |
+| REQ-112 | **Profil-Auswahl** auf `/start` (Patient): „Für wen ist die Untersuchung?“ mit Profil-Chips (Avatar mit Initialen, Kinder mit blauem Avatar `avatar child`, Name bzw. „Vorname, Alter“), „+ Kind hinzufügen“ und – falls noch nicht vorhanden – „Eigenes Profil anlegen“. Die Auswahl wird serverseitig nur aus den zugänglichen Profilen übernommen; das ausgewählte Profil wird mit Namen, Alter und Profilart angezeigt. | M | T | verifiziert | RISK-019 | `apps/web/app/start/page.tsx`, `packages/ui/src/profil-chip.tsx` |
+| REQ-113 | **Arzt – Patientenliste** (`/arzt/patienten`): zeigt nur die vom Arzt angelegten Profile (`angelegtVonId`), Suche nach Vor-/Nachname, „Patient anlegen“ (Erwachsene oder Kind; ohne Sorgerechtsbestätigung), Profil öffnen und bearbeiten. | M | T (E2E) | verifiziert | RISK-015 | `apps/web/app/arzt/patienten/` |
+| REQ-114 | **Arzt-Felder** Nieren-/Leberfunktion und Laborwerte (Parameter, Wert, Einheit, Datum) sind nur für die Rolle ARZT les- und schreibbar – **serverseitig**: Das Schema für Patienten enthält diese Felder nicht (eingeschleuste Werte werden verworfen), die Speicherlogik schreibt sie für Patienten nie, die Ansichtsdaten enthalten sie für Patienten nicht, und Patient-Formulare zeigen sie nicht. | M | T | verifiziert | RISK-016, RISK-003 | `packages/core/src/profile/schemas.ts`, `apps/web/lib/profile/persistenz.ts`, `apps/web/lib/profile/ansicht.ts` |
+| REQ-115 | **Zugriffskontrolle auf Profile** (zentral, serverseitig): Patient → eigenes Profil und Kinderprofile, für die er als Sorgeberechtigter eingetragen ist; Arzt → nur selbst angelegte Profile ohne Kontoinhaber (geteilte Fälle folgen mit Meilenstein 10, reservierter Bereich REQ-900 …). Regel `darfProfilZugreifen` in `packages/core`; der Loader fragt nur mit dem passenden Filter (`profilFilter`, `apps/web/lib/profile/filter.ts`) ab und prüft das Ergebnis zusätzlich mit der Regel. Fremde oder unbekannte IDs ergeben **404** (keine Auskunft über die Existenz). | M | T (Unit, E2E) | verifiziert | RISK-015, RISK-006 | `packages/core/src/profile/zugriff.ts`, `apps/web/lib/profile/filter.ts`, `apps/web/lib/profile/zugriff.ts`; E2E: fremde `profilId` in der Server Action |
+| REQ-116 | Jede Server Action zu Profilen prüft erneut Sitzung, Rolle und – bei vorhandenem Profil – den Profilzugriff (REQ-115); die Rolle stammt immer aus der Sitzung, nie aus dem Formular. | M | T, R | verifiziert | RISK-015, RISK-016 | `apps/web/app/profile/actions.ts` |
+
+### Design-Grundlage und Navigation (CLAUDE.md §13)
+
+| ID | Anforderung | Prio | Verifikation | Status | Risiko | Umsetzung |
+|---|---|---|---|---|---|---|
+| REQ-117 | Wiederverwendbare Bausteine in `packages/ui` nutzen ausschließlich Klassen und Variablen aus `/styles/style.css` (keine neuen Farben; Rosé nie Warnfarbe): `ProfilChip`, `ProfilAuswahl`, `Panel`, `Hinweis`, `SelectField`, `TextareaField`, `CheckboxField`, `Field` (Label auch mit Fachbegriff `.term`). Barrierefreiheit: Labels, Fehlermeldung per `aria-describedby`, Bedienelemente mind. 48 px (auch Marken-Link und Namenslinks in Listen), sichtbarer Fokus, Kinder-Avatar blau. Neue Layout-Klassen stehen in `style.css` (einzige Quelle, REQ-004). | M | T, R | verifiziert | RISK-019 | `packages/ui/src/`, `styles/style.css` |
+| REQ-118 | Die Kopfzeile enthält für angemeldete Nutzer eine Navigation je Rolle (Patient: „Übersicht“, „Meine Profile“; Arzt: „Übersicht“, „Patienten“) und „Abmelden“; die aktuelle Seite ist mit `aria-current` markiert. Der Demo-Hinweis bleibt in jeder Ansicht (REQ-001). | M | T (E2E) | verifiziert | RISK-001 | `apps/web/app/kopf-navigation.tsx`, `packages/ui/src/app-header.tsx` |
+| REQ-119 | Alle Profilansichten sind in Mobilbreite (390 px) ohne horizontales Scrollen der Seite bedienbar (Tabellen scrollen innerhalb ihres Containers). | S | D (Screenshots) | umgesetzt | – | `styles/style.css` |
+
+---
+
+## Spätere Meilensteine
+
+Werden vor der jeweiligen Umsetzung ergänzt (CLAUDE.md §12). Reservierte Bereiche:
+
+| Bereich | IDs |
+|---|---|
+| Patientenprofil-UI, Kinderprofile, Design | REQ-100 … (belegt bis REQ-119) |
+| Regel-Engine, Red Flags, Krisenpfad, Rollenfilter | REQ-200 … |
+| Geführte Eingrenzung, Entwicklungs-Check | REQ-300 … |
+| Freitext, Sprache, Foto | REQ-400 … |
+| KI-Schicht | REQ-500 … |
+| Eingrenzungs-Schleife | REQ-600 … |
+| Therapie/Medikation | REQ-700 … |
+| PDF-Berichte | REQ-800 … |
+| Fall teilen | REQ-900 … |
+| Mobile, Wearables | REQ-1000 … |
