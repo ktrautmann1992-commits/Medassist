@@ -10,7 +10,7 @@ if (existsSync(envDatei)) process.loadEnvFile(envDatei);
 
 /**
  * Web-Abläufe (CLAUDE.md §8). Benötigt eine migrierte Datenbank (DATABASE_URL)
- * und TOTP_ENCRYPTION_KEY; die App wird mit `next start` gestartet.
+ * und – bei `ZWEI_FA_AKTIV=true` – TOTP_ENCRYPTION_KEY; die App wird mit `next start` gestartet.
  *
  * REQ-021: Der webServer erbt die Umgebung dieses Prozesses (Shell + `.env`), also
  * auch `ZWEI_FA_AKTIV` (Standard: aus). Für den 2FA-Pfad: `ZWEI_FA_AKTIV=true pnpm test:e2e`

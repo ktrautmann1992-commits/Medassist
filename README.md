@@ -21,7 +21,7 @@ Voraussetzungen: Node.js ≥ 22.12, pnpm 10, PostgreSQL 16.
 
 ```bash
 pnpm install
-cp .env.example apps/web/.env      # Werte eintragen, TOTP_ENCRYPTION_KEY: openssl rand -base64 32
+cp .env.example apps/web/.env      # Werte eintragen; TOTP_ENCRYPTION_KEY nur für 2FA an: openssl rand -base64 32
 pnpm db:migrate                    # Migrationen auf die lokale Datenbank anwenden
 pnpm dev                           # http://localhost:3000
 ```
@@ -47,6 +47,8 @@ Dieselben Prüfungen laufen in GitHub Actions bei jedem Pull Request (`.github/w
 ## Deployment (Vercel)
 
 - Root Directory: `apps/web`, Build über Turborepo (siehe `apps/web/vercel.json`), Region `fra1`.
-- Environment Variables gemäß `.env.example`, getrennt nach Production / Preview / Development. `DATABASE_URL` und `TOTP_ENCRYPTION_KEY` sind in **jeder** Umgebung Pflicht (auch bei abgeschalteter 2FA) – sonst startet der Server nicht.
+- Environment Variables gemäß `.env.example`, getrennt nach Production / Preview / Development. `DATABASE_URL` ist in **jeder** Umgebung Pflicht. `TOTP_ENCRYPTION_KEY` ist nur bei `ZWEI_FA_AKTIV=true` Pflicht (in der Testphase mit 2FA aus also nicht nötig); ist er gesetzt, muss er gültig sein (32 Byte, Base64). Fehlt ein Pflichtwert oder ist ein Wert ungültig, startet der Server nicht. `APP_URL` (Basis für Bestätigungslinks) nur für Production setzen; in Preview-Deployments wird automatisch die stabile Branch-URL (`VERCEL_BRANCH_URL`, sonst `VERCEL_URL`) verwendet – durch die Deployment Protection funktionieren die Links dort für angemeldete Vercel-Nutzer.
+- **Datenbank:** Vercel → Storage → Neon (Region Frankfurt) anlegen und mit dem Projekt verbinden, Variablen-Präfix nicht ändern (es müssen `DATABASE_URL` und `DATABASE_URL_UNPOOLED` entstehen), Umgebungen Production und Preview auswählen. Die Integration setzt `DATABASE_URL` (gepoolt, für die App) und `DATABASE_URL_UNPOOLED` (direkt, wird für Migrationen bevorzugt).
 - Deployment Protection für Preview und Production aktivieren, solange es eine Demo ist.
-- Produktionsmigrationen nur über die Pipeline (`pnpm --filter @medassist/web db:deploy`).
+- **Migrationen (REQ-022):** laufen automatisch bei jedem Vercel-Build (Production und Preview) **vor** `next build` – `buildCommand` in `apps/web/vercel.json` ruft zuerst `pnpm --filter @medassist/web db:deploy` (`apps/web/scripts/migrate-deploy.mjs` → `prisma migrate deploy`) auf. Fehlt die Datenbank-URL oder schlägt eine Migration fehl, bricht der Build mit Fehlermeldung ab; es wird nichts ausgeliefert. Nie manuell gegen Produktion migrieren. Lokales `pnpm build` und der CI-Checks-Job migrieren nicht und brauchen keine Datenbank.
+- **Bekannte Einschränkung (Testphase, RISK-014):** Mit nur einer Neon-Datenbank für Production und Preview wendet jedes Preview-Deployment die Migrationen seines Branches auf dieselbe Datenbank an, die auch Production nutzt. Daher im Prototyp nur additive (abwärtskompatible) Migrationen; später Neon-Branching pro Preview-Deployment einrichten.

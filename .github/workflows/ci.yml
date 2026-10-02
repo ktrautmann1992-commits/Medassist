@@ -64,7 +64,7 @@ jobs:
     env:
       # Nur für die kurzlebige CI-Datenbank – kein Secret.
       DATABASE_URL: postgresql://medassist:medassist@localhost:5432/medassist
-      APP_URL: http://localhost:3000
+      # APP_URL bewusst nicht gesetzt: Fallback auf http://localhost:3000 wird mitgetestet.
       ZWEI_FA_AKTIV: ${{ matrix.zwei_fa_aktiv }}
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +74,9 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Nur mit 2FA nötig – ohne 2FA wird der Normalfall der Testphase (kein Schlüssel) geprüft.
       - name: Testschlüssel erzeugen (pro Lauf zufällig)
+        if: matrix.zwei_fa_aktiv == 'true'
         run: echo "TOTP_ENCRYPTION_KEY=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
       - name: Migrationen anwenden
         run: pnpm --filter @medassist/web db:deploy

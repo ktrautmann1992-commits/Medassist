@@ -2,7 +2,7 @@
 
 import { registrierungSchema } from "@medassist/core";
 import { db } from "@/lib/db";
-import { env } from "@/lib/env";
+import { basisUrl } from "@/lib/env";
 import { hashPasswort } from "@/lib/auth/password";
 import { EMAIL_TOKEN_GUELTIG_MS, hashToken, neuesToken } from "@/lib/auth/tokens";
 import { feldFehlerAus, type FormState } from "@/lib/forms/state";
@@ -64,6 +64,6 @@ export async function registrieren(_vorher: FormState, formData: FormData): Prom
   });
 
   // REQ-013 (Prototyp): Link anzeigen statt E-Mail versenden.
-  const link = `${env().APP_URL}/verifizieren?token=${encodeURIComponent(token)}`;
+  const link = `${basisUrl()}/verifizieren?token=${encodeURIComponent(token)}`;
   return { erfolg: "Konto angelegt. Bitte bestätigen Sie Ihre E-Mail-Adresse.", verifizierungsLink: link };
 }
