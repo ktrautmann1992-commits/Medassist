@@ -9,8 +9,11 @@ import { leererFormState, type FormState } from "./state";
  * ihren Ausgangswert zurück, während die Oberfläche noch die gewählte Rolle
  * zeigt – und es würde die falsche Rolle abgeschickt (REQ-010).
  */
-export function useFormular(action: (vorher: FormState, formData: FormData) => Promise<FormState>) {
-  const [state, dispatch, laeuft] = useActionState(action, leererFormState);
+export function useFormular<S extends object = FormState>(
+  action: (vorher: Awaited<S>, formData: FormData) => Promise<S>,
+  start: Awaited<S> = leererFormState as Awaited<S>,
+) {
+  const [state, dispatch, laeuft] = useActionState<S, FormData>(action, start);
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);

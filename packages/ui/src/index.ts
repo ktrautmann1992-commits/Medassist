@@ -9,3 +9,5 @@ export * from "./panel";
 export * from "./hinweis";
 export * from "./avatar";
 export * from "./profil-chip";
+export * from "./dringlichkeit";
+export * from "./notfall";

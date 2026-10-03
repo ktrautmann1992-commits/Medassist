@@ -256,6 +256,21 @@ a.profile-chip { color: var(--ink); text-decoration: none; }
 .table th { color: var(--ink-soft); font-weight: 700; }
 .table caption { text-align: left; font-weight: 700; padding-bottom: var(--space-2); }
 
+/* --- Notfall, Krise, Regelstatus (REQ-214) ------------------------------ */
+.urgency .urgency-stufe { display: block; font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.urgency p strong, .urgency li strong { display: inline; font-size: inherit; }
+.urgency a { color: inherit; }
+.urgency .btn-emergency { color: #fff; }
+.urgency-actions { margin-top: var(--space-3); }
+.tel-list { list-style: none; margin: var(--space-2) 0 0; padding: 0; color: var(--ink); }
+.tel-link { display: inline-flex; align-items: center; min-height: 48px; font-weight: 700; font-variant-numeric: tabular-nums; text-decoration: underline; }
+.tel-list .tel-link, .urgency p .tel-link { color: var(--emergency); }
+.urgency-urgent p .tel-link { color: var(--urgent); }
+.badge-ungeprueft { background: var(--surface); color: var(--ink); border: 1.5px dashed var(--ink-soft); font-weight: 700; }
+.rule-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+.rule-list > li { border: 1px solid var(--line); border-radius: var(--radius-field); padding: var(--space-4); }
+.rule-list .rule-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+
 /* --- Bewegung ------------------------------------------------------------ */
 @media (prefers-reduced-motion: no-preference) {
   .btn, .entry-option, .profile-chip, input { transition: border-color .15s, background-color .15s; }

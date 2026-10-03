@@ -110,6 +110,10 @@ importers:
         version: 5.0.3(@types/node@22.20.4)(vite@8.3.2(@types/node@22.20.4)(jiti@2.7.0))
 
   packages/ui:
+    dependencies:
+      '@medassist/core':
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.0
