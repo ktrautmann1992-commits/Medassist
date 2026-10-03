@@ -21,7 +21,7 @@ import { REGEL_STATUS, ZEITRAHMEN, dringlichkeitSchema, quelleSchema } from "./s
 export const VERDACHT_KENNZEICHNUNG = "Verdacht – ärztlich abzuklären";
 
 /** `true` = Primitivwert übernehmen; Objekt = nur diese Schlüssel; `[spec]` = Liste mit Element-Spezifikation. */
-type Whitelist = true | { readonly [feld: string]: Whitelist } | readonly [Whitelist];
+export type Whitelist = true | { readonly [feld: string]: Whitelist } | readonly [Whitelist];
 
 const QUELLE: Whitelist = { titel: true, version: true, url: true };
 
@@ -53,7 +53,8 @@ export const PATIENT_WHITELIST = {
   verhaltenshinweise: [true],
 } as const satisfies Whitelist;
 
-function nachWhitelist(wert: unknown, spec: Whitelist): unknown {
+/** REQ-213/REQ-328: Übernimmt nur ausdrücklich erlaubte Felder (auch für das Entwicklungsergebnis genutzt). */
+export function nachWhitelist(wert: unknown, spec: Whitelist): unknown {
   if (wert === null || wert === undefined) return null;
   if (spec === true) {
     // Nur Primitive – verschachtelte Objekte brauchen eine eigene Spezifikation.

@@ -13,6 +13,9 @@ import {
   type FragenkatalogDatei,
   type KoerperkarteDatei,
 } from "./schema";
+import { baueEntwicklung } from "../entwicklung/laden";
+import { entwicklungskatalogDateiSchema } from "../entwicklung/schema";
+import { baueSchnellcheck, doppelte } from "./schnellcheck";
 import type { Frage, Fragenkataloge, Katalog, Koerperkarte, Option, Region } from "./typen";
 
 /**
@@ -33,6 +36,7 @@ export interface FragenDateien {
   koerperkarte: unknown;
   koerperlich: unknown;
   seelisch: unknown;
+  entwicklung: unknown;
 }
 
 /**
@@ -51,10 +55,6 @@ function parse<T extends z.ZodType>(name: string, schema: T, daten: unknown): z.
     );
   }
   return r.data;
-}
-
-function doppelte(ids: readonly string[]): string[] {
-  return [...new Set(ids.filter((x, i) => ids.indexOf(x) !== i))];
 }
 
 export function formGrenzen(f: Form): { minX: number; minY: number; maxX: number; maxY: number } {
@@ -117,13 +117,6 @@ function baueKatalog(name: string, d: FragenkatalogDatei, bereich: Bereich, kart
   const f = (t: string) => fehler.push(`${name}: ${t}`);
   if (d.bereich !== bereich) f(`Bereich „${d.bereich}“ erwartet „${bereich}“.`);
 
-  // REQ-306: Schnellcheck – Vokabular-IDs müssen existieren; jedes Warnzeichen muss enthalten sein.
-  for (const s of d.schnellcheck.symptome) if (!w.symptome.has(s)) f(`Schnellcheck: unbekanntes Symptom „${s}“.`);
-  for (const m of d.schnellcheck.messwerte) if (!w.messwerte.has(m)) f(`Schnellcheck: unbekannter Messwert „${m}“.`);
-  for (const x of doppelte(d.schnellcheck.symptome)) f(`Schnellcheck: Symptom „${x}“ ist doppelt.`);
-  for (const s of w.symptome.values()) {
-    if (s.warnzeichen && !d.schnellcheck.symptome.includes(s.id)) f(`Selbsttest: Warnzeichen „${s.id}“ fehlt im Schnellcheck.`);
-  }
 
   for (const x of doppelte(d.fragen.map((q) => q.id))) f(`Frage-ID „${x}“ ist doppelt.`);
   const frueher = new Map<string, Frage>();
@@ -175,6 +168,8 @@ function baueKatalog(name: string, d: FragenkatalogDatei, bereich: Bereich, kart
       hilfe: q.hilfe ?? null,
       pflicht: q.pflicht,
       bedingung: q.bedingung,
+      gruppe: null,
+      alter: null,
     };
     let frage: Frage;
     switch (q.typ) {
@@ -207,22 +202,7 @@ function baueKatalog(name: string, d: FragenkatalogDatei, bereich: Bereich, kart
     quelle: d.quelle,
     quelleHinweis: d.quelleHinweis,
     geprueftVon: d.geprueftVon,
-    schnellcheck: {
-      titel: d.schnellcheck.titel,
-      text: d.schnellcheck.text,
-      textKind: d.schnellcheck.textKind,
-      textFremd: d.schnellcheck.textFremd,
-      hilfe: d.schnellcheck.hilfe,
-      keineText: d.schnellcheck.keineText,
-      symptome: d.schnellcheck.symptome.map((s) => {
-        const v = w.symptome.get(s);
-        return { id: s, bezeichnung: v?.bezeichnung ?? s, fachbegriff: v?.fachbegriff ?? null, symptom: s, warnzeichen: v?.warnzeichen ?? false };
-      }),
-      messwerte: d.schnellcheck.messwerte.map((m) => {
-        const v = w.messwerte.get(m);
-        return { id: m, bezeichnung: v?.bezeichnung ?? m, einheit: v?.einheit ?? "", min: v?.plausibel.min ?? 0, max: v?.plausibel.max ?? 0, status: v?.plausibelStatus ?? "ungeprüft" };
-      }),
-    },
+    schnellcheck: baueSchnellcheck(d.schnellcheck, w, f),
     fragen,
     fragenById: new Map(fragen.map((q) => [q.id, q])),
   };
@@ -240,18 +220,23 @@ export function ladeFragenkataloge(dateien: FragenDateien, regelwerk: Regelwerk)
   const kartenDatei = parse("koerperkarte.json", koerperkarteDateiSchema, dateien.koerperkarte);
   const koerperlich = parse("koerperlich.json", fragenkatalogDateiSchema, dateien.koerperlich);
   const seelisch = parse("seelisch.json", fragenkatalogDateiSchema, dateien.seelisch);
+  const entwicklungDatei = parse("entwicklung.json", entwicklungskatalogDateiSchema, dateien.entwicklung);
 
   const fehler: string[] = [];
-  const versionen = new Set([kartenDatei.katalogVersion, koerperlich.katalogVersion, seelisch.katalogVersion]);
+  const versionen = new Set([kartenDatei.katalogVersion, koerperlich.katalogVersion, seelisch.katalogVersion, entwicklungDatei.katalogVersion]);
   if (versionen.size !== 1) fehler.push(`Katalog-Versionen unterscheiden sich: ${[...versionen].join(", ")}`);
 
   const koerperkarte = baueKarte(kartenDatei, fehler);
+  // REQ-320/REQ-321: Entwicklungskatalog (Weg 3) inkl. Selbsttests.
+  const entwicklung = baueEntwicklung("entwicklung.json", entwicklungDatei, regelwerk, fehler);
   const kataloge: Record<Bereich, Katalog> = {
     KOERPERLICH: baueKatalog("koerperlich.json", koerperlich, "KOERPERLICH", koerperkarte, regelwerk, fehler),
     PSYCHISCH: baueKatalog("seelisch.json", seelisch, "PSYCHISCH", koerperkarte, regelwerk, fehler),
+    ENTWICKLUNG: entwicklung.katalog,
   };
   if (fehler.length) throw new FragenkatalogFehler("Fragenkataloge sind ungültig.", fehler);
   for (const b of BEREICHE) tiefgefroren(kataloge[b].fragen);
   tiefgefroren(koerperkarte.regionen);
-  return { version: kartenDatei.katalogVersion, koerperkarte, kataloge };
+  tiefgefroren(entwicklung.entwicklung.bereiche);
+  return { version: kartenDatei.katalogVersion, koerperkarte, kataloge, entwicklung: entwicklung.entwicklung };
 }

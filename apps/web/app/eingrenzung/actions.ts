@@ -1,19 +1,19 @@
 "use server";
 
-import { erlaubterSchritt, naechsterSchritt, standardFragenkataloge, standardRegelwerk } from "@medassist/core";
+import { entwicklungsAlter, erlaubterSchritt, naechsterSchritt, pruefeEntwicklungsZulaessigkeit, standardFragenkataloge, standardRegelwerk } from "@medassist/core";
 import { refresh } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import type { Prisma as DbPrisma } from "@/generated/prisma/client";
 import { requireUser } from "@/lib/auth/guards";
 import { db } from "@/lib/db";
 import { bewerteFall, hinweisEskaliert, neuerFallStatus, type FallStatusWert } from "@/lib/eingrenzung/auswertung";
-import { alterMonate, ladeFall } from "@/lib/eingrenzung/fall";
+import { ablaufAlterMonate, ladeFall } from "@/lib/eingrenzung/fall";
 import { notBewertung, SPEICHERN_FEHLGESCHLAGEN } from "@/lib/eingrenzung/notbewertung";
 import { absichern, kriseSignal, signalIstNeu, verarbeiteSchritt, warnSignal, type NeueEingabe } from "@/lib/eingrenzung/schritt";
 import type { RegelPruefState } from "@/lib/regeln/form";
 import type { FormState } from "@/lib/forms/state";
 import { stichtagHeute } from "@/lib/profile/format";
-import { findeZugaenglichesProfil } from "@/lib/profile/zugriff";
+import { findeZugaenglichesProfil, ladeProfilFuerRegeln } from "@/lib/profile/zugriff";
 
 /**
  * REQ-304, REQ-305, REQ-307, REQ-313 – REQ-316: Server Actions der geführten Eingrenzung.
@@ -23,19 +23,27 @@ import { findeZugaenglichesProfil } from "@/lib/profile/zugriff";
 
 const NICHT_GEFUNDEN = "Fall nicht gefunden.";
 
-/** REQ-304: Fall anlegen. Fremde/unbekannte Profil-ID ⇒ 404, es wird nichts angelegt. */
+/**
+ * REQ-304/REQ-322: Fall anlegen. Fremde/unbekannte Profil-ID ⇒ 404, es wird nichts angelegt.
+ * Entwicklungs-Check nur für Kinderprofile unter 18 Jahren mit Entwicklungsalter im
+ * Altersbereich des Demo-Katalogs – sonst ebenfalls 404 (serverseitig, nicht nur Oberfläche).
+ */
 export async function starteFall(formData: FormData): Promise<void> {
   const { nutzer } = await requireUser();
   const profil = await findeZugaenglichesProfil(nutzer, String(formData.get("profilId") ?? ""));
   if (!profil) notFound();
   const art = formData.get("art");
-  if (art !== "KOERPERLICH" && art !== "PSYCHISCH") notFound();
+  if (art !== "KOERPERLICH" && art !== "PSYCHISCH" && art !== "ENTWICKLUNG") notFound();
+  if (art === "ENTWICKLUNG") {
+    const p = await ladeProfilFuerRegeln(nutzer, profil.id);
+    if (!p || !pruefeEntwicklungsZulaessigkeit(p, standardFragenkataloge().entwicklung, stichtagHeute()).ok) notFound();
+  }
   const fall = await db().fall.create({
     data: {
       profilId: profil.id,
       erstelltVonId: nutzer.id,
       art,
-      weg: "GEFUEHRT",
+      weg: art === "ENTWICKLUNG" ? "ENTWICKLUNG" : "GEFUEHRT",
       status: "ENTWURF",
       regelVersion: standardRegelwerk().version,
       katalogVersion: standardFragenkataloge().version,
@@ -77,7 +85,7 @@ export async function beantworteSchritt(_vorher: SchrittState, formData: FormDat
     profil: fall.profil,
     rolle: nutzer.rolle,
     stichtag,
-    alterMonate: alterMonate(fall.profil.geburtsdatum, stichtag),
+    alterMonate: ablaufAlterMonate(fall.bereich, fall.profil, stichtag),
   };
 
   /**
@@ -169,7 +177,10 @@ export async function beantworteSchritt(_vorher: SchrittState, formData: FormDat
         return { art: "fehler", state: { fehler: "Dieser Schritt ist nicht möglich. Bitte laden Sie die Seite neu." }, neuLaden: s.length > 0 };
       }
 
-      const v = verarbeiteSchritt(kataloge, regelwerk, fall.bereich, schritt, formData);
+      // QA E2: festgehaltenes Entwicklungsalter (erste Bereichsauswahl) oder – vor der ersten Auswahl – das aktuelle.
+      const aktuell = fall.bereich === "ENTWICKLUNG" ? entwicklungsAlter(fall.profil, stichtag) : null;
+      const eAlter = vorher.gesammelt.entwicklungsAlter ?? (aktuell ? { monate: aktuell.monate, korrigiert: aktuell.korrigiert } : null);
+      const v = verarbeiteSchritt(kataloge, regelwerk, fall.bereich, schritt, formData, eAlter);
       const nachher = v.eingaben.length ? await speichere(v.eingaben, !v.fehler) : vorher;
       if (v.fehler) return { art: "fehler", state: { fehler: v.fehler, feldFehler: v.feldFehler }, neuLaden: v.eingaben.length > 0 };
       return { art: "weiter", ziel: `/eingrenzung/${fall.id}${hinweisEskaliert(vorher, nachher) ? "?hinweis=neu" : ""}` };

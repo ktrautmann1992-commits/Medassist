@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { schrittAnsicht, VORRANG_ZIEL_ID } from "@/lib/eingrenzung/ansicht";
 import { ladeFall } from "@/lib/eingrenzung/fall";
 import { fallKontext } from "@/lib/eingrenzung/kontext";
+import { EntwicklungErgebnis, EntwicklungKrisenKontakte, RegressionUnsicherHinweis, VolljaehrigHinweis } from "../entwicklung-ergebnis";
 import { FallZusammenfassung, ProfilZeile, UnvollstaendigHinweis } from "../fall-ansicht";
 import { FokusRahmen } from "../fokus-rahmen";
 import { NichtGespeichertHinweis, SchrittFormular } from "./schritt-formular";
@@ -38,7 +39,8 @@ export default async function Eingrenzung({
   if (!fall.abgeschlossenAm && typeof angefragt === "string") schritt = erlaubterSchritt(kataloge, b.stand, angefragt) ?? schritt;
 
   const id = schrittId(schritt);
-  const ansicht = schrittAnsicht(kataloge, ctx.regelwerk, fall.bereich, schritt, b.gesammelt, nutzer.rolle, fall.profil.istKinderprofil);
+  const ansicht = schrittAnsicht(kataloge, ctx.regelwerk, fall.bereich, schritt, b.gesammelt, nutzer.rolle, fall.profil.istKinderprofil, b.stand.alterMonate);
+  const entwicklung = fall.bereich === "ENTWICKLUNG";
   const zurueck = vorherigerSchritt(kataloge, b.stand, id);
   const pos = fortschritt(kataloge, b.stand, id);
   const fertig = schritt.art === "zusammenfassung" || schritt.art === "beendet";
@@ -49,14 +51,27 @@ export default async function Eingrenzung({
       <FokusRahmen fokus={hinweis === "neu"}>
         <VorrangHinweise state={b.state ?? {}} rolle={nutzer.rolle} />
         {b.unvollstaendig && <UnvollstaendigHinweis />}
+        {ctx.entwicklungHinweise?.regressionUnsicher && <RegressionUnsicherHinweis />}
       </FokusRahmen>
       {/* QA R3-B2: Ziel für Hinweise aus dem Formular (Speichern fehlgeschlagen) – vor der Überschrift */}
       <div id={VORRANG_ZIEL_ID} style={{ display: "contents" }} />
       {!fertig && <NichtGespeichertHinweis fallId={fall.id} />}
 
-      <h1>{schritt.art === "beendet" ? "Ablauf beendet" : fertig ? "Zusammenfassung" : "Beschwerden eingrenzen"}</h1>
+      <h1>
+        {schritt.art === "beendet"
+          ? "Ablauf beendet"
+          : entwicklung
+            ? fertig
+              ? "Ergebnis: Entwicklungs-Check"
+              : "Entwicklung prüfen"
+            : fertig
+              ? "Zusammenfassung"
+              : "Beschwerden eingrenzen"}
+      </h1>
       <ProfilZeile profil={ctx.profilKopf} art={fall.bereich} />
-      {!fertig && pos && <Schrittanzeige nummer={pos.nummer} gesamt={pos.gesamt} />}
+      {ctx.entwicklungHinweise?.volljaehrig && <VolljaehrigHinweis />}
+      {/* Entwicklungs-Check: Gesamtzahl erst nach der Bereichsauswahl bekannt */}
+      {!fertig && pos && !(entwicklung && !b.stand.bereiche?.length) && <Schrittanzeige nummer={pos.nummer} gesamt={pos.gesamt} />}
       {!fertig && ctx.fragenUngeprueft && (
         <p className="text-soft" style={{ margin: 0 }}>
           <UngeprueftKennzeichen text="Fragen ungeprüft" /> Eigene Formulierungen des Prototyps – keine medizinische Beratung.
@@ -79,7 +94,10 @@ export default async function Eingrenzung({
 
       {schritt.art === "zusammenfassung" && (
         <>
+          {/* REQ-325 – REQ-327: Ergebnis je Bereich (rollengefiltert) */}
+          {ctx.entwicklung && <EntwicklungErgebnis anzeige={ctx.entwicklung} rolle={nutzer.rolle} />}
           <FallZusammenfassung
+            entwicklung={entwicklung}
             abschnitte={ctx.zusammenfassung}
             state={b.state}
             unvollstaendig={b.unvollstaendig}
@@ -112,6 +130,7 @@ export default async function Eingrenzung({
       )}
 
       {fall.bereich === "PSYCHISCH" && <KrisenKontakte />}
+      {ctx.entwicklungHinweise?.krisenKontakte && <EntwicklungKrisenKontakte profilId={fall.profil.id} />}
     </section>
   );
 }

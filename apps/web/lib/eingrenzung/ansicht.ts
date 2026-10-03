@@ -1,5 +1,6 @@
 import {
   DAUER_EINHEIT_TEXT,
+  verfuegbareBereiche,
   type AntwortWert,
   type Fragenkataloge,
   type Gesammelt,
@@ -36,6 +37,14 @@ export type SchrittAnsicht =
     }
   | { art: "notfall_weiter" }
   | {
+      /** REQ-323: Bereichsauswahl des Entwicklungs-Checks (nur für das Entwicklungsalter angebotene Bereiche). */
+      art: "bereiche";
+      bereiche: { id: string; bezeichnung: string; beschreibung: string }[];
+      gewaehlt: string[];
+      /** QA E3: Bereiche mit beantworteten Fragen – nicht abwählbar. */
+      gesperrt: string[];
+    }
+  | {
       art: "region";
       regionen: { id: string; bezeichnung: string; fachbegriff: string | null; formen: Fragenkataloge["koerperkarte"]["regionen"][number]["formen"] }[];
       viewBox: { breite: number; hoehe: number };
@@ -44,6 +53,8 @@ export type SchrittAnsicht =
   | {
       art: "frage";
       id: string;
+      /** REQ-323: Bereich des Entwicklungs-Checks (Bezeichnung) oder `null`. */
+      gruppe: string | null;
       typ: "einfach" | "mehrfach" | "skala" | "freitext" | "dauer";
       text: string;
       hilfe: string | null;
@@ -70,6 +81,8 @@ export function schrittAnsicht(
   g: Gesammelt,
   rolle: Rolle,
   kinderprofil: boolean,
+  /** Ablauf-Alter (Entwicklungsalter im Entwicklungs-Check). */
+  alterMonate: number | null = null,
 ): SchrittAnsicht | null {
   const katalog = k.kataloge[bereich];
   switch (schritt.art) {
@@ -101,12 +114,20 @@ export function schrittAnsicht(
         viewBox: k.koerperkarte.viewBox,
         ausgewaehlt: g.region,
       };
+    case "bereiche":
+      return {
+        art: "bereiche",
+        bereiche: verfuegbareBereiche(k.entwicklung, alterMonate).map((b) => ({ id: b.id, bezeichnung: b.bezeichnung, beschreibung: b.beschreibung })),
+        gewaehlt: g.bereiche ?? [],
+        gesperrt: [...new Set(Object.keys(g.antworten).flatMap((fid) => k.entwicklung.meta.get(fid)?.bereich ?? []))],
+      };
     case "frage": {
       const f = schritt.frage;
       const optionen = f.typ === "einfach" || f.typ === "mehrfach" ? f.optionen.map((o) => ({ wert: o.id, bezeichnung: o.bezeichnung, fachbegriff: o.fachbegriff })) : [];
       return {
         art: "frage",
         id: f.id,
+        gruppe: f.gruppe ? (k.entwicklung.bereicheById.get(f.gruppe)?.bezeichnung ?? null) : null,
         typ: f.typ,
         text: textFuer(rolle, kinderprofil, f),
         hilfe: f.hilfe,

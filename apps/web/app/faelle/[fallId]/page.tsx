@@ -5,6 +5,7 @@ import { VorrangHinweise } from "@/app/regeln/pruefen/vorrang-hinweise";
 import { requireUser } from "@/lib/auth/guards";
 import { ladeFall } from "@/lib/eingrenzung/fall";
 import { fallKontext } from "@/lib/eingrenzung/kontext";
+import { EntwicklungErgebnis, EntwicklungKrisenKontakte, RegressionUnsicherHinweis } from "../../eingrenzung/entwicklung-ergebnis";
 import { FallZusammenfassung, ProfilZeile, UnvollstaendigHinweis } from "../../eingrenzung/fall-ansicht";
 import { FokusRahmen } from "../../eingrenzung/fokus-rahmen";
 
@@ -25,6 +26,7 @@ export default async function FallAnsicht({ params }: { params: Promise<{ fallId
       <FokusRahmen fokus={false}>
         <VorrangHinweise state={b.state ?? {}} rolle={nutzer.rolle} />
         {b.unvollstaendig && <UnvollstaendigHinweis />}
+        {ctx.entwicklungHinweise?.regressionUnsicher && <RegressionUnsicherHinweis />}
       </FokusRahmen>
       <h1>Fall</h1>
       <ProfilZeile profil={ctx.profilKopf} art={fall.bereich} />
@@ -39,7 +41,9 @@ export default async function FallAnsicht({ params }: { params: Promise<{ fallId
           </Link>
         </div>
       )}
+      {ctx.entwicklung && <EntwicklungErgebnis anzeige={ctx.entwicklung} rolle={nutzer.rolle} />}
       <FallZusammenfassung
+        entwicklung={fall.bereich === "ENTWICKLUNG"}
         abschnitte={ctx.zusammenfassung}
         state={b.state}
         unvollstaendig={b.unvollstaendig}
@@ -49,6 +53,7 @@ export default async function FallAnsicht({ params }: { params: Promise<{ fallId
         abgeschlossen={Boolean(fall.abgeschlossenAm)}
       />
       {fall.bereich === "PSYCHISCH" && <KrisenKontakte />}
+      {ctx.entwicklungHinweise?.krisenKontakte && <EntwicklungKrisenKontakte profilId={fall.profil.id} />}
       <p>
         <Link href="/faelle">Zur Fallübersicht</Link>
       </p>

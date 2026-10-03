@@ -25,7 +25,7 @@ export interface ZusammenfassungEintrag {
 }
 
 export interface ZusammenfassungAbschnitt {
-  id: "krise" | "warnzeichen" | "region" | "angaben";
+  id: "krise" | "warnzeichen" | "region" | "bereiche" | "angaben";
   titel: string;
   eintraege: ZusammenfassungEintrag[];
 }
@@ -129,6 +129,20 @@ export function erstelleZusammenfassung(
         ],
       });
     }
+  }
+
+  if (stand.bereich === "ENTWICKLUNG" && g.bereiche?.length) {
+    abschnitte.push({
+      id: "bereiche",
+      titel: "Gewählte Bereiche",
+      eintraege: [
+        {
+          id: "bereiche",
+          bezeichnung: "Bereiche",
+          werte: g.bereiche.map((b) => ({ text: k.entwicklung.bereicheById.get(b)?.bezeichnung ?? b, fachbegriff: null })),
+        },
+      ],
+    });
   }
 
   const angaben = anwendbareFragen(k, stand)

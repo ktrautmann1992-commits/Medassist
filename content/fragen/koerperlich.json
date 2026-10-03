@@ -1,7 +1,7 @@
 {
   "art": "fragenkatalog",
   "bereich": "KOERPERLICH",
-  "katalogVersion": "0.1.0",
+  "katalogVersion": "0.2.0",
   "stand": "2026-10-03",
   "hinweis": "Demo – nicht für den klinischen Einsatz. Generischer Anamnese-Katalog für Weg 2, körperlich (REQ-310). Alle Fragen sind eigene, fachlich ungeprüfte Formulierungen; regionsbezogene Zusatzfragen (k_seite, k_haut) nur minimal.",
   "status": "ungeprüft",

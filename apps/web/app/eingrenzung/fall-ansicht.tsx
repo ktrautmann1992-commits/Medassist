@@ -8,7 +8,7 @@ import type { RegelPruefState } from "@/lib/regeln/form";
  * Rein darstellend (ohne Hooks).
  */
 
-export const ART_TEXT = { KOERPERLICH: "Körperliche Beschwerden", PSYCHISCH: "Seelische Beschwerden" } as const;
+export const ART_TEXT = { KOERPERLICH: "Körperliche Beschwerden", PSYCHISCH: "Seelische Beschwerden", ENTWICKLUNG: "Entwicklungs-Check" } as const;
 
 
 export interface ProfilKopf {
@@ -16,6 +16,8 @@ export interface ProfilKopf {
   initialen: string;
   alter: string;
   istKinderprofil: boolean;
+  /** REQ-322: korrigiertes Entwicklungsalter (nur bei Frühgeborenen im Entwicklungs-Check). */
+  entwicklungsalter?: string;
 }
 
 /** REQ-304, RISK-019: Für wen wird gerade eingegrenzt – Avatar, Name, Alter, „Kinderprofil“ als Text. */
@@ -25,6 +27,7 @@ export function ProfilZeile({ profil, art }: { profil: ProfilKopf; art?: keyof t
       <Avatar initialen={profil.initialen} kind={profil.istKinderprofil} />
       <span>
         Für <strong>{profil.name}</strong> · {profil.alter}
+        {profil.entwicklungsalter && ` · Entwicklungsalter ${profil.entwicklungsalter}`}
         {profil.istKinderprofil && " · Kinderprofil"}
         {art && ` · ${ART_TEXT[art]}`}
       </span>
@@ -41,13 +44,15 @@ interface ZusammenfassungProps {
   fragenUngeprueft: boolean;
   abgeschlossen: boolean;
   kopf?: ReactNode;
+  /** Weg 3: kein Hinweis auf die KI-Schicht – das Ergebnis steht im Entwicklungsergebnis (REQ-325). */
+  entwicklung?: boolean;
 }
 
 /** REQ-312: Zusammenfassung – Angaben, Dringlichkeit aus der Regel-Engine, keine Diagnosen. */
-export function FallZusammenfassung({ abschnitte, state, unvollstaendig, rolle, katalogVersion, fragenUngeprueft, abgeschlossen, kopf }: ZusammenfassungProps) {
+export function FallZusammenfassung({ abschnitte, state, unvollstaendig, rolle, katalogVersion, fragenUngeprueft, abgeschlossen, kopf, entwicklung = false }: ZusammenfassungProps) {
   const e = state?.ergebnis;
   return (
-    <Panel titel={abgeschlossen ? "Überblick über den Fall" : "Bisherige Angaben"} data-testid="zusammenfassung">
+    <Panel titel={entwicklung ? "Angaben im Überblick" : abgeschlossen ? "Überblick über den Fall" : "Bisherige Angaben"} data-testid="zusammenfassung">
       {kopf}
       {e && e.status === "KEINE_WARNZEICHEN" && unvollstaendig && (
         <Hinweis titel="Prüfung unvollständig – bitte Angaben prüfen.">
@@ -58,8 +63,10 @@ export function FallZusammenfassung({ abschnitte, state, unvollstaendig, rolle, 
         </Hinweis>
       )}
       {e && e.status === "KEINE_WARNZEICHEN" && !unvollstaendig && (
-        <Hinweis titel="Keine Warnzeichen aus dem Demo-Regelsatz erkannt.">
+        <Hinweis titel={entwicklung ? "Keine akuten Warnzeichen aus dem Demo-Regelsatz erkannt." : "Keine Warnzeichen aus dem Demo-Regelsatz erkannt."}>
           <span data-testid="keine-warnzeichen">
+            {entwicklung &&
+              "Das betrifft nur akute Warnzeichen (z. B. Atemnot, Verlust erworbener Fähigkeiten) – das Ergebnis des Entwicklungs-Checks oben gilt unabhängig davon. "}
             Das ist keine Entwarnung: Geprüft wurde nur ein kleiner, ungeprüfter Regelsatz. Bei Verschlechterung oder
             Unsicherheit holen Sie ärztlichen Rat ein (ärztlicher Bereitschaftsdienst 116117), im Notfall wählen Sie 112.
           </span>
@@ -130,10 +137,17 @@ export function FallZusammenfassung({ abschnitte, state, unvollstaendig, rolle, 
         </section>
       )}
 
-      <Hinweis titel="Mögliche Ursachen und Empfehlungen folgen in einem späteren Schritt (KI-Schicht, Meilenstein 6).">
-        Diese Zusammenfassung enthält nur Ihre Angaben und die Prüfung auf Warnzeichen – keine Diagnose und keine
-        Empfehlung einer Fachrichtung.
-      </Hinweis>
+      {entwicklung ? (
+        <Hinweis titel="Keine Diagnose.">
+          Diese Übersicht enthält die Angaben und die Prüfung auf Warnzeichen. Die Software stellt keine
+          Entwicklungsstörung fest und ersetzt keine Vorsorgeuntersuchung (U-Untersuchung).
+        </Hinweis>
+      ) : (
+        <Hinweis titel="Mögliche Ursachen und Empfehlungen folgen in einem späteren Schritt (KI-Schicht, Meilenstein 6).">
+          Diese Zusammenfassung enthält nur Ihre Angaben und die Prüfung auf Warnzeichen – keine Diagnose und keine
+          Empfehlung einer Fachrichtung.
+        </Hinweis>
+      )}
       <p className="text-soft" style={{ margin: 0 }} data-testid="versionen">
         {fragenUngeprueft && (
           <>

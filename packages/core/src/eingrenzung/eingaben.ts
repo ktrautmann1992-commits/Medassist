@@ -27,6 +27,13 @@ export interface Gesammelt {
   schnellcheckErledigt: boolean;
   notfallBestaetigt: boolean;
   region: string | null;
+  /**
+   * REQ-323: zuletzt gewählte Bereiche des Entwicklungs-Checks – immer ergänzt um Bereiche mit
+   * bereits beantworteten Fragen (QA E3: beantwortete Bereiche können nicht abgewählt werden).
+   */
+  bereiche: string[] | null;
+  /** QA E2: Entwicklungsalter, festgehalten bei der ersten Bereichsauswahl. */
+  entwicklungsAlter: { monate: number; korrigiert: boolean } | null;
   antworten: Record<string, AntwortWert>;
   /** Alle Symptome (Vereinigung) – Reihenfolge der ersten Angabe. */
   symptome: string[];
@@ -57,6 +64,8 @@ export function sammleEingaben(
     schnellcheckErledigt: false,
     notfallBestaetigt: false,
     region: null,
+    bereiche: null,
+    entwicklungsAlter: null,
     antworten: {},
     symptome: [],
     messwerte: {},
@@ -131,6 +140,13 @@ export function sammleEingaben(
         if (schritt === "region" && !teilweise) g.region = wert.region;
         else g.ungueltig++;
         break;
+      case "bereiche":
+        // REQ-323: nur im Entwicklungs-Check und nur bekannte Bereiche – sonst nicht lesbar.
+        if (schritt === "bereiche" && !teilweise && bereich === "ENTWICKLUNG" && wert.bereiche.every((b) => k.entwicklung.bereicheById.has(b))) {
+          g.bereiche = [...wert.bereiche];
+          g.entwicklungsAlter ??= { monate: wert.alterMonate, korrigiert: wert.korrigiert };
+        } else g.ungueltig++;
+        break;
       default: {
         // Antwort auf eine Frage. Symptome zählen immer (auch Teil-Eingaben, andere Katalogversion).
         if (wert.typ === "mehrfach") symptomHinzu(wert.symptome);
@@ -141,6 +157,13 @@ export function sammleEingaben(
         else g.ungueltig++;
       }
     }
+  }
+
+  if (bereich === "ENTWICKLUNG" && g.bereiche) {
+    // QA E3: Bereiche mit beantworteten Fragen bleiben gewählt (Reihenfolge wie im Katalog).
+    const beantwortet = new Set(Object.keys(g.antworten).flatMap((fid) => k.entwicklung.meta.get(fid)?.bereich ?? []));
+    const gewaehlt = new Set([...g.bereiche, ...beantwortet]);
+    g.bereiche = k.entwicklung.bereiche.filter((b) => gewaehlt.has(b.id)).map((b) => b.id);
   }
 
   if (g.kriseErledigt) {
@@ -180,9 +203,11 @@ export function ablaufStandAus(
     notfallAktiv: bewertung.notfallAktiv,
     notfallBestaetigt: g.notfallBestaetigt,
     region: g.region,
+    bereiche: g.bereiche,
     antworten: g.antworten,
     kinderprofil: bewertung.kinderprofil,
-    alterMonate: bewertung.alterMonate,
+    // QA E2: im Entwicklungs-Check gilt ab der Bereichsauswahl das festgehaltene Entwicklungsalter.
+    alterMonate: bereich === "ENTWICKLUNG" && g.entwicklungsAlter ? g.entwicklungsAlter.monate : bewertung.alterMonate,
   };
 }
 

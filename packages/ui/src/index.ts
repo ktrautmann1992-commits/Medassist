@@ -13,3 +13,4 @@ export * from "./dringlichkeit";
 export * from "./notfall";
 export * from "./koerperkarte";
 export * from "./frage-felder";
+export * from "./entwicklung";

@@ -67,7 +67,7 @@ test.describe("Beschwerden eingrenzen (Weg 2)", () => {
     await expect(nav.getByRole("link", { name: "Meine Fälle" })).toBeVisible();
     const fallId = await starteFall(page, profilId, "Körperlich");
     const fall = () => db.fall.findUniqueOrThrow({ where: { id: fallId }, include: { eingaben: { orderBy: { erstelltAm: "asc" } } } });
-    expect(await fall()).toMatchObject({ art: "KOERPERLICH", weg: "GEFUEHRT", status: "ENTWURF", katalogVersion: "0.1.0", regelVersion: "0.2.0" });
+    expect(await fall()).toMatchObject({ art: "KOERPERLICH", weg: "GEFUEHRT", status: "ENTWURF", katalogVersion: "0.2.0", regelVersion: "0.2.0" });
 
     // REQ-306: Schnellcheck zuerst – ohne Antwort abgewiesen
     await expect(page.getByTestId("schrittanzeige")).toContainText("Schritt 1 von");

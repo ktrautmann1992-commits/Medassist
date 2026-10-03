@@ -9,7 +9,7 @@ import { FRAGEN_DATEIEN, standardFragenkataloge } from "./standard";
 const ORDNER = path.resolve(import.meta.dirname, "../../../../content/fragen");
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- Tests verändern Rohdaten gezielt. */
-function kopie(): FragenDateien & { koerperkarte: any; koerperlich: any; seelisch: any } {
+function kopie(): FragenDateien & { koerperkarte: any; koerperlich: any; seelisch: any; entwicklung: any } {
   return structuredClone(FRAGEN_DATEIEN) as any;
 }
 
@@ -28,21 +28,23 @@ const frage = (d: any, id: string) => d.fragen.find((f: any) => f.id === id);
 describe("REQ-300 alle Dateien unter /content/fragen", () => {
   it("jede Datei ist bekannt und gültig; gebündelte Importe entsprechen den Dateien", () => {
     const dateien = readdirSync(ORDNER).sort();
-    expect(dateien).toEqual(["koerperkarte.json", "koerperlich.json", "seelisch.json"]);
+    expect(dateien).toEqual(["entwicklung.json", "koerperkarte.json", "koerperlich.json", "seelisch.json"]);
     const roh = Object.fromEntries(dateien.map((d) => [d, JSON.parse(readFileSync(path.join(ORDNER, d), "utf8"))]));
     expect(roh["koerperkarte.json"]).toEqual(FRAGEN_DATEIEN.koerperkarte);
     expect(roh["koerperlich.json"]).toEqual(FRAGEN_DATEIEN.koerperlich);
     expect(roh["seelisch.json"]).toEqual(FRAGEN_DATEIEN.seelisch);
+    expect(roh["entwicklung.json"]).toEqual(FRAGEN_DATEIEN.entwicklung);
     const k = ladeFragenkataloge(
-      { koerperkarte: roh["koerperkarte.json"], koerperlich: roh["koerperlich.json"], seelisch: roh["seelisch.json"] },
+      { koerperkarte: roh["koerperkarte.json"], koerperlich: roh["koerperlich.json"], seelisch: roh["seelisch.json"], entwicklung: roh["entwicklung.json"] },
       standardRegelwerk(),
     );
-    expect(k.version).toBe("0.1.0");
+    // REQ-320: mit dem Entwicklungskatalog gemeinsam auf 0.2.0 angehoben.
+    expect(k.version).toBe("0.2.0");
   });
 
   it("REQ-300/RISK-032: Start-Kataloge sind ungeprüft und ohne Quelle gekennzeichnet", () => {
     const k = standardFragenkataloge();
-    for (const x of [k.koerperkarte, k.kataloge.KOERPERLICH, k.kataloge.PSYCHISCH]) {
+    for (const x of [k.koerperkarte, k.kataloge.KOERPERLICH, k.kataloge.PSYCHISCH, k.kataloge.ENTWICKLUNG]) {
       expect(x.status).toBe("ungeprüft");
       expect(x.quelle).toBeNull();
       expect(x.geprueftVon).toBeNull();
@@ -67,7 +69,7 @@ describe("REQ-300 alle Dateien unter /content/fragen", () => {
 
   it("abweichende Katalog-Versionen sind ein Ladefehler", () => {
     const d = kopie();
-    d.seelisch.katalogVersion = "0.2.0";
+    d.seelisch.katalogVersion = "0.3.0";
     expect(fehlerVon(d).message).toContain("Katalog-Versionen unterscheiden sich");
   });
 

@@ -1,7 +1,7 @@
 {
   "art": "fragenkatalog",
   "bereich": "PSYCHISCH",
-  "katalogVersion": "0.1.0",
+  "katalogVersion": "0.2.0",
   "stand": "2026-10-03",
   "hinweis": "Demo – nicht für den klinischen Einsatz. Fragen für Weg 2, seelisch (REQ-311). Das Krisen-Screening kommt aus content/regeln/krisenpfad.json und ist immer der erste Schritt. Eigene, fachlich ungeprüfte Formulierungen – keine validierten Fragebögen (z. B. PHQ-9, GAD-7), Lizenz nicht geklärt.",
   "status": "ungeprüft",

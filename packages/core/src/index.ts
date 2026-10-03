@@ -11,3 +11,4 @@ export * from "./profile/zugriff";
 export * from "./profile/anzeige";
 export * from "./regeln";
 export * from "./eingrenzung";
+export * from "./entwicklung";

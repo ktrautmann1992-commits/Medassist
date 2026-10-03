@@ -1,6 +1,6 @@
 {
   "art": "koerperkarte",
-  "katalogVersion": "0.1.0",
+  "katalogVersion": "0.2.0",
   "stand": "2026-10-03",
   "hinweis": "Demo – nicht für den klinischen Einsatz. Körperkarte für Weg 2 (REQ-303). Vorderansicht: Die rechte Körperseite erscheint links im Bild (Blick auf die Person). Zuordnung zu Organsystemen ist eine grobe, ungeprüfte Orientierung – keine Zuordnung zu Fachrichtungen.",
   "status": "ungeprüft",

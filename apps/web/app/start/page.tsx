@@ -123,7 +123,24 @@ async function ProfilWahl({ nutzer, gewaehlt }: { nutzer: Nutzer; gewaehlt: stri
               Profil ansehen
             </Link>
           </div>
-          <p className="text-soft">Freie Beschreibung (Text, Sprache, Foto) und Entwicklungs-Check folgen in den nächsten Meilensteinen.</p>
+          {auswahl.istKinderprofil && (
+            // REQ-329: Entwicklungs-Check nur beim Kinderprofil (wie docs/design-vorschau.html)
+            <div className="grid">
+              <Link className="entry-option" href={`/eingrenzung?profil=${encodeURIComponent(auswahl.id)}&weg=entwicklung`}>
+                <strong className="entry-title">Entwicklung prüfen</strong>
+                <span className="text-soft">
+                  Sprache, Bewegung, Verhalten: kurze Beobachtungsfragen für {auswahl.vorname} und wann eine Abklärung in der
+                  Kinderarztpraxis sinnvoll ist.
+                </span>
+                <span className="methods">
+                  <span className="method-tag">Sprache</span>
+                  <span className="method-tag">Motorik</span>
+                  <span className="method-tag">Verhalten</span>
+                </span>
+              </Link>
+            </div>
+          )}
+          <p className="text-soft">Freie Beschreibung (Text, Sprache, Foto) folgt in einem nächsten Meilenstein.</p>
         </div>
       ) : (
         <p className="text-soft">Legen Sie zuerst Ihr eigenes Profil oder ein Kinderprofil an.</p>

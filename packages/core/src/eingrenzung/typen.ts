@@ -1,5 +1,6 @@
 import type { Quelle, RegelStatus } from "../regeln/schema";
-import type { Ansicht, Bereich, DauerEinheit, Form, FrageBedingung } from "./schema";
+import type { EntwicklungsKatalog } from "../entwicklung/typen";
+import type { MonatsBereich, Ansicht, Bereich, DauerEinheit, Form, FrageBedingung } from "./schema";
 
 /**
  * Aufgelöste (geladene und geprüfte) Fragenkataloge und Körperkarte (REQ-300 – REQ-303).
@@ -25,6 +26,10 @@ interface FrageKopf {
   hilfe: string | null;
   pflicht: boolean;
   bedingung: FrageBedingung | null;
+  /** REQ-323: Bereich des Entwicklungs-Checks (z. B. `sprache`) oder `null` (Weg 2, Pflichtfrage). */
+  gruppe: string | null;
+  /** REQ-322: Altersbereich (Entwicklungsalter) oder `null` = jedes Alter. */
+  alter: MonatsBereich | null;
 }
 
 export type Frage =
@@ -98,4 +103,6 @@ export interface Fragenkataloge {
   version: string;
   koerperkarte: Koerperkarte;
   kataloge: Readonly<Record<Bereich, Katalog>>;
+  /** REQ-320: Zusatzdaten des Entwicklungs-Checks (Bereiche, Einstufungen, Anlaufstellen). */
+  entwicklung: EntwicklungsKatalog;
 }

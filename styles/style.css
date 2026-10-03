@@ -317,6 +317,17 @@ a.profile-chip { color: var(--ink); text-decoration: none; }
 .fall-list > li { border: 1px solid var(--line); border-radius: var(--radius-field); padding: var(--space-3) var(--space-4); display: grid; gap: var(--space-2); }
 .fall-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
 
+/* --- Entwicklungs-Check (REQ-326, REQ-327) ------------------------------- */
+/* „Keine Auffälligkeit“: neutral (keine Status- oder Markenfarbe), immer mit Symbol und Text. */
+.urgency-neutral { color: var(--ink-soft); background: var(--page); }
+.urgency-neutral strong { color: var(--ink); }
+.anlaufstellen { margin: 0; padding-left: var(--space-5); display: grid; gap: var(--space-2); }
+.bereich-wahl .check-row { align-items: flex-start; }
+.bereich-wahl .check-row input { margin-top: 4px; }
+a.entry-option { color: var(--ink); text-decoration: none; }
+.table .urgency-tag { border-radius: var(--radius-field); align-items: flex-start; }
+a.entry-option .entry-title { color: var(--rose-700); text-decoration: underline; }
+
 /* --- Bewegung ------------------------------------------------------------ */
 @media (prefers-reduced-motion: no-preference) {
   .btn, .entry-option, .profile-chip, input { transition: border-color .15s, background-color .15s; }

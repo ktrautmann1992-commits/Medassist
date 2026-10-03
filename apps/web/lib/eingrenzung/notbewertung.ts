@@ -31,7 +31,14 @@ export function notBewertung(kontext: Omit<FallKontext, "eingaben">, eingabenVor
     const schrittId = formData.get("schritt");
     const schritt = typeof schrittId === "string" ? erlaubterSchritt(kontext.kataloge, vorher.stand, schrittId) : null;
     const neue = schritt
-      ? verarbeiteSchritt(kontext.kataloge, kontext.regelwerk, kontext.bereich, schritt, formData).eingaben
+      ? verarbeiteSchritt(
+          kontext.kataloge,
+          kontext.regelwerk,
+          kontext.bereich,
+          schritt,
+          formData,
+          vorher.gesammelt.entwicklungsAlter ?? (kontext.alterMonate === null ? null : { monate: kontext.alterMonate, korrigiert: false }),
+        ).eingaben
       : [kriseSignal(kontext.kataloge, kontext.regelwerk, formData), warnSignal(kontext.kataloge, kontext.regelwerk, kontext.bereich, schrittId, formData)].filter(
           (x) => x !== null,
         );

@@ -1,5 +1,5 @@
 import { initialen, sicheresAlter } from "@medassist/core";
-import { Avatar, DringlichkeitKurz, Hinweis, Panel } from "@medassist/ui";
+import { Avatar, DringlichkeitKurz, EntwicklungsStatus, Hinweis, Panel } from "@medassist/ui";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/guards";
 import { ladeFaelle } from "@/lib/eingrenzung/fall";
@@ -54,9 +54,9 @@ export default async function Faelle() {
           >
             <ul className="fall-list">
               {liste.map((f) => {
-                const { anzeige } = fallKontext(nutzer, f);
+                const { anzeige, entwicklung } = fallKontext(nutzer, f);
                 const offen = anzeige.offen;
-                const art = f.art === "PSYCHISCH" ? ART_TEXT.PSYCHISCH : ART_TEXT.KOERPERLICH;
+                const art = ART_TEXT[f.bereich];
                 const datum = ZEIT.format(f.erstelltAm);
                 return (
                   <li key={f.id} data-fall-id={f.id}>
@@ -66,6 +66,16 @@ export default async function Faelle() {
                       <span data-testid="fall-status">Status: {anzeige.text}</span>
                       <DringlichkeitKurz stufe={anzeige.dringlichkeit} ohneStufe={anzeige.ohneDringlichkeit} />
                     </div>
+                    {entwicklung?.art === "ergebnis" && (
+                      // REQ-329: Kurzergebnis je Bereich (Symbol + Text)
+                      <ul className="fall-meta" style={{ listStyle: "none", margin: 0, padding: 0 }} data-testid="entwicklung-kurz">
+                        {entwicklung.ergebnis.bereiche.map((b) => (
+                          <li key={b.id}>
+                            {b.bezeichnung}: <EntwicklungsStatus einstufung={b.einstufung} />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                     <div className="actions">
                       <Link className="list-link" href={`/faelle/${f.id}`}>
                         Ansehen<span className="visually-hidden">: {art}, {datum}</span>

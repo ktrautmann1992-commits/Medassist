@@ -1,6 +1,6 @@
 "use client";
 
-import { NOTRUF, type Ansicht, type Rolle } from "@medassist/core";
+import { NOTRUF, type Ansicht, type Bereich, type Rolle } from "@medassist/core";
 import {
   AuswahlFrage,
   Button,
@@ -27,7 +27,7 @@ import { beantworteSchritt, type SchrittState } from "../actions";
  */
 interface Props {
   fallId: string;
-  bereich: "KOERPERLICH" | "PSYCHISCH";
+  bereich: Bereich;
   rolle: Rolle;
   schrittId: string;
   ansicht: SchrittAnsicht;
@@ -232,6 +232,55 @@ export function SchrittFormular({ fallId, bereich, rolle, schrittId, ansicht, zu
         </div>
       )}
 
+      {ansicht.art === "bereiche" && (
+        // REQ-323: Bereichsauswahl – einzelne Bereiche oder alle; Prüfung serverseitig.
+        <fieldset className="form-section stack bereich-wahl" aria-describedby={f("bereiche") ? "bereiche-fehler" : "bereiche-hilfe"}>
+          <legend>Welche Bereiche möchten Sie prüfen?</legend>
+          <p className="text-soft" id="bereiche-hilfe" style={{ margin: 0 }}>
+            Angeboten werden nur Bereiche mit Demo-Fragen für das Alter Ihres Kindes. Sie können einzelne Bereiche ankreuzen
+            oder alle prüfen.
+          </p>
+          <div className="choice-list">
+            {ansicht.bereiche.map((b) => {
+              const gesperrt = ansicht.gesperrt.includes(b.id);
+              return (
+                <label key={b.id} className="check-row" htmlFor={`bereich-${b.id}`}>
+                  <input
+                    type="checkbox"
+                    id={`bereich-${b.id}`}
+                    name="bereich"
+                    value={b.id}
+                    defaultChecked={gesperrt || ansicht.gewaehlt.includes(b.id)}
+                    disabled={gesperrt}
+                  />
+                  {/* QA E3: deaktivierte Felder werden nicht gesendet – der Server ergänzt beantwortete Bereiche ohnehin. */}
+                  {gesperrt && <input type="hidden" name="bereich" value={b.id} />}
+                  <span>
+                    <strong>{b.bezeichnung}</strong>
+                    <br />
+                    <span className="text-soft">
+                      {b.beschreibung}
+                      {gesperrt && " · Bereits beantwortet – bleibt im Ergebnis."}
+                    </span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+          {f("bereiche") && (
+            <p className="error" id="bereiche-fehler" style={{ margin: 0 }}>
+              {f("bereiche")}
+            </p>
+          )}
+        </fieldset>
+      )}
+
+      {ansicht.art === "frage" && ansicht.gruppe && (
+        <p className="text-soft" style={{ margin: 0 }} data-testid="bereich-name">
+          Bereich: <strong>{ansicht.gruppe}</strong>
+        </p>
+      )}
+
       {ansicht.art === "frage" && (
         <>
           {(ansicht.typ === "einfach" || ansicht.typ === "mehrfach") && (
@@ -299,6 +348,11 @@ export function SchrittFormular({ fallId, bereich, rolle, schrittId, ansicht, zu
         <Button type="submit" variante={ansicht.art === "notfall_weiter" ? "secondary" : "primary"} disabled={laeuft}>
           {laeuft ? "Wird gespeichert …" : ansicht.art === "notfall_weiter" ? "Fragen trotzdem fortsetzen" : "Weiter"}
         </Button>
+        {ansicht.art === "bereiche" && (
+          <Button type="submit" variante="secondary" name="aktion" value="alle" disabled={laeuft}>
+            Alle Bereiche prüfen
+          </Button>
+        )}
         {ueberspringbar && (
           <Button type="submit" variante="secondary" name="aktion" value="ueberspringen" disabled={laeuft}>
             Überspringen

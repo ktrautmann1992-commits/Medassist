@@ -48,6 +48,14 @@ export type KriseWert = z.infer<typeof kriseWertSchema>;
 
 export const regionWertSchema = z.strictObject({ typ: z.literal("region"), region: id });
 export const notfallBestaetigungSchema = z.strictObject({ typ: z.literal("notfall_bestaetigung") });
+/** REQ-323: Bereichsauswahl des Entwicklungs-Checks. */
+export const bereicheWertSchema = z.strictObject({
+  typ: z.literal("bereiche"),
+  bereiche: z.array(id).min(1).max(20),
+  /** QA E2: Entwicklungsalter bei der (ersten) Bereichsauswahl – gilt für Ablauf und Ergebnis des Falls. */
+  alterMonate: z.number().int().min(0).max(216),
+  korrigiert: z.boolean(),
+});
 
 /** REQ-313: Inhalt von `Eingabe.strukturiert` – wird beim Lesen erneut streng geprüft. */
 export const gespeicherteEingabeSchema = z.strictObject({
@@ -56,7 +64,7 @@ export const gespeicherteEingabeSchema = z.strictObject({
   schritt: id,
   /** Ungültige Antwort, von der nur sicherheitsrelevante gültige Teile gespeichert wurden. */
   teilweise: z.boolean(),
-  wert: z.union([antwortWertSchema, schnellcheckWertSchema, kriseWertSchema, regionWertSchema, notfallBestaetigungSchema]),
+  wert: z.union([antwortWertSchema, schnellcheckWertSchema, kriseWertSchema, regionWertSchema, notfallBestaetigungSchema, bereicheWertSchema]),
 });
 export type GespeicherteEingabe = z.infer<typeof gespeicherteEingabeSchema>;
 
@@ -119,7 +127,8 @@ export function pruefeAntwort(frage: Frage, roh: AntwortRoh): AntwortPruefung {
     const gueltig = texte.filter((t) => optionen.has(t));
     // Reihenfolge wie im Katalog (stabil für Anzeige und Tests).
     const gewaehlt = frage.optionen.filter((o) => gueltig.includes(o.id));
-    const symptome = gewaehlt.flatMap((o) => (o.symptom ? [o.symptom] : []));
+    // Mehrere Optionen können dasselbe Symptom setzen (z. B. Regression „ja“/„unsicher“) – einmal zählen.
+    const symptome = [...new Set(gewaehlt.flatMap((o) => (o.symptom ? [o.symptom] : [])))];
     const keine = istGesetzt(roh.keine);
     if (ungueltig || gueltig.length !== texte.length) return fehler("Unbekannte Auswahl – bitte erneut auswählen.", symptome);
     if (keine && !frage.keineOption) return fehler("Unbekannte Auswahl – bitte erneut auswählen.", symptome);

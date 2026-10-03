@@ -25,11 +25,20 @@ export const DAUER_EINHEIT_TEXT: Record<DauerEinheit, { eins: string; mehr: stri
 export const ANSICHTEN = ["vorne", "hinten"] as const;
 export type Ansicht = (typeof ANSICHTEN)[number];
 
-export const BEREICHE = ["KOERPERLICH", "PSYCHISCH"] as const;
+/** REQ-304/REQ-323: Weg 2 (körperlich, seelisch) und Weg 3 (Entwicklungs-Check). */
+export const BEREICHE = ["KOERPERLICH", "PSYCHISCH", "ENTWICKLUNG"] as const;
 export type Bereich = (typeof BEREICHE)[number];
+/** Bereiche mit einer Datei vom Typ `fragenkatalog` (Weg 2). */
+export const GEFUEHRTE_BEREICHE = ["KOERPERLICH", "PSYCHISCH"] as const;
 
-/** REQ-301: Diese Schritt-IDs sind für den Ablauf reserviert und keine Frage-IDs. */
-export const RESERVIERTE_SCHRITTE = ["krise", "schnellcheck", "notfall_weiter", "region", "zusammenfassung"] as const;
+/** REQ-301/REQ-323: Diese Schritt-IDs sind für den Ablauf reserviert und keine Frage-IDs. */
+export const RESERVIERTE_SCHRITTE = ["krise", "schnellcheck", "notfall_weiter", "region", "bereiche", "zusammenfassung"] as const;
+
+/** REQ-320: Altersbereich in vollen Monaten (`minMonate` inklusiv, `unterMonate` exklusiv). */
+export interface MonatsBereich {
+  minMonate: number;
+  unterMonate: number;
+}
 
 /** REQ-302: maximale Verschachtelungstiefe von Bedingungen. */
 export const MAX_BEDINGUNG_TIEFE = 4;
@@ -40,7 +49,7 @@ const id = katalogIdSchema;
 const text = z.string().trim().min(1);
 
 /** Kopf jeder Datei: Version, Stand, Status, Quelle (wie REQ-200: „geprüft“ nur mit Quelle und Prüfer). */
-const kopfFelder = {
+export const kopfFelder = {
   katalogVersion: semver,
   stand: z.iso.date(),
   hinweis: text,
@@ -50,7 +59,7 @@ const kopfFelder = {
   geprueftVon: text.nullable(),
 };
 
-function pruefeStatus(d: { status: string; quelle: unknown; quelleHinweis: string | null; geprueftVon: string | null }, ctx: z.RefinementCtx) {
+export function pruefeStatus(d: { status: string; quelle: unknown; quelleHinweis: string | null; geprueftVon: string | null }, ctx: z.RefinementCtx) {
   if (d.status === "geprüft" && (!d.quelle || !d.geprueftVon)) {
     ctx.addIssue({ code: "custom", path: ["status"], message: "Status „geprüft“ verlangt Quelle und geprueftVon." });
   }
@@ -154,7 +163,7 @@ export const schnellcheckSchema = z.strictObject({
 export const fragenkatalogDateiSchema = z
   .strictObject({
     art: z.literal("fragenkatalog"),
-    bereich: z.enum(BEREICHE),
+    bereich: z.enum(GEFUEHRTE_BEREICHE),
     ...kopfFelder,
     schnellcheck: schnellcheckSchema,
     fragen: z.array(frageSchema).min(1),

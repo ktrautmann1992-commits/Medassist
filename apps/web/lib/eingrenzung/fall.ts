@@ -1,5 +1,5 @@
 import "server-only";
-import { berechneAlter, type Bereich, type ProfilNutzer } from "@medassist/core";
+import { berechneAlter, entwicklungsAlter, type Bereich, type ProfilNutzer } from "@medassist/core";
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "../db";
 import { profilFilter } from "../profile/filter";
@@ -39,6 +39,12 @@ const fallFelder = {
   profil: { select: profilFelder },
 } satisfies Prisma.FallSelect;
 
+/** Weg 2 (geführt: körperlich/seelisch) und Weg 3 (Entwicklungs-Check, REQ-323). */
+function istUnterstuetzt(f: { weg: string; art: string }): boolean {
+  if (f.weg === "GEFUEHRT") return f.art === "KOERPERLICH" || f.art === "PSYCHISCH";
+  return f.weg === "ENTWICKLUNG" && f.art === "ENTWICKLUNG";
+}
+
 function gueltigeId(id: unknown): id is string {
   return typeof id === "string" && id.length > 0 && id.length <= 64;
 }
@@ -53,8 +59,8 @@ export async function ladeFall(nutzer: ProfilNutzer, fallId: unknown) {
     },
   });
   if (!fall || !regelErfuellt(nutzer, fall.profil)) return null;
-  // Nur die Weg-2-Fälle dieses Meilensteins (geführt, körperlich/seelisch).
-  if (fall.weg !== "GEFUEHRT" || (fall.art !== "KOERPERLICH" && fall.art !== "PSYCHISCH")) return null;
+  // Nur die Fälle von Weg 2 und Weg 3 (andere Wege folgen mit späteren Meilensteinen).
+  if (!istUnterstuetzt(fall)) return null;
   return { ...fall, bereich: fall.art as Bereich };
 }
 export type FallDaten = NonNullable<Awaited<ReturnType<typeof ladeFall>>>;
@@ -69,7 +75,7 @@ export async function ladeFaelle(nutzer: ProfilNutzer) {
     take: 500,
   });
   return faelle
-    .filter((f) => regelErfuellt(nutzer, f.profil) && f.weg === "GEFUEHRT" && (f.art === "KOERPERLICH" || f.art === "PSYCHISCH"))
+    .filter((f) => regelErfuellt(nutzer, f.profil) && istUnterstuetzt(f))
     .map((f) => ({ ...f, bereich: f.art as Bereich }));
 }
 
@@ -80,4 +86,17 @@ export function alterMonate(geburtsdatum: Date, stichtag: Date): number | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Alter für den Ablauf (Fragebedingungen, Altersbereiche): im Entwicklungs-Check das
+ * Entwicklungsalter (bei Frühgeborenen korrigiert, REQ-322), sonst das chronologische Alter.
+ */
+export function ablaufAlterMonate(
+  bereich: Bereich,
+  profil: { geburtsdatum: Date; sswBeiGeburtWochen: number | null; sswBeiGeburtTage: number | null },
+  stichtag: Date,
+): number | null {
+  if (bereich === "ENTWICKLUNG") return entwicklungsAlter(profil, stichtag)?.monate ?? null;
+  return alterMonate(profil.geburtsdatum, stichtag);
 }

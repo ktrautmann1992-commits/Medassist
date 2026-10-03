@@ -1,3 +1,4 @@
+import { imMonatsBereich } from "../entwicklung/alter";
 import type { AntwortWert } from "./antwort";
 import { bedingungErfuellt, type FrageKontext } from "./bedingung";
 import type { Bereich } from "./schema";
@@ -10,6 +11,8 @@ import type { Frage, Fragenkataloge } from "./typen";
  *
  * seelisch:   Krisen-Screening → Schnellcheck → [Notfall-Bestätigung] → Fragen → Zusammenfassung
  * körperlich: Schnellcheck → [Notfall-Bestätigung] → Körperregion → Fragen → Zusammenfassung
+ * Entwicklung (REQ-323): Schnellcheck → [Notfall-Bestätigung] → Pflichtfrage Regression →
+ *             Bereichsauswahl → Fragen der gewählten Bereiche (Entwicklungsalter) → Ergebnis
  * KRISE beendet den Ablauf sofort (kein weiterer Diagnose-Ablauf, REQ-208).
  */
 
@@ -18,6 +21,7 @@ export type Schritt =
   | { art: "schnellcheck" }
   | { art: "notfall_weiter" }
   | { art: "region" }
+  | { art: "bereiche" }
   | { art: "frage"; frage: Frage }
   | { art: "zusammenfassung" }
   | { art: "beendet" };
@@ -35,7 +39,10 @@ export interface AblaufStand {
   /** Letzte vollständige Antwort je Frage. */
   antworten: Readonly<Record<string, AntwortWert>>;
   kinderprofil: boolean;
+  /** Serverseitig aus dem Profil; im Entwicklungs-Check das Entwicklungsalter (REQ-322). */
   alterMonate: number | null;
+  /** REQ-323: gewählte Bereiche des Entwicklungs-Checks (`null` = noch nicht gewählt). */
+  bereiche?: readonly string[] | null;
 }
 
 export function schrittId(s: Schritt): string {
@@ -53,10 +60,23 @@ export function frageKontext(k: Fragenkataloge, stand: AblaufStand): FrageKontex
   };
 }
 
-/** Fragen, deren Bedingung beim aktuellen Stand erfüllt ist – in Katalogreihenfolge. */
+/**
+ * Fragen, deren Bedingung beim aktuellen Stand erfüllt ist – in Katalogreihenfolge. Im
+ * Entwicklungs-Check nur Fragen gewählter Bereiche und im Altersbereich (REQ-322, REQ-323).
+ */
 export function anwendbareFragen(k: Fragenkataloge, stand: AblaufStand): Frage[] {
   const kontext = frageKontext(k, stand);
-  return k.kataloge[stand.bereich].fragen.filter((f) => f.bedingung === null || bedingungErfuellt(f.bedingung, kontext));
+  const gewaehlt = stand.bereiche ?? [];
+  return k.kataloge[stand.bereich].fragen.filter(
+    (f) =>
+      (f.gruppe === null || gewaehlt.includes(f.gruppe)) &&
+      imMonatsBereich(f.alter, stand.alterMonate) &&
+      (f.bedingung === null || bedingungErfuellt(f.bedingung, kontext)),
+  );
+}
+
+function bereicheGewaehlt(stand: AblaufStand): boolean {
+  return Boolean(stand.bereiche && stand.bereiche.length > 0);
 }
 
 function beantwortet(stand: AblaufStand, id: string): boolean {
@@ -70,7 +90,14 @@ export function naechsterSchritt(k: Fragenkataloge, stand: AblaufStand): Schritt
   // REQ-308: Bei NOTFALL vor jeder weiteren Frage ausdrücklich bestätigen lassen.
   if (stand.notfallAktiv && !stand.notfallBestaetigt) return { art: "notfall_weiter" };
   if (stand.bereich === "KOERPERLICH" && !(stand.region && k.koerperkarte.regionenById.has(stand.region))) return { art: "region" };
-  const offen = anwendbareFragen(k, stand).find((f) => !beantwortet(stand, f.id));
+  const anwendbar = anwendbareFragen(k, stand);
+  if (stand.bereich === "ENTWICKLUNG") {
+    // REQ-323: zuerst die Pflichtfrage(n) ohne Bereich, dann die Bereichsauswahl.
+    const allgemein = anwendbar.find((f) => f.gruppe === null && !beantwortet(stand, f.id));
+    if (allgemein) return { art: "frage", frage: allgemein };
+    if (!bereicheGewaehlt(stand)) return { art: "bereiche" };
+  }
+  const offen = anwendbar.find((f) => !beantwortet(stand, f.id));
   return offen ? { art: "frage", frage: offen } : { art: "zusammenfassung" };
 }
 
@@ -83,19 +110,31 @@ export function pfad(k: Fragenkataloge, stand: AblaufStand): string[] {
   if (stand.bereich === "PSYCHISCH") schritte.push("krise");
   schritte.push("schnellcheck");
   if (stand.bereich === "KOERPERLICH") schritte.push("region");
-  schritte.push(...anwendbareFragen(k, stand).map((f) => f.id));
+  const anwendbar = anwendbareFragen(k, stand);
+  if (stand.bereich === "ENTWICKLUNG") {
+    schritte.push(...anwendbar.filter((f) => f.gruppe === null).map((f) => f.id), "bereiche");
+    schritte.push(...anwendbar.filter((f) => f.gruppe !== null).map((f) => f.id));
+    return schritte;
+  }
+  schritte.push(...anwendbar.map((f) => f.id));
   return schritte;
 }
 
 /**
- * REQ-305: Bearbeitbar sind nur die Körperregion und bereits beantwortete, anwendbare
+ * REQ-305/REQ-323: Bearbeitbar sind nur Körperregion, Bereichsauswahl und bereits beantwortete, anwendbare
  * Fragen – nie Krisen-Screening, Schnellcheck oder Notfall-Bestätigung (RISK-030).
  */
 export function bearbeitbareSchritte(k: Fragenkataloge, stand: AblaufStand): string[] {
   if (stand.krise || (stand.bereich === "PSYCHISCH" && !stand.kriseErledigt) || !stand.schnellcheckErledigt) return [];
   const ids: string[] = [];
   if (stand.bereich === "KOERPERLICH" && stand.region) ids.push("region");
-  ids.push(...anwendbareFragen(k, stand).filter((f) => beantwortet(stand, f.id)).map((f) => f.id));
+  if (stand.bereich === "ENTWICKLUNG" && bereicheGewaehlt(stand)) ids.push("bereiche");
+  // QA E1: Die Pflichtfrage(n) des Entwicklungs-Checks sind wie der Schnellcheck nicht erneut bearbeitbar.
+  ids.push(
+    ...anwendbareFragen(k, stand)
+      .filter((f) => beantwortet(stand, f.id) && !(stand.bereich === "ENTWICKLUNG" && f.gruppe === null))
+      .map((f) => f.id),
+  );
   return ids;
 }
 
@@ -111,6 +150,7 @@ export function erlaubterSchritt(k: Fragenkataloge, stand: AblaufStand, id: stri
   if (naechster.art === "krise" || naechster.art === "schnellcheck" || naechster.art === "notfall_weiter") return null;
   if (!bearbeitbareSchritte(k, stand).includes(id)) return null;
   if (id === "region") return { art: "region" };
+  if (id === "bereiche") return { art: "bereiche" };
   const frage = k.kataloge[stand.bereich].fragenById.get(id);
   return frage ? { art: "frage", frage } : null;
 }

@@ -5,6 +5,7 @@ import {
   gespeicherteEingabeSchema,
   type Gesammelt,
   pruefeAntwort,
+  pruefeBereiche,
   pruefeKrise,
   pruefeRegion,
   pruefeSchnellcheck,
@@ -26,6 +27,11 @@ export interface NeueEingabe {
   inhalt: string;
   koerperregion: string | null;
   strukturiert: GespeicherteEingabe;
+}
+
+export interface EntwicklungsAlterWert {
+  monate: number;
+  korrigiert: boolean;
 }
 
 export interface SchrittVerarbeitung {
@@ -94,9 +100,11 @@ export function verarbeiteSchritt(
   bereich: Bereich,
   schritt: Schritt,
   formData: FormData,
+  /** Entwicklungsalter für die Bereichsauswahl (bereits festgehalten oder aktuell, QA E2). */
+  entwicklungsAlter: EntwicklungsAlterWert | null = null,
 ): SchrittVerarbeitung {
   if (schritt.art === "krise") return { eingaben: [kriseEingabe(k, regelwerk, krisenPaare(regelwerk, formData))] };
-  const einzel = verarbeiteEinzeln(k, regelwerk, bereich, schritt, formData);
+  const einzel = verarbeiteEinzeln(k, regelwerk, bereich, schritt, formData, entwicklungsAlter);
   // Jede in einem anderen Schritt übermittelte Krisenantwort wird gespeichert und ausgewertet.
   const paare = krisenPaare(regelwerk, formData);
   const eingaben = [...(paare.length ? [kriseEingabe(k, regelwerk, paare)] : []), ...(einzel.eingabe ? [einzel.eingabe] : [])];
@@ -109,6 +117,7 @@ function verarbeiteEinzeln(
   bereich: Bereich,
   schritt: Schritt,
   formData: FormData,
+  entwicklungsAlter: EntwicklungsAlterWert | null = null,
 ): EinzelVerarbeitung {
   const katalog = k.kataloge[bereich];
   const huelle = (s: string, teilweise: boolean, wert: GespeicherteEingabe["wert"]) => huelleFuer(k, s, teilweise, wert);
@@ -148,6 +157,23 @@ function verarbeiteEinzeln(
       const region = k.koerperkarte.regionenById.get(r.region)!;
       return {
         eingabe: { frageId: "region", typ: "KOERPERREGION", inhalt: region.bezeichnung, koerperregion: region.id, strukturiert: huelle("region", false, { typ: "region", region: region.id }) },
+      };
+    }
+    case "bereiche": {
+      // REQ-323: nur im Entwicklungs-Check; nur angebotene Bereiche (serverseitig aus dem Entwicklungsalter).
+      if (bereich !== "ENTWICKLUNG") return { eingabe: null, fehler: "Dieser Schritt nimmt keine Antworten an." };
+      // QA E2: Ohne bekanntes Entwicklungsalter keine Bereichsauswahl (das Alter wird mit ihr festgehalten).
+      if (!entwicklungsAlter) return { eingabe: null, fehler: "Das Alter ist unbekannt – bitte das Geburtsdatum im Profil prüfen." };
+      const r = pruefeBereiche(k.entwicklung, entwicklungsAlter.monate, texte(formData.getAll("bereich")), formData.get("aktion") === "alle");
+      if (!r.ok) return { eingabe: null, fehler: PRUEFEN, feldFehler: { bereiche: [r.fehler] } };
+      return {
+        eingabe: {
+          frageId: "bereiche",
+          typ: "ANTWORT",
+          inhalt: `Bereiche: ${r.bereiche.map((b) => k.entwicklung.bereicheById.get(b)?.bezeichnung ?? b).join(", ")}`,
+          koerperregion: null,
+          strukturiert: huelle("bereiche", false, { typ: "bereiche", bereiche: r.bereiche, alterMonate: entwicklungsAlter.monate, korrigiert: entwicklungsAlter.korrigiert }),
+        },
       };
     }
     case "frage": {
