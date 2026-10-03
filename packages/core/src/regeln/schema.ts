@@ -27,7 +27,7 @@ const vokabularId = z.string().regex(/^[a-z][a-z0-9_]{1,63}$/, "ID: Kleinbuchsta
 const regelId = z.string().regex(/^[A-Z]{2,}(-[A-Z0-9]+)+$/, "Regel-ID z. B. RF-KIND-001.");
 const text = z.string().trim().min(1);
 
-const vergleichSchema = z
+export const vergleichSchema = z
   .strictObject({
     "<": z.number().finite().optional(),
     "<=": z.number().finite().optional(),

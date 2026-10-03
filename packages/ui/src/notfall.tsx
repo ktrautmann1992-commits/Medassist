@@ -116,3 +116,34 @@ export function Krisenhinweis({ adressat = "patient", children, id }: Krisenhinw
     </Dringlichkeit>
   );
 }
+
+/**
+ * REQ-311: Neutraler, stets sichtbarer Hinweis „Hilfe in Krisen“ im seelischen Ablauf –
+ * Information, keine Dringlichkeit (keine Warnfarbe, kein Rosé). Nummern aus `packages/core`.
+ */
+export function KrisenKontakte({ titel = "Hilfe in Krisen – jederzeit erreichbar:", id }: { titel?: string; id?: string } = {}) {
+  return (
+    <div className="panel note" role="note" data-testid="krisen-kontakte" id={id}>
+      <span className="note-icon" aria-hidden="true">
+        i
+      </span>
+      <div>
+        <strong>{titel} </strong>
+        {NOTRUF.bezeichnung}{" "}
+        <a className="tel-link" href={NOTRUF.href}>
+          {NOTRUF.nummer}
+        </a>
+        {" · "}
+        {TELEFONSEELSORGE[0]!.bezeichnung}{" "}
+        {TELEFONSEELSORGE.map((k, i) => (
+          <span key={k.href}>
+            {i > 0 && " oder "}
+            <a className="tel-link" href={k.href}>
+              {k.nummer}
+            </a>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}

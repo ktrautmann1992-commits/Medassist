@@ -519,6 +519,8 @@ model Fall {
   dringlichkeit   Dringlichkeit?
   /// Version des Regelwerks, mit dem zuletzt bewertet wurde.
   regelVersion    String?
+  /// REQ-313: Version der Fragenkataloge (`/content/fragen/`), mit denen der Fall angelegt wurde.
+  katalogVersion  String?
   erstelltAm      DateTime        @default(now())
   aktualisiertAm  DateTime        @updatedAt
   abgeschlossenAm DateTime?

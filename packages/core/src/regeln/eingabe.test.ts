@@ -186,3 +186,22 @@ describe("N-1 im Zweifel ablehnen statt interpretieren", () => {
     expect(akzeptiert).toBeGreaterThan(100);
   });
 });
+
+describe("M4a (QA R3-B1) mehrereAbgaben", () => {
+  const roh = (mehrereAbgaben?: boolean): RegelEingabeRoh => ({
+    symptome: [],
+    messwerte: [
+      ["temperatur_c", "37"],
+      ["temperatur_c", "38.4"],
+    ],
+    antworten: [],
+    psychisch: false,
+    ...(mehrereAbgaben === undefined ? {} : { mehrereAbgaben }),
+  });
+  it("Standard (Formular): mehrere Werte ⇒ Feldfehler; mit mehrereAbgaben: kein Fehler, beide Werte geprüft", () => {
+    expect(pruefeRegelEingabe(w, roh()).feldFehler["messwert.temperatur_c"]).toBeDefined();
+    const e = pruefeRegelEingabe(w, roh(true));
+    expect(e.feldFehler).toEqual({});
+    expect(e.daten.messwerte).toEqual({ temperatur_c: [37, 38.4] });
+  });
+});

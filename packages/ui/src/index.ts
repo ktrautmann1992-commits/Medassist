@@ -11,3 +11,5 @@ export * from "./avatar";
 export * from "./profil-chip";
 export * from "./dringlichkeit";
 export * from "./notfall";
+export * from "./koerperkarte";
+export * from "./frage-felder";

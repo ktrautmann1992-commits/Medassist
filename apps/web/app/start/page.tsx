@@ -115,11 +115,15 @@ async function ProfilWahl({ nutzer, gewaehlt }: { nutzer: Nutzer; gewaehlt: stri
             {auswahl.istKinderprofil ? "Kinderprofil" : auswahl.istEigenesProfil ? "Eigenes Profil" : "Profil"}
           </p>
           <div className="actions">
+            {/* REQ-318: Einstieg in die geführte Eingrenzung mit dem ausgewählten Profil */}
+            <Link className="btn btn-primary" href={`/eingrenzung?profil=${encodeURIComponent(auswahl.id)}`}>
+              Beschwerden eingrenzen
+            </Link>
             <Link className="btn btn-secondary" href={`/profile/${auswahl.id}`}>
               Profil ansehen
             </Link>
           </div>
-          <p className="text-soft">Beschwerden eingeben und Entwicklungs-Check folgen in den nächsten Meilensteinen.</p>
+          <p className="text-soft">Freie Beschreibung (Text, Sprache, Foto) und Entwicklungs-Check folgen in den nächsten Meilensteinen.</p>
         </div>
       ) : (
         <p className="text-soft">Legen Sie zuerst Ihr eigenes Profil oder ein Kinderprofil an.</p>
@@ -141,6 +145,9 @@ async function ArztEinstieg({ nutzer }: { nutzer: Nutzer }) {
         </Link>
         <Link className="btn btn-secondary" href="/arzt/patienten/neu">
           Patient anlegen
+        </Link>
+        <Link className="btn btn-secondary" href="/eingrenzung">
+          Beschwerden eingrenzen
         </Link>
       </div>
     </Panel>

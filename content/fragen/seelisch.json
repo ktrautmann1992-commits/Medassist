@@ -1,0 +1,277 @@
+{
+  "art": "fragenkatalog",
+  "bereich": "PSYCHISCH",
+  "katalogVersion": "0.1.0",
+  "stand": "2026-10-03",
+  "hinweis": "Demo – nicht für den klinischen Einsatz. Fragen für Weg 2, seelisch (REQ-311). Das Krisen-Screening kommt aus content/regeln/krisenpfad.json und ist immer der erste Schritt. Eigene, fachlich ungeprüfte Formulierungen – keine validierten Fragebögen (z. B. PHQ-9, GAD-7), Lizenz nicht geklärt.",
+  "status": "ungeprüft",
+  "quelle": null,
+  "quelleHinweis": "Eigene Formulierungen des Projekts, keine validierten Fragebögen (Lizenz nicht geklärt). Fragen und Antwortoptionen fachlich prüfen lassen.",
+  "geprueftVon": null,
+  "schnellcheck": {
+    "titel": "Zuerst: Gibt es Warnzeichen?",
+    "text": "Trifft eines dieser Warnzeichen gerade zu?",
+    "textKind": "Trifft eines dieser Warnzeichen bei Ihrem Kind gerade zu?",
+    "textFremd": "Liegt bei der Patientin bzw. dem Patienten eines dieser Warnzeichen vor?",
+    "hilfe": "Bitte alles ankreuzen, was zutrifft. Wenn nichts davon zutrifft, kreuzen Sie „Nichts davon trifft zu“ an.",
+    "symptome": [
+      "bewusstlosigkeit",
+      "teilnahmslosigkeit",
+      "atemnot",
+      "blaue_lippen",
+      "brustschmerz_akut",
+      "laehmung_ploetzlich",
+      "sprachstoerung_ploetzlich",
+      "trinkschwaeche",
+      "verlust_erworbener_faehigkeiten",
+      "fieber"
+    ],
+    "messwerte": [
+      "temperatur_c"
+    ],
+    "keineText": "Nichts davon trifft zu"
+  },
+  "fragen": [
+    {
+      "id": "s_stimmung",
+      "typ": "einfach",
+      "kurz": "Stimmung",
+      "text": "Wie war Ihre Stimmung in letzter Zeit überwiegend?",
+      "textKind": "Wie war die Stimmung Ihres Kindes in letzter Zeit überwiegend?",
+      "textFremd": "Wie wird die Stimmung in letzter Zeit beschrieben?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "gut",
+          "bezeichnung": "Überwiegend gut",
+          "fachbegriff": null
+        },
+        {
+          "id": "wechselnd",
+          "bezeichnung": "Wechselhaft",
+          "fachbegriff": null
+        },
+        {
+          "id": "gedrueckt",
+          "bezeichnung": "Eher gedrückt oder traurig",
+          "fachbegriff": null
+        },
+        {
+          "id": "sehr_gedrueckt",
+          "bezeichnung": "Sehr gedrückt, kaum Freude",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "s_antrieb",
+      "typ": "einfach",
+      "kurz": "Antrieb",
+      "text": "Wie ist Ihr Antrieb, Ihre Energie im Alltag?",
+      "textKind": "Wie ist der Antrieb, die Energie Ihres Kindes im Alltag?",
+      "textFremd": "Wie wird der Antrieb beschrieben?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "normal",
+          "bezeichnung": "Wie sonst auch",
+          "fachbegriff": null
+        },
+        {
+          "id": "weniger",
+          "bezeichnung": "Etwas weniger als sonst",
+          "fachbegriff": null
+        },
+        {
+          "id": "viel_weniger",
+          "bezeichnung": "Deutlich weniger, alles fällt schwer",
+          "fachbegriff": null
+        },
+        {
+          "id": "unruhig",
+          "bezeichnung": "Eher unruhig oder getrieben",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "s_schlaf",
+      "typ": "mehrfach",
+      "kurz": "Schlaf",
+      "text": "Wie schlafen Sie zurzeit?",
+      "textKind": "Wie schläft Ihr Kind zurzeit?",
+      "textFremd": "Wie wird der Schlaf beschrieben?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "einschlafen",
+          "bezeichnung": "Schwierigkeiten beim Einschlafen",
+          "fachbegriff": null
+        },
+        {
+          "id": "durchschlafen",
+          "bezeichnung": "Häufiges Aufwachen in der Nacht",
+          "fachbegriff": null
+        },
+        {
+          "id": "frueh",
+          "bezeichnung": "Sehr frühes Aufwachen",
+          "fachbegriff": null
+        },
+        {
+          "id": "viel",
+          "bezeichnung": "Deutlich mehr Schlaf als sonst",
+          "fachbegriff": null
+        }
+      ],
+      "keineOption": "Keine Probleme mit dem Schlaf"
+    },
+    {
+      "id": "s_angst",
+      "typ": "einfach",
+      "kurz": "Ängste und Sorgen",
+      "text": "Wie oft haben Sie zurzeit Ängste oder Sorgen, die Sie belasten?",
+      "textKind": "Wie oft wirkt Ihr Kind zurzeit ängstlich oder besorgt?",
+      "textFremd": "Wie häufig werden belastende Ängste oder Sorgen angegeben?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "selten",
+          "bezeichnung": "Selten oder nie",
+          "fachbegriff": null
+        },
+        {
+          "id": "manchmal",
+          "bezeichnung": "Manchmal",
+          "fachbegriff": null
+        },
+        {
+          "id": "oft",
+          "bezeichnung": "Oft",
+          "fachbegriff": null
+        },
+        {
+          "id": "staendig",
+          "bezeichnung": "Fast ständig",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "s_belastung",
+      "typ": "skala",
+      "kurz": "Belastung",
+      "text": "Wie stark fühlen Sie sich zurzeit insgesamt belastet?",
+      "textKind": "Wie stark wirkt Ihr Kind zurzeit insgesamt belastet?",
+      "textFremd": "Wie stark wird die aktuelle Belastung eingeschätzt?",
+      "pflicht": false,
+      "bedingung": null,
+      "min": 0,
+      "max": 10,
+      "minText": "0 = gar nicht",
+      "maxText": "10 = extrem"
+    },
+    {
+      "id": "s_dauer",
+      "typ": "dauer",
+      "kurz": "Dauer",
+      "text": "Seit wann geht es Ihnen so?",
+      "textKind": "Seit wann geht es Ihrem Kind so?",
+      "textFremd": "Seit wann bestehen die Beschwerden?",
+      "pflicht": false,
+      "bedingung": null,
+      "einheiten": [
+        "stunden",
+        "tage",
+        "wochen",
+        "monate",
+        "jahre"
+      ],
+      "maxAnzahl": 99
+    },
+    {
+      "id": "s_alltag",
+      "typ": "einfach",
+      "kurz": "Alltag",
+      "text": "Wie sehr beeinträchtigt Sie das im Alltag (Arbeit, Schule, Familie, Freizeit)?",
+      "textKind": "Wie sehr beeinträchtigt das Ihr Kind im Alltag (Kita, Schule, Familie, Freizeit)?",
+      "textFremd": "Wie stark ist die Beeinträchtigung im Alltag?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "nicht",
+          "bezeichnung": "Gar nicht",
+          "fachbegriff": null
+        },
+        {
+          "id": "etwas",
+          "bezeichnung": "Etwas",
+          "fachbegriff": null
+        },
+        {
+          "id": "deutlich",
+          "bezeichnung": "Deutlich",
+          "fachbegriff": null
+        },
+        {
+          "id": "stark",
+          "bezeichnung": "Sehr stark, vieles geht nicht mehr",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "s_unterstuetzung",
+      "typ": "einfach",
+      "kurz": "Bisherige Unterstützung",
+      "text": "Haben Sie deswegen schon Unterstützung bekommen?",
+      "textKind": "Hat Ihr Kind deswegen schon Unterstützung bekommen?",
+      "textFremd": "Gab es bereits Unterstützung oder Behandlung?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "nein",
+          "bezeichnung": "Nein",
+          "fachbegriff": null
+        },
+        {
+          "id": "hausarzt",
+          "bezeichnung": "Ja, hausärztlich bzw. kinderärztlich",
+          "fachbegriff": null
+        },
+        {
+          "id": "psychotherapie",
+          "bezeichnung": "Ja, psychotherapeutisch",
+          "fachbegriff": "Psychotherapie"
+        },
+        {
+          "id": "psychiatrie",
+          "bezeichnung": "Ja, psychiatrisch",
+          "fachbegriff": "Psychiatrie"
+        },
+        {
+          "id": "andere",
+          "bezeichnung": "Ja, andere Unterstützung (z. B. Beratungsstelle)",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "s_ergaenzung",
+      "typ": "freitext",
+      "kurz": "Ergänzung",
+      "text": "Möchten Sie noch etwas ergänzen? (kurz, bitte keine Namen)",
+      "textKind": "Möchten Sie zu Ihrem Kind noch etwas ergänzen? (kurz, bitte keine Namen)",
+      "textFremd": "Ergänzende Angaben (kurz, ohne Namen)",
+      "pflicht": false,
+      "bedingung": null,
+      "maxLaenge": 200
+    }
+  ]
+}

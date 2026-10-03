@@ -23,6 +23,12 @@ export interface RegelEingabeRoh {
   antworten: ReadonlyArray<readonly [string, unknown]>;
   /** Jeder gesetzte, nicht leere Wert gilt als „seelische Beschwerden“ (S4). */
   psychisch: unknown;
+  /**
+   * M4a (QA R3-B1): Werte stammen aus **verschiedenen** gespeicherten Abgaben eines Falls –
+   * mehrere Werte je Messwert sind dann kein Eingabefehler. Alle Werte werden weiterhin
+   * geprüft (jede Schwelle). Standard: `false` (Formular, M3-Verhalten unverändert).
+   */
+  mehrereAbgaben?: boolean;
 }
 
 export interface RegelEingabeErgebnis {
@@ -109,7 +115,7 @@ export function pruefeRegelEingabe(w: Regelwerk, roh: RegelEingabeRoh): RegelEin
       continue;
     }
     const gesetzt = werte.filter(istGesetzt);
-    if (gesetzt.length > 1) fehler(feld, "Mehrere Werte angegeben – jeder gültige Wert wurde geprüft.");
+    if (gesetzt.length > 1 && !roh.mehrereAbgaben) fehler(feld, "Mehrere Werte angegeben – jeder gültige Wert wurde geprüft.");
     for (const wert of gesetzt) {
       const lesung: ZahlLesung = typeof wert === "string" ? leseZahl(wert) : { ok: false, grund: "format" };
       if (!lesung.ok) {

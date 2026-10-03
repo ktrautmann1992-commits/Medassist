@@ -14,7 +14,7 @@ export { profilFilter };
  * zusätzlich mit der zentralen Regel `darfProfilZugreifen` geprüft.
  * Fremde oder unbekannte IDs → 404 (keine Auskunft über die Existenz).
  */
-const zugriffsFelder = {
+export const zugriffsFelder = {
   id: true,
   kontoinhaberId: true,
   angelegtVonId: true,
@@ -22,7 +22,8 @@ const zugriffsFelder = {
   sorgeberechtigte: { select: { nutzerId: true } },
 } satisfies Prisma.PatientenprofilSelect;
 
-function regelErfuellt(
+/** REQ-115/REQ-316: zusätzliche Prüfung nach dem gefilterten Laden (auch für Fälle). */
+export function regelErfuellt(
   nutzer: ProfilNutzer,
   p: { kontoinhaberId: string | null; angelegtVonId: string; istKinderprofil: boolean; sorgeberechtigte: { nutzerId: string }[] },
 ) {
