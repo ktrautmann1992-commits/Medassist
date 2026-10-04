@@ -191,6 +191,12 @@ enum PlanTyp {
   FOERDERIDEEN
 }
 
+/// REQ-411: Zweck eines Hochladeauftrags (Meilenstein 5).
+enum HochladeZweck {
+  FOTO
+  AUDIO
+}
+
 /// REQ-038: Einwilligungen je Zweck (DSGVO Art. 9).
 enum EinwilligungsZweck {
   NUTZUNGSBEDINGUNGEN
@@ -236,14 +242,15 @@ model Nutzer {
   sorgeberechtigungen Sorgeberechtigung[]
   sorgeEinladungen    SorgeEinladung[]    @relation("EingeladenVon")
 
-  erstellteFaelle    Fall[]     @relation("FallErstelltVon")
+  erstellteFaelle    Fall[]            @relation("FallErstelltVon")
   eingaben           Eingabe[]
   fotos              Foto[]
   befunde            Befund[]
   plaene             Plan[]
   diagnosen          Diagnose[]
-  erteilteFreigaben  Freigabe[] @relation("FreigabeErteiltVon")
-  erhalteneFreigaben Freigabe[] @relation("FreigabeAnArzt")
+  erteilteFreigaben  Freigabe[]        @relation("FreigabeErteiltVon")
+  erhalteneFreigaben Freigabe[]        @relation("FreigabeAnArzt")
+  hochladeauftraege  Hochladeauftrag[]
 }
 
 /// REQ-017: Serverseitige Sitzung; im Cookie steht nur das Token, hier sein SHA-256-Hash.
@@ -525,12 +532,13 @@ model Fall {
   aktualisiertAm  DateTime        @updatedAt
   abgeschlossenAm DateTime?
 
-  eingaben  Eingabe[]
-  fotos     Foto[]
-  befunde   Befund[]
-  diagnosen Diagnose[]
-  plaene    Plan[]
-  freigaben Freigabe[]
+  eingaben          Eingabe[]
+  fotos             Foto[]
+  befunde           Befund[]
+  diagnosen         Diagnose[]
+  plaene            Plan[]
+  freigaben         Freigabe[]
+  hochladeauftraege Hochladeauftrag[]
 
   @@index([profilId])
   @@index([erstelltVonId])
@@ -576,6 +584,37 @@ model Foto {
   erstelltAm          DateTime  @default(now())
 
   @@index([fallId])
+}
+
+/// REQ-411: Serverseitig angelegter, einmal verwendbarer Auftrag für einen direkten Upload in
+/// den Objektspeicher (Foto oder Sprachaufnahme). Der Schlüssel ist zufällig und enthält keine
+/// Personen- oder Fall-IDs. Das Audio selbst wird nach der Transkription gelöscht; gespeichert
+/// bleibt nur der SHA-256-Wert des Roh-Transkripts (für das `korrigiert`-Kennzeichen, REQ-407).
+model Hochladeauftrag {
+  id                 String        @id @default(cuid())
+  fallId             String
+  fall               Fall          @relation(fields: [fallId], references: [id], onDelete: Cascade)
+  nutzerId           String
+  nutzer             Nutzer        @relation(fields: [nutzerId], references: [id], onDelete: Cascade)
+  zweck              HochladeZweck
+  /// Zufälliger Schlüssel im Eingangsbereich (`eingang/<128 Bit hex>`).
+  eingangsSchluessel String        @unique
+  mimeType           String
+  /// Exakte Größe des angekündigten Uploads in Byte.
+  groesseBytes       Int
+  laeuftAbAm         DateTime
+  /// Gesetzt, sobald der Auftrag verwendet wurde (angenommen oder abgelehnt) – einmalig.
+  erledigtAm         DateTime?
+  /// „angenommen“, „abgelehnt:<grund>“ oder „transkribiert“ (ohne Inhalte).
+  ergebnis           String?
+  /// AUDIO: SHA-256 (hex) des normalisierten Roh-Transkripts; der Text selbst wird hier nicht gespeichert.
+  transkriptHash     String?
+  /// AUDIO: verwendeter STT-Adapter (z. B. „test“) – Nachvollziehbarkeit.
+  sttAnbieter        String?
+  erstelltAm         DateTime      @default(now())
+
+  @@index([fallId, erstelltAm])
+  @@index([nutzerId])
 }
 
 model Befund {
