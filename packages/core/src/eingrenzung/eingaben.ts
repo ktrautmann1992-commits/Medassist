@@ -2,7 +2,7 @@ import type { RegelEingabeRoh } from "../regeln/eingabe";
 import type { Regelwerk } from "../regeln/laden";
 import type { Antwort } from "../regeln/schema";
 import { normalisiereAntwort } from "../regeln/engine";
-import { begrenzeMesswerte, gespeicherteEingabeSchema, type AntwortWert } from "./antwort";
+import { begrenzeMesswerte, gespeicherteEingabeSchema, type AntwortWert, type BeschreibungWert } from "./antwort";
 import type { Bereich } from "./schema";
 import type { Fragenkataloge } from "./typen";
 import type { AblaufStand } from "./ablauf";
@@ -35,6 +35,8 @@ export interface Gesammelt {
   /** QA E2: Entwicklungsalter, festgehalten bei der ersten Bereichsauswahl. */
   entwicklungsAlter: { monate: number; korrigiert: boolean } | null;
   antworten: Record<string, AntwortWert>;
+  /** REQ-402/REQ-407: letzte vollständige Beschreibung (Weg 1) oder `null`. */
+  beschreibung: BeschreibungWert | null;
   /** Alle Symptome (Vereinigung) – Reihenfolge der ersten Angabe. */
   symptome: string[];
   messwerte: Record<string, number[]>;
@@ -67,6 +69,7 @@ export function sammleEingaben(
     bereiche: null,
     entwicklungsAlter: null,
     antworten: {},
+    beschreibung: null,
     symptome: [],
     messwerte: {},
     schnellcheckKeine: false,
@@ -140,6 +143,11 @@ export function sammleEingaben(
         if (schritt === "region" && !teilweise) g.region = wert.region;
         else g.ungueltig++;
         break;
+      case "beschreibung":
+        // REQ-401: nur im Schritt „beschreibung“ (Weg 1) – sonst nicht lesbar.
+        if (schritt === "beschreibung" && !teilweise && bereich !== "ENTWICKLUNG") g.beschreibung = wert;
+        else g.ungueltig++;
+        break;
       case "bereiche":
         // REQ-323: nur im Entwicklungs-Check und nur bekannte Bereiche – sonst nicht lesbar.
         if (schritt === "bereiche" && !teilweise && bereich === "ENTWICKLUNG" && wert.bereiche.every((b) => k.entwicklung.bereicheById.has(b))) {
@@ -193,7 +201,7 @@ export function sammleEingaben(
 export function ablaufStandAus(
   bereich: Bereich,
   g: Gesammelt,
-  bewertung: { krise: boolean; notfallAktiv: boolean; kinderprofil: boolean; alterMonate: number | null },
+  bewertung: { krise: boolean; notfallAktiv: boolean; kinderprofil: boolean; alterMonate: number | null; mitBeschreibung?: boolean },
 ): AblaufStand {
   return {
     bereich,
@@ -205,6 +213,9 @@ export function ablaufStandAus(
     region: g.region,
     bereiche: g.bereiche,
     antworten: g.antworten,
+    // REQ-401: Weg 1 (Fall mit `weg` FREITEXT).
+    mitBeschreibung: Boolean(bewertung.mitBeschreibung),
+    beschreibungErledigt: g.beschreibung !== null,
     kinderprofil: bewertung.kinderprofil,
     // QA E2: im Entwicklungs-Check gilt ab der Bereichsauswahl das festgehaltene Entwicklungsalter.
     alterMonate: bereich === "ENTWICKLUNG" && g.entwicklungsAlter ? g.entwicklungsAlter.monate : bewertung.alterMonate,
