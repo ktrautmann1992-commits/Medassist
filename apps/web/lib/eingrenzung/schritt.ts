@@ -1,5 +1,9 @@
+import { createHash } from "node:crypto";
 import {
+  MAX_BESCHREIBUNG,
   MAX_SYMPTOME,
+  normalisiereBeschreibung,
+  pruefeBeschreibung,
   antwortText,
   begrenzeMesswerte,
   gespeicherteEingabeSchema,
@@ -23,11 +27,29 @@ import {
  */
 export interface NeueEingabe {
   frageId: string;
-  typ: "ANTWORT" | "KOERPERREGION";
+  typ: "ANTWORT" | "KOERPERREGION" | "TEXT" | "SPRACH_TRANSKRIPT";
   inhalt: string;
   koerperregion: string | null;
+  /** REQ-407: Transkript vor dem Absenden geändert (vom Server ermittelt). */
+  korrigiert?: boolean;
   strukturiert: GespeicherteEingabe;
 }
+
+/**
+ * REQ-407: Roh-Transkript einer Sprachaufnahme (serverseitig, aus dem Hochladeauftrag) – nur
+ * der SHA-256-Wert; damit setzt der Server `korrigiert`, nicht der Client.
+ */
+export interface SprachTranskript {
+  transkriptHash: string;
+}
+
+/** SHA-256 (hex) des normalisierten Texts (CRLF → LF, ohne Rand-Leerzeichen). */
+export function transkriptHash(text: string): string {
+  return createHash("sha256").update(normalisiereBeschreibung(text), "utf8").digest("hex");
+}
+
+export const SPRACHE_NICHT_GEFUNDEN = "Die Sprachaufnahme wurde nicht gefunden oder ist abgelaufen – bitte erneut aufnehmen oder den Text eintippen.";
+export const TRANSKRIPT_PRUEFEN = "Bitte bestätigen Sie, dass Sie das Transkript geprüft (und bei Bedarf korrigiert) haben.";
 
 export interface EntwicklungsAlterWert {
   monate: number;
@@ -102,9 +124,11 @@ export function verarbeiteSchritt(
   formData: FormData,
   /** Entwicklungsalter für die Bereichsauswahl (bereits festgehalten oder aktuell, QA E2). */
   entwicklungsAlter: EntwicklungsAlterWert | null = null,
+  /** REQ-407: Roh-Transkript (Hash) der Sprachaufnahme dieses Nutzers/Falls oder `null`. */
+  sprache: SprachTranskript | null = null,
 ): SchrittVerarbeitung {
   if (schritt.art === "krise") return { eingaben: [kriseEingabe(k, regelwerk, krisenPaare(regelwerk, formData))] };
-  const einzel = verarbeiteEinzeln(k, regelwerk, bereich, schritt, formData, entwicklungsAlter);
+  const einzel = verarbeiteEinzeln(k, regelwerk, bereich, schritt, formData, entwicklungsAlter, sprache);
   // Jede in einem anderen Schritt übermittelte Krisenantwort wird gespeichert und ausgewertet.
   const paare = krisenPaare(regelwerk, formData);
   const eingaben = [...(paare.length ? [kriseEingabe(k, regelwerk, paare)] : []), ...(einzel.eingabe ? [einzel.eingabe] : [])];
@@ -118,6 +142,7 @@ function verarbeiteEinzeln(
   schritt: Schritt,
   formData: FormData,
   entwicklungsAlter: EntwicklungsAlterWert | null = null,
+  sprache: SprachTranskript | null = null,
 ): EinzelVerarbeitung {
   const katalog = k.kataloge[bereich];
   const huelle = (s: string, teilweise: boolean, wert: GespeicherteEingabe["wert"]) => huelleFuer(k, s, teilweise, wert);
@@ -148,6 +173,28 @@ function verarbeiteEinzeln(
           inhalt: "Hinweis „Zuerst Notruf 112“ bestätigt, Fragen fortgesetzt",
           koerperregion: null,
           strukturiert: huelle("notfall_weiter", false, { typ: "notfall_bestaetigung" }),
+        },
+      };
+    }
+    case "beschreibung": {
+      // REQ-402: nie still kürzen – zu lang/leer/Steuerzeichen ⇒ Ablehnung mit Meldung.
+      const quelle = formData.get("quelle") === "sprache" ? "sprache" : "text";
+      const p = pruefeBeschreibung(formData.get("text"));
+      if (!p.ok) return { eingabe: null, fehler: PRUEFEN, feldFehler: { text: [p.fehler] } };
+      // REQ-407: Transkript nur mit serverseitig bekannter Aufnahme und ausdrücklicher Prüfbestätigung.
+      if (quelle === "sprache" && !sprache) return { eingabe: null, fehler: PRUEFEN, feldFehler: { text: [SPRACHE_NICHT_GEFUNDEN] } };
+      if (quelle === "sprache" && formData.get("transkriptGeprueft") !== "on") {
+        return { eingabe: null, fehler: PRUEFEN, feldFehler: { transkriptGeprueft: [TRANSKRIPT_PRUEFEN] } };
+      }
+      const korrigiert = quelle === "sprache" && sprache !== null && transkriptHash(p.text) !== sprache.transkriptHash;
+      return {
+        eingabe: {
+          frageId: "beschreibung",
+          typ: quelle === "sprache" ? "SPRACH_TRANSKRIPT" : "TEXT",
+          inhalt: p.text,
+          koerperregion: null,
+          korrigiert,
+          strukturiert: huelle("beschreibung", false, { typ: "beschreibung", quelle, text: p.text, korrigiert }),
         },
       };
     }
@@ -227,7 +274,8 @@ export function warnSignal(k: Fragenkataloge, regelwerk: Regelwerk, bereich: Ber
   return { ...v.eingabe, strukturiert: { ...v.eingabe.strukturiert, teilweise: true } };
 }
 
-const MAX_INHALT = 1000;
+/** REQ-314/REQ-402: Obergrenze für `inhalt` – passend zur längsten zulässigen Eingabe (Beschreibung). */
+const MAX_INHALT = MAX_BESCHREIBUNG;
 
 /**
  * QA N1: Jede Eingabe wird **vor dem Speichern** gegen `gespeicherteEingabeSchema` geprüft –

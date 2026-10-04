@@ -355,3 +355,8 @@ a.entry-option .entry-title { color: var(--rose-700); text-decoration: underline
   h1 { font-size: 18pt; } h2 { font-size: 14pt; } h3 { font-size: 12pt; }
   a { color: var(--ink); text-decoration: none; }
 }
+
+/* Meilenstein 5 – Fotos eines Falls (REQ-410): Miniaturen, auf Mobilgeräten zweispaltig */
+.foto-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); }
+.foto-kachel { display: grid; gap: var(--space-2); align-content: start; border: 1px solid var(--line); border-radius: var(--radius-field); padding: var(--space-2); }
+.foto-kachel img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-field); background: var(--page); }

@@ -1,5 +1,6 @@
 import {
   DAUER_EINHEIT_TEXT,
+  MAX_BESCHREIBUNG,
   verfuegbareBereiche,
   type AntwortWert,
   type Fragenkataloge,
@@ -36,6 +37,12 @@ export type SchrittAnsicht =
       messwerte: { id: string; bezeichnung: string; einheit: string; min: number; max: number; ungeprueft: boolean }[];
     }
   | { art: "notfall_weiter" }
+  | {
+      /** REQ-402/REQ-407: freie Beschreibung (Weg 1) – Text oder korrigierbares Transkript. */
+      art: "beschreibung";
+      maxLaenge: number;
+      vorher: { text: string; quelle: "text" | "sprache" } | null;
+    }
   | {
       /** REQ-323: Bereichsauswahl des Entwicklungs-Checks (nur für das Entwicklungsalter angebotene Bereiche). */
       art: "bereiche";
@@ -107,6 +114,8 @@ export function schrittAnsicht(
     }
     case "notfall_weiter":
       return { art: "notfall_weiter" };
+    case "beschreibung":
+      return { art: "beschreibung", maxLaenge: MAX_BESCHREIBUNG, vorher: g.beschreibung ? { text: g.beschreibung.text, quelle: g.beschreibung.quelle } : null };
     case "region":
       return {
         art: "region",

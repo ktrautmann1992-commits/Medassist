@@ -21,7 +21,7 @@ import { ablaufAlterMonate, type FallDaten } from "./fall";
 export const KRISENKONTAKTE_AB_MONATE = 120;
 
 /** Was für Bewertung und Anzeige gebraucht wird (Einzelfall und Fallliste). */
-type FallFuerAnzeige = Pick<FallDaten, "bereich" | "profil" | "eingaben" | "status" | "dringlichkeit" | "abgeschlossenAm">;
+type FallFuerAnzeige = Pick<FallDaten, "bereich" | "weg" | "profil" | "eingaben" | "status" | "dringlichkeit" | "abgeschlossenAm">;
 
 /**
  * REQ-325/REQ-330: Entwicklungsergebnis (nur Weg 3, erst wenn alle Fragen beantwortet sind) –
@@ -62,6 +62,7 @@ export function fallKontext(nutzer: ProfilNutzer, fall: FallFuerAnzeige) {
     rolle: nutzer.rolle,
     stichtag,
     alterMonate: ablaufAlterMonate(fall.bereich, p, stichtag),
+    weg: fall.weg,
   });
   // QA B1b: gespeicherter Status nur Untergrenze – Maximum mit dem aus den Eingaben abgeleiteten.
   const anzeige = anzeigeStatus(

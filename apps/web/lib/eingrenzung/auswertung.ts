@@ -46,6 +46,8 @@ export interface FallKontext {
   rolle: Rolle;
   stichtag: Date;
   alterMonate: number | null;
+  /** REQ-401: Weg des Falls – bei FREITEXT (Weg 1) gibt es den Schritt „Beschreibung“. */
+  weg?: string;
 }
 
 export function bewerteFall(k: FallKontext): FallBewertung {
@@ -68,6 +70,7 @@ export function bewerteFall(k: FallKontext): FallBewertung {
     notfallAktiv: notfall === "NOTFALL",
     kinderprofil: k.profil.istKinderprofil,
     alterMonate: k.alterMonate,
+    mitBeschreibung: k.weg === "FREITEXT",
   });
   return {
     gesammelt,

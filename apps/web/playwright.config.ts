@@ -10,6 +10,20 @@ if (existsSync(envDatei)) process.loadEnvFile(envDatei);
 // QA N2: kurze Wartezeit auf die Zeilensperre, damit der Sperr-Test schnell abbricht (Standard der App: 5000 ms).
 process.env.EINGRENZUNG_SPERRE_MS ??= "1500";
 
+// Meilenstein 5 (REQ-406, REQ-408, REQ-412): Der Haupt-Server (Port 3000) läuft mit den
+// Test-Adaptern – lokaler Speicher und Test-STT. `next start` läuft mit NODE_ENV=production,
+// deshalb die ausdrückliche Freigabe TESTADAPTER_ERLAUBT (nie auf Vercel). Der feste
+// HMAC-Schlüssel ist nur ein Testwert (der lokale Adapter läuft nie produktiv) – Tests nutzen
+// ihn, um eine abgelaufene, korrekt signierte URL zu erzeugen.
+process.env.STORAGE_ANBIETER ??= "lokal";
+process.env.STT_ANBIETER ??= "test";
+process.env.TESTADAPTER_ERLAUBT ??= "true";
+process.env.STORAGE_LOKAL_SCHLUESSEL ??= Buffer.alloc(32, "medassist-e2e-nur-test").toString("base64");
+process.env.STORAGE_LOKAL_PFAD ??= path.join(import.meta.dirname, ".lokaler-speicher", "e2e");
+
+/** Zweiter Server im Standardmodus (Speicher und STT aus) für die Prüfung der Hinweise. */
+const STANDARD_URL = "http://localhost:3001";
+
 /**
  * Web-Abläufe (CLAUDE.md §8). Benötigt eine migrierte Datenbank (DATABASE_URL)
  * und – bei `ZWEI_FA_AKTIV=true` – TOTP_ENCRYPTION_KEY; die App wird mit `next start` gestartet.
@@ -35,16 +49,28 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         // Vorinstallierter Browser (z. B. in Cloud-Umgebungen), sonst Playwright-Standard.
-        launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH
-          ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH }
-          : {},
+        launchOptions: {
+          ...(process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {}),
+          // REQ-407: Sprachaufnahme mit simuliertem Mikrofon (kein echtes Gerät, keine Abfrage).
+          args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+        },
       },
     },
   ],
-  webServer: {
-    command: "pnpm start",
-    url: "http://localhost:3000/api/health",
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
-  },
+  webServer: [
+    {
+      command: "pnpm start",
+      url: "http://localhost:3000/api/health",
+      reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
+    },
+    {
+      // Standardmodus: STORAGE_ANBIETER/STT_ANBIETER „aus“ (REQ-406, REQ-408).
+      command: "pnpm exec next start -p 3001",
+      url: `${STANDARD_URL}/api/health`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
+      env: { STORAGE_ANBIETER: "aus", STT_ANBIETER: "aus", TESTADAPTER_ERLAUBT: "false" },
+    },
+  ],
 });

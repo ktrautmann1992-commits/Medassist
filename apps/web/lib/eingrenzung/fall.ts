@@ -39,9 +39,9 @@ const fallFelder = {
   profil: { select: profilFelder },
 } satisfies Prisma.FallSelect;
 
-/** Weg 2 (geführt: körperlich/seelisch) und Weg 3 (Entwicklungs-Check, REQ-323). */
+/** Weg 1 (freie Beschreibung, REQ-400), Weg 2 (geführt: körperlich/seelisch) und Weg 3 (Entwicklungs-Check, REQ-323). */
 function istUnterstuetzt(f: { weg: string; art: string }): boolean {
-  if (f.weg === "GEFUEHRT") return f.art === "KOERPERLICH" || f.art === "PSYCHISCH";
+  if (f.weg === "GEFUEHRT" || f.weg === "FREITEXT") return f.art === "KOERPERLICH" || f.art === "PSYCHISCH";
   return f.weg === "ENTWICKLUNG" && f.art === "ENTWICKLUNG";
 }
 
@@ -59,7 +59,7 @@ export async function ladeFall(nutzer: ProfilNutzer, fallId: unknown) {
     },
   });
   if (!fall || !regelErfuellt(nutzer, fall.profil)) return null;
-  // Nur die Fälle von Weg 2 und Weg 3 (andere Wege folgen mit späteren Meilensteinen).
+  // Nur Fälle der umgesetzten Wege 1–3.
   if (!istUnterstuetzt(fall)) return null;
   return { ...fall, bereich: fall.art as Bereich };
 }

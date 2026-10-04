@@ -90,7 +90,46 @@ function EntwicklungEinstieg({ p, stichtag }: { p: Profil; stichtag: Date }) {
 }
 
 /**
- * REQ-304, REQ-329: Start – Profil wählen (nur zugängliche Profile, REQ-115; fremde/unbekannte
+ * REQ-400: Einstieg in Weg 1 „Beschwerden beschreiben“ – Häkchen „seelische Beschwerden“
+ * (⇒ Pflicht-Krisen-Screening zuerst). Der Warnzeichen-Schnellcheck kommt vor der Beschreibung.
+ */
+function FreitextEinstieg({ p, stichtag }: { p: Profil; stichtag: Date }) {
+  return (
+    <section className="stack">
+      <h1>Beschwerden beschreiben</h1>
+      <ProfilZeile profil={profilKopf(p, stichtag)} />
+      <Hinweis titel="So geht es weiter.">
+        Zuerst fragen wir kurz nach Warnzeichen – sie haben immer Vorrang. Danach beschreiben Sie Ihre Beschwerden in eigenen
+        Worten (Text, wenn aktiviert auch per Sprachaufnahme) und können Fotos hinzufügen. Anschließend folgen kurze Fragen.
+      </Hinweis>
+      <form action={starteFall} className="stack">
+        <input type="hidden" name="profilId" value={p.id} />
+        <input type="hidden" name="weg" value="FREITEXT" />
+        <label className="check-row" htmlFor="seelisch">
+          <input type="checkbox" id="seelisch" name="seelisch" />
+          <span>Es geht (auch) um seelische Beschwerden – zum Beispiel Stimmung, Ängste oder Belastung.</span>
+        </label>
+        <p className="text-soft" style={{ margin: 0 }}>
+          Bei seelischen Beschwerden kommen zuerst einige Fragen zu Ihrer Sicherheit.
+        </p>
+        <div className="actions">
+          <button className="btn btn-primary" type="submit">
+            Beschreibung beginnen
+          </button>
+        </div>
+      </form>
+      <Hinweis titel="Prototyp – keine medizinische Beratung.">
+        Bitte nur Testdaten eingeben, keine echten Namen. Im Notfall immer den Notruf 112 wählen.
+      </Hinweis>
+      <p>
+        <Link href={`/eingrenzung?profil=${encodeURIComponent(p.id)}`}>Zurück zur Auswahl</Link>
+      </p>
+    </section>
+  );
+}
+
+/**
+ * REQ-304, REQ-329, REQ-400: Start – Profil wählen (nur zugängliche Profile, REQ-115; fremde/unbekannte
  * ID ⇒ 404), dann „körperlich“, „seelisch/psychisch“ oder – bei Kinderprofilen – „Entwicklung prüfen“.
  */
 export default async function EingrenzungStart({ searchParams }: { searchParams: Promise<{ profil?: string | string[]; weg?: string | string[] }> }) {
@@ -102,6 +141,7 @@ export default async function EingrenzungStart({ searchParams }: { searchParams:
     const p = typeof profilParam === "string" ? await ladeProfilFuerRegeln(nutzer, profilParam) : null;
     if (!p) notFound();
     if (weg === "entwicklung") return <EntwicklungEinstieg p={p} stichtag={stichtag} />;
+    if (weg === "freitext") return <FreitextEinstieg p={p} stichtag={stichtag} />;
     return (
       <section className="stack">
         <h1>Beschwerden eingrenzen</h1>
@@ -110,6 +150,16 @@ export default async function EingrenzungStart({ searchParams }: { searchParams:
           <input type="hidden" name="profilId" value={p.id} />
           <h2>Worum geht es?</h2>
           <div className="grid">
+            {/* REQ-400: Weg 1 wie docs/design-vorschau.html */}
+            <Link className="entry-option" href={`/eingrenzung?profil=${encodeURIComponent(p.id)}&weg=freitext`}>
+              <strong className="entry-title">Beschwerden beschreiben</strong>
+              <span className="text-soft">Erzählen Sie in eigenen Worten, was los ist. Ein Foto hilft bei Hautveränderungen.</span>
+              <span className="methods">
+                <span className="method-tag">Text</span>
+                <span className="method-tag">Sprachaufnahme</span>
+                <span className="method-tag">Foto</span>
+              </span>
+            </Link>
             <button className="entry-option" type="submit" name="art" value="KOERPERLICH">
               <strong className="entry-title">Körperlich</strong>
               <span className="text-soft">Schmerzen, Haut, Fieber oder andere körperliche Beschwerden. Sie wählen die Körperstelle, dann folgen kurze Fragen.</span>
