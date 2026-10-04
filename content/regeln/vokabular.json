@@ -1,0 +1,84 @@
+{
+  "art": "vokabular",
+  "regelwerkVersion": "0.2.0",
+  "stand": "2026-10-03",
+  "hinweis": "Demo – nicht für den klinischen Einsatz. Kontrolliertes Vokabular für die Regel-Engine (REQ-203). Bezeichnungen und Fachbegriffe sind fachlich ungeprüft. `warnzeichen: true` = Symptom ist für sich ein Warnzeichen; wird es angegeben und löst keine Regel aus, greift das Sicherheitsnetz (REQ-218). Fieber ist nur altersabhängig ein Warnzeichen (ungeprüft). `mindestens` = Mindest-Dringlichkeit des Warnzeichens in jedem Alter (nur für Zeichen, die bereits als NOTFALL für alle Altersgruppen eingestuft sind; ungeprüft); ein Selbsttest beim Laden erzwingt sie (REQ-222).",
+  "symptome": [
+    {
+      "id": "fieber",
+      "bezeichnung": "Fieber",
+      "fachbegriff": "Pyrexie",
+      "warnzeichen": false
+    },
+    {
+      "id": "trinkschwaeche",
+      "bezeichnung": "Trinkt kaum oder gar nicht",
+      "fachbegriff": "Trinkschwäche",
+      "warnzeichen": true
+    },
+    {
+      "id": "teilnahmslosigkeit",
+      "bezeichnung": "Ungewöhnlich teilnahmslos, kaum ansprechbar",
+      "fachbegriff": "Apathie",
+      "warnzeichen": true,
+      "mindestens": "NOTFALL"
+    },
+    {
+      "id": "verlust_erworbener_faehigkeiten",
+      "bezeichnung": "Verlernt Fähigkeiten, die schon sicher da waren",
+      "fachbegriff": "Entwicklungsregression",
+      "warnzeichen": true
+    },
+    {
+      "id": "atemnot",
+      "bezeichnung": "Atemnot",
+      "fachbegriff": "Dyspnoe",
+      "warnzeichen": true
+    },
+    {
+      "id": "blaue_lippen",
+      "bezeichnung": "Bläuliche Lippen oder Haut",
+      "fachbegriff": "Zyanose",
+      "warnzeichen": true
+    },
+    {
+      "id": "brustschmerz_akut",
+      "bezeichnung": "Plötzliche Schmerzen in der Brust",
+      "fachbegriff": "Akuter Thoraxschmerz",
+      "warnzeichen": true
+    },
+    {
+      "id": "bewusstlosigkeit",
+      "bezeichnung": "Bewusstlos oder nicht erweckbar",
+      "fachbegriff": "Bewusstlosigkeit",
+      "warnzeichen": true,
+      "mindestens": "NOTFALL"
+    },
+    {
+      "id": "laehmung_ploetzlich",
+      "bezeichnung": "Plötzliche Lähmung oder Schwäche einer Körperseite",
+      "fachbegriff": "Akute Parese",
+      "warnzeichen": true,
+      "mindestens": "NOTFALL"
+    },
+    {
+      "id": "sprachstoerung_ploetzlich",
+      "bezeichnung": "Plötzliche Sprach- oder Sprechstörung",
+      "fachbegriff": "Akute Aphasie/Dysarthrie",
+      "warnzeichen": true,
+      "mindestens": "NOTFALL"
+    }
+  ],
+  "messwerte": [
+    {
+      "id": "temperatur_c",
+      "bezeichnung": "Körpertemperatur",
+      "einheit": "°C",
+      "plausibel": {
+        "min": 30,
+        "max": 45
+      },
+      "plausibelStatus": "ungeprüft"
+    }
+  ]
+}

@@ -14,7 +14,7 @@ export { profilFilter };
  * zusätzlich mit der zentralen Regel `darfProfilZugreifen` geprüft.
  * Fremde oder unbekannte IDs → 404 (keine Auskunft über die Existenz).
  */
-const zugriffsFelder = {
+export const zugriffsFelder = {
   id: true,
   kontoinhaberId: true,
   angelegtVonId: true,
@@ -22,7 +22,8 @@ const zugriffsFelder = {
   sorgeberechtigte: { select: { nutzerId: true } },
 } satisfies Prisma.PatientenprofilSelect;
 
-function regelErfuellt(
+/** REQ-115/REQ-316: zusätzliche Prüfung nach dem gefilterten Laden (auch für Fälle). */
+export function regelErfuellt(
   nutzer: ProfilNutzer,
   p: { kontoinhaberId: string | null; angelegtVonId: string; istKinderprofil: boolean; sorgeberechtigte: { nutzerId: string }[] },
 ) {
@@ -92,3 +93,34 @@ export async function ladeZugaenglicheProfile(nutzer: ProfilNutzer, suche?: stri
 }
 
 export type ProfilUebersicht = Awaited<ReturnType<typeof ladeZugaenglicheProfile>>[number];
+
+/**
+ * REQ-204/REQ-215: Stammdaten für die Regel-Engine (Alter wird daraus serverseitig
+ * berechnet). Gleicher Berechtigungsfilter wie alle Loader; `null` = kein Zugriff.
+ */
+export async function ladeProfilFuerRegeln(nutzer: ProfilNutzer, id: string) {
+  if (typeof id !== "string" || id.length === 0 || id.length > 64) return null;
+  const p = await db().patientenprofil.findFirst({
+    where: { AND: [{ id }, profilFilter(nutzer)] },
+    select: {
+      ...zugriffsFelder,
+      vorname: true,
+      nachname: true,
+      geburtsdatum: true,
+      schwangerschaft: true,
+      sswBeiGeburtWochen: true,
+      sswBeiGeburtTage: true,
+    },
+  });
+  if (!p || !regelErfuellt(nutzer, p)) return null;
+  return {
+    id: p.id,
+    vorname: p.vorname,
+    nachname: p.nachname,
+    istKinderprofil: p.istKinderprofil,
+    geburtsdatum: p.geburtsdatum,
+    schwangerschaft: p.schwangerschaft,
+    sswBeiGeburtWochen: p.sswBeiGeburtWochen,
+    sswBeiGeburtTage: p.sswBeiGeburtTage,
+  };
+}

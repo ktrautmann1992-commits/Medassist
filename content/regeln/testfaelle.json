@@ -1,0 +1,1060 @@
+{
+  "art": "testfaelle",
+  "regelwerkVersion": "0.2.0",
+  "stichtag": "2026-10-03",
+  "hinweis": "Klinische Testfälle (REQ-217): Eingabe → erwarteter Status, ausgelöste Regel-IDs (in Rangfolge, Krisenpfad zuerst), ablaufBeenden und Anzahl verworfener Angaben. Erwartungen bilden den ungeprüften Start-Regelsatz ab, nicht eine fachlich geprüfte Bewertung.",
+  "faelle": [
+    {
+      "id": "TF-001",
+      "beschreibung": "Säugling 6 Wochen mit Fieber",
+      "profil": {
+        "geburtsdatum": "2026-08-22",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-002",
+      "beschreibung": "Kind 2 Jahre mit Fieber, keine weiteren Zeichen – keine Säuglings-Red-Flag; Fieber allein ist kein Warnzeichen (Sicherheitsnetz greift nicht)",
+      "profil": {
+        "geburtsdatum": "2024-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "KEINE_WARNZEICHEN",
+        "regelIds": [],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-003",
+      "beschreibung": "Altersgrenze: 89 Tage mit Fieber",
+      "profil": {
+        "geburtsdatum": "2026-07-06",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-004",
+      "beschreibung": "Altersgrenze: 90 Tage (2 Kalendermonate) mit Fieber – Regel greift",
+      "profil": {
+        "geburtsdatum": "2026-07-05",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-005",
+      "beschreibung": "Altersgrenze: 91 Tage (2 Monate 29 Tage) mit Fieber – Regel greift",
+      "profil": {
+        "geburtsdatum": "2026-07-04",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-006",
+      "beschreibung": "Altersgrenze: 92 Tage = genau 3 Kalendermonate mit Fieber – Regel greift nicht",
+      "profil": {
+        "geburtsdatum": "2026-07-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "KEINE_WARNZEICHEN",
+        "regelIds": [],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-007",
+      "beschreibung": "Altersgrenze: Tag vor 3 Kalendermonaten (Stichtag 2026-10-02, Geburt 2026-07-03) – Regel greift",
+      "profil": {
+        "geburtsdatum": "2026-07-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "stichtag": "2026-10-02",
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-008",
+      "beschreibung": "Monatsende: Geburt 30.11., Stichtag 27.02. (2 Monate) – Regel greift",
+      "profil": {
+        "geburtsdatum": "2025-11-30",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "stichtag": "2026-02-27",
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-009",
+      "beschreibung": "Monatsende: Geburt 30.11., Stichtag 28.02. (3 Monate, geklemmt) – Regel greift nicht",
+      "profil": {
+        "geburtsdatum": "2025-11-30",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "stichtag": "2026-02-28",
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "KEINE_WARNZEICHEN",
+        "regelIds": [],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-010",
+      "beschreibung": "Säugling 6 Wochen, Temperatur 38,0 °C ohne angekreuztes Fieber",
+      "profil": {
+        "geburtsdatum": "2026-08-22",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {
+          "temperatur_c": 38.0
+        },
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-011",
+      "beschreibung": "Säugling 6 Wochen, Temperatur 37,9 °C",
+      "profil": {
+        "geburtsdatum": "2026-08-22",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {
+          "temperatur_c": 37.9
+        },
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "KEINE_WARNZEICHEN",
+        "regelIds": [],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-012",
+      "beschreibung": "Säugling 6 Wochen, mehrere Temperaturen 37,0 und 38,5 °C – jeder Wert zählt (konservativ)",
+      "profil": {
+        "geburtsdatum": "2026-08-22",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {
+          "temperatur_c": [
+            37.0,
+            38.5
+          ]
+        },
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-013",
+      "beschreibung": "Frühgeborenes 28+0 SSW, chronologisch 120 Tage (korrigiert 36 Tage), Fieber – konservativ",
+      "profil": {
+        "geburtsdatum": "2026-06-05",
+        "sswBeiGeburtWochen": 28,
+        "sswBeiGeburtTage": 0,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-014",
+      "beschreibung": "Reifgeborenes 39+0 SSW, 120 Tage, Fieber – keine Korrektur",
+      "profil": {
+        "geburtsdatum": "2026-06-05",
+        "sswBeiGeburtWochen": 39,
+        "sswBeiGeburtTage": 0,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "fieber"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "KEINE_WARNZEICHEN",
+        "regelIds": [],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-015",
+      "beschreibung": "Erwachsener: Atemnot mit bläulichen Lippen – Rangfolge NOTFALL vor DRINGEND",
+      "profil": {
+        "geburtsdatum": "1986-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "atemnot",
+          "blaue_lippen"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "NOTFALL",
+        "regelIds": [
+          "RF-ALLG-001",
+          "RF-ALLG-002"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-016",
+      "beschreibung": "Erwachsener: Atemnot allein",
+      "profil": {
+        "geburtsdatum": "1986-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "atemnot"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-ALLG-002"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-017",
+      "beschreibung": "Erwachsener: bläuliche Lippen allein – Sicherheitsnetz",
+      "profil": {
+        "geburtsdatum": "1986-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "blaue_lippen"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "SN-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-018",
+      "beschreibung": "Keine Symptome",
+      "profil": {
+        "geburtsdatum": "1986-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "KEINE_WARNZEICHEN",
+        "regelIds": [],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-019",
+      "beschreibung": "Erwachsener: akuter Brustschmerz",
+      "profil": {
+        "geburtsdatum": "1986-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "brustschmerz_akut"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "NOTFALL",
+        "regelIds": [
+          "RF-ERW-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-020",
+      "beschreibung": "Kind 10 Jahre: akuter Brustschmerz – Sicherheitsnetz (nie „keine Warnzeichen“)",
+      "profil": {
+        "geburtsdatum": "2016-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "brustschmerz_akut"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "SN-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-021",
+      "beschreibung": "Jugendliche einen Tag vor dem 18. Geburtstag: akuter Brustschmerz – Sicherheitsnetz",
+      "profil": {
+        "geburtsdatum": "2008-10-04",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "brustschmerz_akut"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "SN-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-022",
+      "beschreibung": "Kind 5 Jahre: Teilnahmslosigkeit",
+      "profil": {
+        "geburtsdatum": "2021-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "teilnahmslosigkeit"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "NOTFALL",
+        "regelIds": [
+          "RF-ALLG-005"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-023",
+      "beschreibung": "Erwachsener 30 Jahre: Teilnahmslosigkeit (alle Altersgruppen)",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "teilnahmslosigkeit"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "NOTFALL",
+        "regelIds": [
+          "RF-ALLG-005"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-024",
+      "beschreibung": "Säugling 6 Monate: Trinkschwäche",
+      "profil": {
+        "geburtsdatum": "2026-04-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "trinkschwaeche"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-002"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-025",
+      "beschreibung": "Kind 13 Monate: Trinkschwäche – Sicherheitsnetz",
+      "profil": {
+        "geburtsdatum": "2025-09-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "trinkschwaeche"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "SN-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-026",
+      "beschreibung": "Kind 3 Jahre: Verlust erworbener Fähigkeiten",
+      "profil": {
+        "geburtsdatum": "2023-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "verlust_erworbener_faehigkeiten"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-004"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-027",
+      "beschreibung": "Erwachsener: Verlust erworbener Fähigkeiten – Sicherheitsnetz",
+      "profil": {
+        "geburtsdatum": "1986-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "verlust_erworbener_faehigkeiten"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "SN-001"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-028",
+      "beschreibung": "Säugling 6 Wochen: Fieber, Trinkschwäche, Teilnahmslosigkeit – Rangfolge",
+      "profil": {
+        "geburtsdatum": "2026-08-22",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "fieber",
+          "trinkschwaeche",
+          "teilnahmslosigkeit"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "NOTFALL",
+        "regelIds": [
+          "RF-ALLG-005",
+          "RF-KIND-001",
+          "RF-KIND-002"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-029",
+      "beschreibung": "Säugling 6 Wochen: Fieber und Atemnot – DRINGEND/SOFORT vor DRINGEND/HEUTE",
+      "profil": {
+        "geburtsdatum": "2026-08-22",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "fieber",
+          "atemnot"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "DRINGEND",
+        "regelIds": [
+          "RF-KIND-001",
+          "RF-ALLG-002"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-030",
+      "beschreibung": "Plötzliche Sprachstörung (alle Alter)",
+      "profil": {
+        "geburtsdatum": "1956-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "sprachstoerung_ploetzlich"
+        ],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "NOTFALL",
+        "regelIds": [
+          "RF-ALLG-004"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-031",
+      "beschreibung": "Seelische Beschwerden, Krisenfrage positiv",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {},
+        "antworten": {
+          "krise_gedanken_nicht_leben": "ja",
+          "krise_gedanken_selbstverletzung": "nein",
+          "krise_plaene": "nein"
+        },
+        "psychisch": true
+      },
+      "erwartet": {
+        "status": "KRISE",
+        "regelIds": [
+          "KP-001"
+        ],
+        "ablaufBeenden": true,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-032",
+      "beschreibung": "Seelische Beschwerden, Krisenfragen unbeantwortet – konservativ KRISE",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": true
+      },
+      "erwartet": {
+        "status": "KRISE",
+        "regelIds": [
+          "KP-002"
+        ],
+        "ablaufBeenden": true,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-033",
+      "beschreibung": "Seelische Beschwerden, eine Frage „keine Angabe“ – konservativ KRISE",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {},
+        "antworten": {
+          "krise_gedanken_nicht_leben": "nein",
+          "krise_gedanken_selbstverletzung": "nein",
+          "krise_plaene": "keine_angabe"
+        },
+        "psychisch": true
+      },
+      "erwartet": {
+        "status": "KRISE",
+        "regelIds": [
+          "KP-002"
+        ],
+        "ablaufBeenden": true,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-034",
+      "beschreibung": "Seelische Beschwerden, alle Krisenfragen „nein“",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {},
+        "antworten": {
+          "krise_gedanken_nicht_leben": "nein",
+          "krise_gedanken_selbstverletzung": "nein",
+          "krise_plaene": "nein"
+        },
+        "psychisch": true
+      },
+      "erwartet": {
+        "status": "KEINE_WARNZEICHEN",
+        "regelIds": [],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-035",
+      "beschreibung": "Ohne Angabe seelischer Beschwerden, aber eine Krisenfrage „ja“ – Krisenpfad aktiv",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {},
+        "antworten": {
+          "krise_plaene": "ja"
+        },
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "KRISE",
+        "regelIds": [
+          "KP-001",
+          "KP-002"
+        ],
+        "ablaufBeenden": true,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-036",
+      "beschreibung": "Krise und Bewusstlosigkeit – Red Flag wird trotzdem ausgewertet",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "bewusstlosigkeit"
+        ],
+        "messwerte": {},
+        "antworten": {
+          "krise_gedanken_nicht_leben": "nein",
+          "krise_gedanken_selbstverletzung": "ja",
+          "krise_plaene": "nein"
+        },
+        "psychisch": true
+      },
+      "erwartet": {
+        "status": "KRISE",
+        "regelIds": [
+          "KP-001",
+          "RF-ALLG-003"
+        ],
+        "ablaufBeenden": true,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-037",
+      "beschreibung": "Körperliche Beschwerden ohne Krisenangaben – Krisenpfad nicht aktiv",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {},
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "KEINE_WARNZEICHEN",
+        "regelIds": [],
+        "ablaufBeenden": false,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-038",
+      "beschreibung": "Ungültiger Antwortwert „JA“ – wie „keine Angabe“ (KRISE)",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [],
+        "messwerte": {},
+        "antworten": {
+          "krise_gedanken_nicht_leben": "nein",
+          "krise_gedanken_selbstverletzung": "nein",
+          "krise_plaene": "JA"
+        },
+        "psychisch": true
+      },
+      "erwartet": {
+        "status": "KRISE",
+        "regelIds": [
+          "KP-002"
+        ],
+        "ablaufBeenden": true,
+        "befundlageFehler": 0
+      }
+    },
+    {
+      "id": "TF-039",
+      "beschreibung": "Unbekanntes Symptom und Krisenfrage „ja“ – Krise trotzdem erkannt, Fehler gemeldet",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "xyz"
+        ],
+        "messwerte": {},
+        "antworten": {
+          "krise_gedanken_nicht_leben": "nein",
+          "krise_gedanken_selbstverletzung": "nein",
+          "krise_plaene": "ja"
+        },
+        "psychisch": true
+      },
+      "erwartet": {
+        "status": "KRISE",
+        "regelIds": [
+          "KP-001"
+        ],
+        "ablaufBeenden": true,
+        "befundlageFehler": 1
+      }
+    },
+    {
+      "id": "TF-040",
+      "beschreibung": "Bewusstlosigkeit und unplausible Temperatur 29 °C – Notfall trotzdem erkannt, Wert verworfen",
+      "profil": {
+        "geburtsdatum": "1996-10-03",
+        "sswBeiGeburtWochen": null,
+        "sswBeiGeburtTage": null,
+        "schwangerschaft": "UNBEKANNT"
+      },
+      "eingabe": {
+        "symptome": [
+          "bewusstlosigkeit"
+        ],
+        "messwerte": {
+          "temperatur_c": 29
+        },
+        "antworten": {},
+        "psychisch": false
+      },
+      "erwartet": {
+        "status": "NOTFALL",
+        "regelIds": [
+          "RF-ALLG-003"
+        ],
+        "ablaufBeenden": false,
+        "befundlageFehler": 1
+      }
+    }
+  ]
+}

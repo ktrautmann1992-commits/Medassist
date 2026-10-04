@@ -12,6 +12,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
+  "dependencies": {
+    "@medassist/core": "workspace:*"
+  },
   "peerDependencies": {
     "react": "^19.0.0"
   },

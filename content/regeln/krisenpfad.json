@@ -1,0 +1,100 @@
+{
+  "art": "krisenpfad",
+  "regelwerkVersion": "0.2.0",
+  "stand": "2026-10-03",
+  "hinweis": "Demo – nicht für den klinischen Einsatz. Suizidalitäts-Screening (CLAUDE.md §5, REQ-208/REQ-209). `textFremd` für die Fremdanamnese durch Ärztinnen und Ärzte. Eigene, neutral formulierte Fragen – kein validierter Fragebogen (Lizenz nicht geklärt). Fachliche Prüfung erforderlich.",
+  "fragenStatus": "ungeprüft",
+  "fragenHinweis": "Eigene Formulierungen, fachliche Prüfung erforderlich. Validierte Instrumente (z. B. C-SSRS, PHQ-9 Item 9) erst nach Lizenzklärung.",
+  "fragen": [
+    {
+      "id": "krise_gedanken_nicht_leben",
+      "text": "Hatten Sie in letzter Zeit Gedanken, nicht mehr leben zu wollen?",
+      "textKind": "Hat Ihr Kind in letzter Zeit geäußert oder gezeigt, nicht mehr leben zu wollen?",
+      "textFremd": "Hatte die Patientin bzw. der Patient in letzter Zeit Gedanken, nicht mehr leben zu wollen?"
+    },
+    {
+      "id": "krise_gedanken_selbstverletzung",
+      "text": "Hatten Sie in letzter Zeit Gedanken, sich selbst zu verletzen oder sich das Leben zu nehmen?",
+      "textKind": "Hat Ihr Kind in letzter Zeit geäußert oder gezeigt, sich selbst verletzen oder sich das Leben nehmen zu wollen?",
+      "textFremd": "Hatte die Patientin bzw. der Patient in letzter Zeit Gedanken, sich selbst zu verletzen oder sich das Leben zu nehmen?"
+    },
+    {
+      "id": "krise_plaene",
+      "text": "Haben Sie bereits darüber nachgedacht, wie Sie es tun würden, oder Vorbereitungen getroffen?",
+      "textKind": "Gibt es Hinweise, dass Ihr Kind darüber nachgedacht hat, wie es das tun würde, oder Vorbereitungen getroffen hat?",
+      "textFremd": "Hat die Patientin bzw. der Patient bereits darüber nachgedacht, wie sie bzw. er es tun würde, oder Vorbereitungen getroffen?"
+    }
+  ],
+  "regeln": [
+    {
+      "id": "KP-001",
+      "version": "0.1.0",
+      "titel": "Hinweis auf Suizidgedanken",
+      "bedingung": {
+        "eines": [
+          {
+            "antwort": "krise_gedanken_nicht_leben",
+            "gleich": "ja"
+          },
+          {
+            "antwort": "krise_gedanken_selbstverletzung",
+            "gleich": "ja"
+          },
+          {
+            "antwort": "krise_plaene",
+            "gleich": "ja"
+          }
+        ]
+      },
+      "altersbereich": null,
+      "ergebnis": {
+        "dringlichkeit": "NOTFALL",
+        "krise": true,
+        "ablaufBeenden": true,
+        "hinweisPatient": "Ihre Angaben weisen auf eine akute seelische Krise hin. Sie sind nicht allein – bitte holen Sie sich jetzt Hilfe.",
+        "hinweisArzt": "Positives Suizidalitäts-Screening (eigene, ungeprüfte Fragen): ärztliche Akutvorstellung, Suizidalität klinisch abklären. Kein weiterer Diagnose-Ablauf in der Software.",
+        "anlaufstelle": "KRISE_AKUTVORSTELLUNG",
+        "zeitrahmen": "SOFORT"
+      },
+      "quelle": null,
+      "quelleHinweis": "Quelle vor klinischer Nutzung ergänzen (z. B. AWMF-Leitlinie). Fragen fachlich prüfen lassen.",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    },
+    {
+      "id": "KP-002",
+      "version": "0.1.0",
+      "titel": "Krisen-Screening unvollständig (konservativ)",
+      "bedingung": {
+        "eines": [
+          {
+            "antwort": "krise_gedanken_nicht_leben",
+            "gleich": "keine_angabe"
+          },
+          {
+            "antwort": "krise_gedanken_selbstverletzung",
+            "gleich": "keine_angabe"
+          },
+          {
+            "antwort": "krise_plaene",
+            "gleich": "keine_angabe"
+          }
+        ]
+      },
+      "altersbereich": null,
+      "ergebnis": {
+        "dringlichkeit": "NOTFALL",
+        "krise": true,
+        "ablaufBeenden": true,
+        "hinweisPatient": "Nicht alle Fragen zu Ihrer Sicherheit wurden beantwortet. Zu Ihrer Sicherheit zeigen wir Ihnen die Hilfsangebote. Wenn Sie in einer Krise sind, holen Sie sich bitte jetzt Hilfe.",
+        "hinweisArzt": "Suizidalitäts-Screening unvollständig oder verweigert – konservativ wie positiv gewertet (REQ-209). Suizidalität klinisch abklären.",
+        "anlaufstelle": "KRISE_AKUTVORSTELLUNG",
+        "zeitrahmen": "SOFORT"
+      },
+      "quelle": null,
+      "quelleHinweis": "Konservative Festlegung des Projekts (fehlende Antwort ist kein Entwarnungssignal); fachlich prüfen.",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    }
+  ]
+}

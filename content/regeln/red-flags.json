@@ -1,0 +1,255 @@
+{
+  "art": "red-flags",
+  "regelwerkVersion": "0.2.0",
+  "stand": "2026-10-03",
+  "hinweis": "Demo – nicht für den klinischen Einsatz. Kleiner Start-Regelsatz (REQ-206): Warnzeichen aus CLAUDE.md §3a bzw. allgemein bekannte Notfall-Warnzeichen. Alle Regeln sind ungeprüft und ohne Quelle.",
+  "regeln": [
+    {
+      "id": "RF-ALLG-001",
+      "version": "0.1.0",
+      "titel": "Atemnot mit bläulichen Lippen",
+      "bedingung": {
+        "alle": [
+          {
+            "symptom": "atemnot"
+          },
+          {
+            "symptom": "blaue_lippen"
+          }
+        ]
+      },
+      "altersbereich": null,
+      "ergebnis": {
+        "dringlichkeit": "NOTFALL",
+        "hinweisPatient": "Atemnot mit bläulichen Lippen ist ein Notfall. Rufen Sie sofort den Notruf 112.",
+        "hinweisArzt": "Dyspnoe mit Zyanose: Notfall. Einstufung ungeprüft.",
+        "anlaufstelle": "NOTRUF_112",
+        "zeitrahmen": "SOFORT"
+      },
+      "quelle": null,
+      "quelleHinweis": "Quelle vor klinischer Nutzung ergänzen (z. B. AWMF-Leitlinie).",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    },
+    {
+      "id": "RF-ALLG-002",
+      "version": "0.1.0",
+      "titel": "Atemnot",
+      "bedingung": {
+        "symptom": "atemnot"
+      },
+      "altersbereich": null,
+      "ergebnis": {
+        "dringlichkeit": "DRINGEND",
+        "hinweisPatient": "Atemnot sollte heute ärztlich abgeklärt werden – außerhalb der Sprechzeiten über den ärztlichen Bereitschaftsdienst 116117. Bei schwerer oder zunehmender Atemnot rufen Sie den Notruf 112.",
+        "hinweisArzt": "Dyspnoe ohne angegebene Zyanose: zeitnahe Abklärung, Schweregrad beurteilen. Einstufung ungeprüft.",
+        "anlaufstelle": "BEREITSCHAFTSDIENST_116117",
+        "zeitrahmen": "HEUTE"
+      },
+      "quelle": null,
+      "quelleHinweis": "Quelle vor klinischer Nutzung ergänzen (z. B. AWMF-Leitlinie). Einstufung fachlich prüfen.",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    },
+    {
+      "id": "RF-ALLG-003",
+      "version": "0.1.0",
+      "titel": "Bewusstlosigkeit",
+      "bedingung": {
+        "symptom": "bewusstlosigkeit"
+      },
+      "altersbereich": null,
+      "ergebnis": {
+        "dringlichkeit": "NOTFALL",
+        "hinweisPatient": "Bewusstlosigkeit ist ein Notfall. Rufen Sie sofort den Notruf 112.",
+        "hinweisArzt": "Bewusstlosigkeit: Notfall. Einstufung ungeprüft.",
+        "anlaufstelle": "NOTRUF_112",
+        "zeitrahmen": "SOFORT"
+      },
+      "quelle": null,
+      "quelleHinweis": "Quelle vor klinischer Nutzung ergänzen (z. B. AWMF-Leitlinie).",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    },
+    {
+      "id": "RF-ALLG-004",
+      "version": "0.1.0",
+      "titel": "Plötzliche Lähmung oder Sprachstörung",
+      "bedingung": {
+        "eines": [
+          {
+            "symptom": "laehmung_ploetzlich"
+          },
+          {
+            "symptom": "sprachstoerung_ploetzlich"
+          }
+        ]
+      },
+      "altersbereich": null,
+      "ergebnis": {
+        "dringlichkeit": "NOTFALL",
+        "hinweisPatient": "Eine plötzliche Lähmung oder Sprachstörung ist ein Notfall. Rufen Sie sofort den Notruf 112.",
+        "hinweisArzt": "Akutes fokal-neurologisches Defizit (Parese, Aphasie/Dysarthrie): Notfall. Einstufung ungeprüft.",
+        "anlaufstelle": "NOTRUF_112",
+        "zeitrahmen": "SOFORT"
+      },
+      "quelle": null,
+      "quelleHinweis": "Quelle vor klinischer Nutzung ergänzen (z. B. AWMF-Leitlinie).",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    },
+    {
+      "id": "RF-ALLG-005",
+      "version": "0.2.0",
+      "titel": "Ungewöhnliche Teilnahmslosigkeit, kaum ansprechbar",
+      "bedingung": {
+        "symptom": "teilnahmslosigkeit"
+      },
+      "altersbereich": null,
+      "ergebnis": {
+        "dringlichkeit": "NOTFALL",
+        "hinweisPatient": "Ungewöhnliche Teilnahmslosigkeit oder kaum Ansprechbarkeit ist ein Warnzeichen. Rufen Sie den Notruf 112.",
+        "hinweisArzt": "Teilnahmslosigkeit/Bewusstseinsminderung (alle Altersgruppen): Notfallvorstellung. Einstufung und Ausweitung auf alle Altersgruppen ungeprüft.",
+        "anlaufstelle": "NOTRUF_112",
+        "zeitrahmen": "SOFORT"
+      },
+      "quelle": null,
+      "quelleHinweis": "Quelle vor klinischer Nutzung ergänzen (z. B. AWMF-Leitlinie). Einstufung NOTFALL und Geltung für alle Altersgruppen fachlich prüfen.",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    },
+    {
+      "id": "RF-ERW-001",
+      "version": "0.1.0",
+      "titel": "Akuter Brustschmerz bei Erwachsenen",
+      "bedingung": {
+        "symptom": "brustschmerz_akut"
+      },
+      "altersbereich": {
+        "minMonate": 216,
+        "bezug": "chronologisch"
+      },
+      "ergebnis": {
+        "dringlichkeit": "NOTFALL",
+        "hinweisPatient": "Plötzliche Schmerzen in der Brust können ein Notfall sein. Rufen Sie sofort den Notruf 112.",
+        "hinweisArzt": "Akuter Thoraxschmerz beim Erwachsenen: Notfall bis zum Ausschluss lebensbedrohlicher Ursachen. Einstufung ungeprüft.",
+        "anlaufstelle": "NOTRUF_112",
+        "zeitrahmen": "SOFORT"
+      },
+      "quelle": null,
+      "quelleHinweis": "Quelle vor klinischer Nutzung ergänzen (z. B. AWMF-Leitlinie). Altersgrenze 18 Jahre fachlich prüfen; Brustschmerz bei Kindern ist noch nicht abgedeckt.",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    },
+    {
+      "id": "RF-KIND-001",
+      "version": "0.2.0",
+      "titel": "Fieber bei Säuglingen unter 3 Monaten",
+      "bedingung": {
+        "eines": [
+          {
+            "symptom": "fieber"
+          },
+          {
+            "messwert": "temperatur_c",
+            "op": ">=",
+            "wert": 38.0
+          }
+        ]
+      },
+      "altersbereich": {
+        "unterMonate": 3,
+        "bezug": "chronologisch_oder_korrigiert"
+      },
+      "ergebnis": {
+        "dringlichkeit": "DRINGEND",
+        "hinweisPatient": "Fieber bei einem Säugling unter 3 Monaten sollte sofort ärztlich abgeklärt werden – in der Kinderarztpraxis oder über den ärztlichen Bereitschaftsdienst 116117. Wirkt Ihr Kind schwer krank, rufen Sie den Notruf 112.",
+        "hinweisArzt": "Fieber im Alter < 3 Kalendermonaten (chronologisch oder korrigiert): umgehende ärztliche Abklärung. Schwellenwert 38,0 °C und Einstufung ungeprüft.",
+        "anlaufstelle": "BEREITSCHAFTSDIENST_116117",
+        "zeitrahmen": "SOFORT"
+      },
+      "quelle": null,
+      "quelleHinweis": "Quelle vor klinischer Nutzung ergänzen (z. B. AWMF-Leitlinie). Grenze 3 Kalendermonate, Fieberschwelle 38,0 °C, Altersbezug bei Frühgeborenen und Einstufung (DRINGEND, sofort) fachlich prüfen.",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    },
+    {
+      "id": "RF-KIND-002",
+      "version": "0.1.0",
+      "titel": "Trinkschwäche beim Säugling",
+      "bedingung": {
+        "symptom": "trinkschwaeche"
+      },
+      "altersbereich": {
+        "unterMonate": 12,
+        "bezug": "chronologisch_oder_korrigiert"
+      },
+      "ergebnis": {
+        "dringlichkeit": "DRINGEND",
+        "hinweisPatient": "Wenn Ihr Baby kaum oder gar nicht trinkt, lassen Sie es heute ärztlich untersuchen – Kinderarztpraxis oder ärztlicher Bereitschaftsdienst 116117. Wirkt es schwer krank, rufen Sie den Notruf 112.",
+        "hinweisArzt": "Trinkschwäche im Säuglingsalter: zeitnahe ärztliche Beurteilung (u. a. Hydratation). Einstufung und Altersgrenze ungeprüft.",
+        "anlaufstelle": "BEREITSCHAFTSDIENST_116117",
+        "zeitrahmen": "HEUTE"
+      },
+      "quelle": null,
+      "quelleHinweis": "Quelle vor klinischer Nutzung ergänzen (z. B. AWMF-Leitlinie). Altersgrenze 12 Monate fachlich prüfen.",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    },
+    {
+      "id": "RF-KIND-004",
+      "version": "0.2.0",
+      "titel": "Verlust bereits erworbener Fähigkeiten",
+      "bedingung": {
+        "symptom": "verlust_erworbener_faehigkeiten"
+      },
+      "altersbereich": {
+        "unterMonate": 216,
+        "bezug": "chronologisch"
+      },
+      "ergebnis": {
+        "dringlichkeit": "DRINGEND",
+        "hinweisPatient": "Wenn Ihr Kind Fähigkeiten verliert, die es schon sicher konnte, lassen Sie das heute kinderärztlich abklären – außerhalb der Sprechzeiten über den ärztlichen Bereitschaftsdienst 116117.",
+        "hinweisArzt": "Regression bereits erworbener Fähigkeiten: zeitnahe pädiatrische/neuropädiatrische Abklärung. Einstufung ungeprüft.",
+        "anlaufstelle": "BEREITSCHAFTSDIENST_116117",
+        "zeitrahmen": "HEUTE"
+      },
+      "quelle": null,
+      "quelleHinweis": "Quelle vor klinischer Nutzung ergänzen (z. B. AWMF-Leitlinie). Einstufung fachlich prüfen.",
+      "status": "ungeprüft",
+      "geprueftVon": null
+    }
+  ],
+  "sicherheitsnetz": {
+    "id": "SN-001",
+    "version": "0.2.0",
+    "titel": "Warnzeichen angegeben, im Regelsatz für dieses Alter nicht abgedeckt",
+    "ergebnis": {
+      "dringlichkeit": "DRINGEND",
+      "zeitrahmen": "HEUTE",
+      "hinweisPatient": "Sie haben ein Warnzeichen angegeben, das der Demo-Regelsatz für dieses Alter nicht abdeckt. Bitte heute ärztlich abklären lassen – außerhalb der Sprechzeiten über den ärztlichen Bereitschaftsdienst 116117. Bei Verschlechterung oder Lebensgefahr rufen Sie den Notruf 112.",
+      "hinweisArzt": "Angegebenes Warnzeichen ohne passende Regel für dieses Alter (Sicherheitsnetz, REQ-218): ärztliche Beurteilung erforderlich. Mindest-Einstufung DRINGEND ist eine konservative Projektfestlegung.",
+      "anlaufstelle": "BEREITSCHAFTSDIENST_116117"
+    },
+    "quelle": null,
+    "quelleHinweis": "Konservative Festlegung des Projekts (Untertriage vermeiden); fachlich prüfen.",
+    "status": "ungeprüft",
+    "geprueftVon": null
+  },
+  "mindestDringlichkeit": {
+    "id": "SN-002",
+    "version": "0.2.0",
+    "titel": "Mindest-Dringlichkeit eines Warnzeichens",
+    "ergebnis": {
+      "dringlichkeit": "NOTFALL",
+      "zeitrahmen": "SOFORT",
+      "hinweisPatient": "Sie haben ein Warnzeichen angegeben, das immer als Notfall gilt. Rufen Sie sofort den Notruf 112.",
+      "hinweisArzt": "Angegebenes Warnzeichen mit Mindest-Dringlichkeit NOTFALL (Vokabular `mindestens`), ohne ausreichend dringliche Regel – Laufzeit-Absicherung (REQ-222). Notfall.",
+      "anlaufstelle": "NOTRUF_112"
+    },
+    "quelle": null,
+    "quelleHinweis": "Konservative Festlegung des Projekts (Mindeststufe je Warnzeichen); fachlich prüfen.",
+    "status": "ungeprüft",
+    "geprueftVon": null
+  }
+}

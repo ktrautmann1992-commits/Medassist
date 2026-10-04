@@ -7,6 +7,8 @@ import { defineConfig, devices } from "@playwright/test";
 // Variablen – die Shell-Umgebung (z. B. in CI) hat Vorrang.
 const envDatei = path.join(import.meta.dirname, ".env");
 if (existsSync(envDatei)) process.loadEnvFile(envDatei);
+// QA N2: kurze Wartezeit auf die Zeilensperre, damit der Sperr-Test schnell abbricht (Standard der App: 5000 ms).
+process.env.EINGRENZUNG_SPERRE_MS ??= "1500";
 
 /**
  * Web-Abläufe (CLAUDE.md §8). Benötigt eine migrierte Datenbank (DATABASE_URL)

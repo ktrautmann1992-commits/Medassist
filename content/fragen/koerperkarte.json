@@ -1,0 +1,728 @@
+{
+  "art": "koerperkarte",
+  "katalogVersion": "0.2.0",
+  "stand": "2026-10-03",
+  "hinweis": "Demo – nicht für den klinischen Einsatz. Körperkarte für Weg 2 (REQ-303). Vorderansicht: Die rechte Körperseite erscheint links im Bild (Blick auf die Person). Zuordnung zu Organsystemen ist eine grobe, ungeprüfte Orientierung – keine Zuordnung zu Fachrichtungen.",
+  "status": "ungeprüft",
+  "quelle": null,
+  "quelleHinweis": "Eigene Einteilung des Projekts. Regionen, Fachbegriffe und Zuordnung zu Organsystemen fachlich prüfen lassen.",
+  "geprueftVon": null,
+  "viewBox": {
+    "breite": 240,
+    "hoehe": 520
+  },
+  "organsysteme": [
+    {
+      "id": "nervensystem",
+      "bezeichnung": "Nerven und Gehirn",
+      "fachbegriff": "Nervensystem"
+    },
+    {
+      "id": "sinnesorgane",
+      "bezeichnung": "Augen, Ohren, Nase und Rachen",
+      "fachbegriff": null
+    },
+    {
+      "id": "herz_kreislauf",
+      "bezeichnung": "Herz und Kreislauf",
+      "fachbegriff": "Herz-Kreislauf-System"
+    },
+    {
+      "id": "atmung",
+      "bezeichnung": "Atmung und Lunge",
+      "fachbegriff": "Atemwege"
+    },
+    {
+      "id": "verdauung",
+      "bezeichnung": "Magen und Darm",
+      "fachbegriff": "Verdauungstrakt"
+    },
+    {
+      "id": "harnwege",
+      "bezeichnung": "Nieren und Blase",
+      "fachbegriff": "Harnwege"
+    },
+    {
+      "id": "geschlechtsorgane",
+      "bezeichnung": "Geschlechtsorgane",
+      "fachbegriff": null
+    },
+    {
+      "id": "bewegungsapparat",
+      "bezeichnung": "Muskeln, Knochen und Gelenke",
+      "fachbegriff": "Bewegungsapparat"
+    },
+    {
+      "id": "haut",
+      "bezeichnung": "Haut",
+      "fachbegriff": null
+    },
+    {
+      "id": "allgemein",
+      "bezeichnung": "Allgemeinbefinden",
+      "fachbegriff": null
+    }
+  ],
+  "regionen": [
+    {
+      "id": "kopf",
+      "bezeichnung": "Kopf und Gesicht",
+      "fachbegriff": null,
+      "organsysteme": [
+        "nervensystem",
+        "sinnesorgane",
+        "haut"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "ellipse": {
+              "cx": 120,
+              "cy": 38,
+              "rx": 30,
+              "ry": 34
+            }
+          }
+        ],
+        "hinten": [
+          {
+            "ellipse": {
+              "cx": 120,
+              "cy": 38,
+              "rx": 30,
+              "ry": 34
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "hals",
+      "bezeichnung": "Hals (vorne)",
+      "fachbegriff": null,
+      "organsysteme": [
+        "sinnesorgane",
+        "atmung",
+        "bewegungsapparat"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "rechteck": {
+              "x": 100,
+              "y": 72,
+              "breite": 40,
+              "hoehe": 36,
+              "radius": 8
+            }
+          }
+        ],
+        "hinten": []
+      }
+    },
+    {
+      "id": "nacken",
+      "bezeichnung": "Nacken",
+      "fachbegriff": null,
+      "organsysteme": [
+        "bewegungsapparat",
+        "nervensystem"
+      ],
+      "formen": {
+        "vorne": [],
+        "hinten": [
+          {
+            "rechteck": {
+              "x": 100,
+              "y": 72,
+              "breite": 40,
+              "hoehe": 36,
+              "radius": 8
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "brust",
+      "bezeichnung": "Brust",
+      "fachbegriff": "Thorax",
+      "organsysteme": [
+        "herz_kreislauf",
+        "atmung",
+        "bewegungsapparat"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "rechteck": {
+              "x": 72,
+              "y": 108,
+              "breite": 96,
+              "hoehe": 76,
+              "radius": 12
+            }
+          }
+        ],
+        "hinten": []
+      }
+    },
+    {
+      "id": "oberbauch",
+      "bezeichnung": "Oberbauch",
+      "fachbegriff": null,
+      "organsysteme": [
+        "verdauung"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "rechteck": {
+              "x": 76,
+              "y": 184,
+              "breite": 88,
+              "hoehe": 48,
+              "radius": 6
+            }
+          }
+        ],
+        "hinten": []
+      }
+    },
+    {
+      "id": "unterbauch",
+      "bezeichnung": "Unterbauch",
+      "fachbegriff": null,
+      "organsysteme": [
+        "verdauung",
+        "harnwege",
+        "geschlechtsorgane"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "rechteck": {
+              "x": 76,
+              "y": 232,
+              "breite": 88,
+              "hoehe": 44,
+              "radius": 6
+            }
+          }
+        ],
+        "hinten": []
+      }
+    },
+    {
+      "id": "becken_leiste",
+      "bezeichnung": "Becken, Leiste und Genitalbereich",
+      "fachbegriff": null,
+      "organsysteme": [
+        "harnwege",
+        "geschlechtsorgane",
+        "bewegungsapparat"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "polygon": [
+              [
+                76,
+                276
+              ],
+              [
+                164,
+                276
+              ],
+              [
+                156,
+                318
+              ],
+              [
+                84,
+                318
+              ]
+            ]
+          }
+        ],
+        "hinten": []
+      }
+    },
+    {
+      "id": "oberer_ruecken",
+      "bezeichnung": "Oberer Rücken",
+      "fachbegriff": null,
+      "organsysteme": [
+        "bewegungsapparat",
+        "atmung"
+      ],
+      "formen": {
+        "vorne": [],
+        "hinten": [
+          {
+            "rechteck": {
+              "x": 72,
+              "y": 108,
+              "breite": 96,
+              "hoehe": 86,
+              "radius": 12
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "unterer_ruecken",
+      "bezeichnung": "Unterer Rücken",
+      "fachbegriff": "Lumbalregion",
+      "organsysteme": [
+        "bewegungsapparat",
+        "harnwege"
+      ],
+      "formen": {
+        "vorne": [],
+        "hinten": [
+          {
+            "rechteck": {
+              "x": 76,
+              "y": 194,
+              "breite": 88,
+              "hoehe": 82,
+              "radius": 6
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "gesaess",
+      "bezeichnung": "Gesäß",
+      "fachbegriff": "Glutealregion",
+      "organsysteme": [
+        "bewegungsapparat",
+        "haut"
+      ],
+      "formen": {
+        "vorne": [],
+        "hinten": [
+          {
+            "polygon": [
+              [
+                76,
+                276
+              ],
+              [
+                164,
+                276
+              ],
+              [
+                158,
+                322
+              ],
+              [
+                82,
+                322
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "arm_rechts",
+      "bezeichnung": "Rechter Arm und Schulter",
+      "fachbegriff": null,
+      "organsysteme": [
+        "bewegungsapparat",
+        "haut",
+        "nervensystem"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "polygon": [
+              [
+                68,
+                112
+              ],
+              [
+                40,
+                118
+              ],
+              [
+                24,
+                252
+              ],
+              [
+                56,
+                254
+              ],
+              [
+                70,
+                160
+              ]
+            ]
+          }
+        ],
+        "hinten": [
+          {
+            "polygon": [
+              [
+                172,
+                112
+              ],
+              [
+                200,
+                118
+              ],
+              [
+                216,
+                252
+              ],
+              [
+                184,
+                254
+              ],
+              [
+                170,
+                160
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "arm_links",
+      "bezeichnung": "Linker Arm und Schulter",
+      "fachbegriff": null,
+      "organsysteme": [
+        "bewegungsapparat",
+        "haut",
+        "nervensystem"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "polygon": [
+              [
+                172,
+                112
+              ],
+              [
+                200,
+                118
+              ],
+              [
+                216,
+                252
+              ],
+              [
+                184,
+                254
+              ],
+              [
+                170,
+                160
+              ]
+            ]
+          }
+        ],
+        "hinten": [
+          {
+            "polygon": [
+              [
+                68,
+                112
+              ],
+              [
+                40,
+                118
+              ],
+              [
+                24,
+                252
+              ],
+              [
+                56,
+                254
+              ],
+              [
+                70,
+                160
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "hand_rechts",
+      "bezeichnung": "Rechte Hand",
+      "fachbegriff": null,
+      "organsysteme": [
+        "bewegungsapparat",
+        "haut",
+        "nervensystem"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "ellipse": {
+              "cx": 38,
+              "cy": 276,
+              "rx": 18,
+              "ry": 22
+            }
+          }
+        ],
+        "hinten": [
+          {
+            "ellipse": {
+              "cx": 202,
+              "cy": 276,
+              "rx": 18,
+              "ry": 22
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "hand_links",
+      "bezeichnung": "Linke Hand",
+      "fachbegriff": null,
+      "organsysteme": [
+        "bewegungsapparat",
+        "haut",
+        "nervensystem"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "ellipse": {
+              "cx": 202,
+              "cy": 276,
+              "rx": 18,
+              "ry": 22
+            }
+          }
+        ],
+        "hinten": [
+          {
+            "ellipse": {
+              "cx": 38,
+              "cy": 276,
+              "rx": 18,
+              "ry": 22
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "bein_rechts",
+      "bezeichnung": "Rechtes Bein (Hüfte bis Knöchel)",
+      "fachbegriff": null,
+      "organsysteme": [
+        "bewegungsapparat",
+        "haut",
+        "nervensystem"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "polygon": [
+              [
+                82,
+                318
+              ],
+              [
+                120,
+                318
+              ],
+              [
+                116,
+                470
+              ],
+              [
+                84,
+                470
+              ]
+            ]
+          }
+        ],
+        "hinten": [
+          {
+            "polygon": [
+              [
+                158,
+                318
+              ],
+              [
+                120,
+                318
+              ],
+              [
+                124,
+                470
+              ],
+              [
+                156,
+                470
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "bein_links",
+      "bezeichnung": "Linkes Bein (Hüfte bis Knöchel)",
+      "fachbegriff": null,
+      "organsysteme": [
+        "bewegungsapparat",
+        "haut",
+        "nervensystem"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "polygon": [
+              [
+                158,
+                318
+              ],
+              [
+                120,
+                318
+              ],
+              [
+                124,
+                470
+              ],
+              [
+                156,
+                470
+              ]
+            ]
+          }
+        ],
+        "hinten": [
+          {
+            "polygon": [
+              [
+                82,
+                318
+              ],
+              [
+                120,
+                318
+              ],
+              [
+                116,
+                470
+              ],
+              [
+                84,
+                470
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "fuss_rechts",
+      "bezeichnung": "Rechter Fuß",
+      "fachbegriff": null,
+      "organsysteme": [
+        "bewegungsapparat",
+        "haut",
+        "nervensystem"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "rechteck": {
+              "x": 78,
+              "y": 470,
+              "breite": 40,
+              "hoehe": 36,
+              "radius": 10
+            }
+          }
+        ],
+        "hinten": [
+          {
+            "rechteck": {
+              "x": 122,
+              "y": 470,
+              "breite": 40,
+              "hoehe": 36,
+              "radius": 10
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "fuss_links",
+      "bezeichnung": "Linker Fuß",
+      "fachbegriff": null,
+      "organsysteme": [
+        "bewegungsapparat",
+        "haut",
+        "nervensystem"
+      ],
+      "formen": {
+        "vorne": [
+          {
+            "rechteck": {
+              "x": 122,
+              "y": 470,
+              "breite": 40,
+              "hoehe": 36,
+              "radius": 10
+            }
+          }
+        ],
+        "hinten": [
+          {
+            "rechteck": {
+              "x": 78,
+              "y": 470,
+              "breite": 40,
+              "hoehe": 36,
+              "radius": 10
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "haut_mehrere",
+      "bezeichnung": "Haut an mehreren Stellen",
+      "fachbegriff": null,
+      "organsysteme": [
+        "haut"
+      ],
+      "formen": {
+        "vorne": [],
+        "hinten": []
+      }
+    },
+    {
+      "id": "allgemein",
+      "bezeichnung": "Ganzer Körper oder allgemein (z. B. Müdigkeit, Fieber)",
+      "fachbegriff": null,
+      "organsysteme": [
+        "allgemein"
+      ],
+      "formen": {
+        "vorne": [],
+        "hinten": []
+      }
+    }
+  ]
+}

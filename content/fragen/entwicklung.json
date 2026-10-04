@@ -1,0 +1,1098 @@
+{
+  "art": "entwicklungskatalog",
+  "katalogVersion": "0.2.0",
+  "stand": "2026-10-03",
+  "hinweis": "Demo – nicht für den klinischen Einsatz. Demo-Katalog für Weg 3 „Entwicklungs-Check“ (REQ-320). Eigene, allgemein formulierte Beobachtungsfragen – keine validierten Entwicklungs-Screenings oder Elternfragebögen (z. B. ELFRA, SBE-2-KT, ASQ, Denver, MFED, Grenzsteine der Entwicklung): Lizenz nicht geklärt, daher nicht verwendet und nicht nachgebaut. Altersbereiche (in Monaten, Entwicklungsalter) sind bewusst breit und ungeprüft; es gibt keine Normwerte. Einstufungen sind konservativ und ungeprüft.",
+  "status": "ungeprüft",
+  "quelle": null,
+  "quelleHinweis": "Eigene Formulierungen des Projekts. Fragen, Altersbereiche, Einstufungen und Förderideen pädiatrisch fachlich prüfen lassen. Anlaufstellen je Bereich nach CLAUDE.md §5 (Projektvorgabe), fachlich ungeprüft.",
+  "geprueftVon": null,
+  "alter": {
+    "minMonate": 12,
+    "unterMonate": 216
+  },
+  "schnellcheck": {
+    "titel": "Zuerst: Gibt es Warnzeichen?",
+    "text": "Trifft eines dieser Warnzeichen gerade zu?",
+    "textKind": "Trifft eines dieser Warnzeichen bei Ihrem Kind gerade zu?",
+    "textFremd": "Liegt bei der Patientin bzw. dem Patienten eines dieser Warnzeichen vor?",
+    "hilfe": "Bitte alles ankreuzen, was zutrifft. Wenn nichts davon zutrifft, kreuzen Sie „Nichts davon trifft zu“ an.",
+    "symptome": [
+      "bewusstlosigkeit",
+      "teilnahmslosigkeit",
+      "atemnot",
+      "blaue_lippen",
+      "brustschmerz_akut",
+      "laehmung_ploetzlich",
+      "sprachstoerung_ploetzlich",
+      "trinkschwaeche",
+      "verlust_erworbener_faehigkeiten",
+      "fieber"
+    ],
+    "messwerte": [
+      "temperatur_c"
+    ],
+    "keineText": "Nichts davon trifft zu"
+  },
+  "regressionSymptom": "verlust_erworbener_faehigkeiten",
+  "pflichtfrage": {
+    "id": "e_regression",
+    "kurz": "Fähigkeiten wieder verlernt",
+    "textKind": "Hat Ihr Kind Fähigkeiten wieder verlernt, die es schon sicher konnte – zum Beispiel Wörter, Spielen, Laufen oder den Kontakt zu Ihnen?",
+    "textFremd": "Hat das Kind bereits sicher erworbene Fähigkeiten wieder verloren (z. B. Sprache, Spiel, Motorik, Kontakt)?",
+    "hilfe": "Diese Frage wird immer gestellt. Der Verlust bereits erworbener Fähigkeiten ist ein Warnzeichen und sollte heute ärztlich abgeklärt werden – auch wenn Sie unsicher sind. Die Antwort kann danach nicht mehr geändert werden.",
+    "optionen": [
+      {
+        "symptom": "verlust_erworbener_faehigkeiten",
+        "einstufung": "ABKLAERUNG"
+      },
+      {
+        "id": "regression_unsicher",
+        "bezeichnung": "Ich bin mir nicht sicher",
+        "symptom": "verlust_erworbener_faehigkeiten",
+        "einstufung": "ABKLAERUNG"
+      }
+    ],
+    "keineOption": "Nein, das ist mir nicht aufgefallen"
+  },
+  "anlaufstellen": [
+    {
+      "id": "kinderarzt",
+      "bezeichnung": "Kinderärztin oder Kinderarzt",
+      "hinweis": "Immer zuerst: Heilmittel wie Logopädie, Ergotherapie oder Physiotherapie brauchen eine ärztliche Verordnung."
+    },
+    {
+      "id": "logopaedie",
+      "bezeichnung": "Logopädie",
+      "hinweis": "Nach ärztlicher Verordnung."
+    },
+    {
+      "id": "hno_paedaudiologie",
+      "bezeichnung": "HNO-Ärztin/-Arzt oder Pädaudiologie",
+      "hinweis": "Nach ärztlicher Überweisung."
+    },
+    {
+      "id": "ergotherapie",
+      "bezeichnung": "Ergotherapie",
+      "hinweis": "Nach ärztlicher Verordnung."
+    },
+    {
+      "id": "physiotherapie",
+      "bezeichnung": "Physiotherapie",
+      "hinweis": "Nach ärztlicher Verordnung."
+    },
+    {
+      "id": "augenarzt",
+      "bezeichnung": "Augenärztin oder Augenarzt",
+      "hinweis": null
+    },
+    {
+      "id": "hno_arzt",
+      "bezeichnung": "HNO-Ärztin oder HNO-Arzt",
+      "hinweis": null
+    },
+    {
+      "id": "kjp_psychotherapie",
+      "bezeichnung": "Kinder- und Jugendpsychotherapie",
+      "hinweis": null
+    },
+    {
+      "id": "kjp_psychiatrie",
+      "bezeichnung": "Kinder- und Jugendpsychiatrie",
+      "hinweis": null
+    },
+    {
+      "id": "spz",
+      "bezeichnung": "Sozialpädiatrisches Zentrum (SPZ)",
+      "hinweis": "Nach ärztlicher Überweisung."
+    }
+  ],
+  "anlaufstellenQuelle": "CLAUDE.md §5 Weg 3 (Projektvorgabe), fachlich ungeprüft",
+  "ergebnisse": {
+    "ALTERSGERECHT": {
+      "titel": "Keine Auffälligkeit in den Demo-Fragen",
+      "textPatient": "Das ersetzt keine Vorsorgeuntersuchung (U-Untersuchung). Kinder entwickeln sich unterschiedlich schnell – die normale Bandbreite ist groß. Wenn Sie unsicher sind, sprechen Sie Ihre Kinderarztpraxis an.",
+      "textArzt": "Keine auffälligen Angaben in den (ungeprüften) Demo-Fragen. Ersetzt keine Vorsorgeuntersuchung und keine ärztliche Entwicklungsbeurteilung."
+    },
+    "BEOBACHTEN": {
+      "titel": "Beobachten",
+      "textPatient": "Einzelne Angaben fallen auf. Kinder entwickeln sich unterschiedlich schnell. Beobachten Sie die Entwicklung und sprechen Sie sie bei der nächsten Vorsorgeuntersuchung an – oder früher in der Kinderarztpraxis, wenn Sie sich Sorgen machen.",
+      "textArzt": "Einzelne auffällige Angaben. Verlaufsbeobachtung; Beurteilung bei der nächsten Vorsorgeuntersuchung oder früher nach ärztlichem Ermessen."
+    },
+    "ABKLAERUNG": {
+      "titel": "Abklärung empfohlen",
+      "textPatient": "Bitte besprechen Sie die Angaben zeitnah mit Ihrer Kinderarztpraxis. Das ist keine Diagnose – die Software stellt keine Entwicklungsstörung fest, sondern zeigt nur, dass eine ärztliche Abklärung sinnvoll ist.",
+      "textArzt": "Ärztliche Abklärung empfohlen. Weitere Diagnostik und ggf. Heilmittelverordnung nach ärztlicher Beurteilung."
+    }
+  },
+  "bereiche": [
+    {
+      "id": "sprache",
+      "bezeichnung": "Sprache und Sprechen",
+      "beschreibung": "Verstehen, Sprechen, Aussprache, Redefluss und Hören.",
+      "alter": {
+        "minMonate": 12,
+        "unterMonate": 216
+      },
+      "anlaufstellen": [
+        "kinderarzt",
+        "logopaedie",
+        "hno_paedaudiologie"
+      ],
+      "foerderideen": [
+        "Gemeinsam Bilderbücher anschauen und Dinge benennen.",
+        "Im Alltag in einfachen Worten erzählen, was Sie gerade tun.",
+        "Ihrem Kind beim Sprechen Zeit lassen und es ausreden lassen."
+      ],
+      "fragen": [
+        {
+          "id": "s_hoeren",
+          "rolle": "kern",
+          "kurz": "Reagiert auf Ansprache und Geräusche",
+          "textKind": "Reagiert Ihr Kind, wenn Sie es ohne Blickkontakt ansprechen oder wenn in der Nähe ein Geräusch zu hören ist – zum Beispiel, indem es sich umdreht oder antwortet?",
+          "textFremd": "Reagiert das Kind auf Ansprache ohne Blickkontakt und auf Umgebungsgeräusche (Angabe der Bezugsperson bzw. eigene Beobachtung)?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ],
+          "hilfe": "Gemeint ist die Reaktion im Alltag – das ist kein Hörtest."
+        },
+        {
+          "id": "s_verstehen",
+          "rolle": "kern",
+          "kurz": "Versteht einfache Bitten",
+          "textKind": "Versteht Ihr Kind einfache Bitten im Alltag, ohne dass Sie dabei zeigen – zum Beispiel „Hol bitte deine Schuhe“?",
+          "textFremd": "Versteht das Kind einfache Aufforderungen im Alltag ohne Zeigegeste?",
+          "alter": {
+            "minMonate": 18,
+            "unterMonate": 72
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ]
+        },
+        {
+          "id": "s_mitteilen",
+          "rolle": "weitere",
+          "kurz": "Teilt sich mit Wörtern mit",
+          "textKind": "Teilt sich Ihr Kind mit Wörtern mit, die Sie als Wörter erkennen?",
+          "textFremd": "Nutzt das Kind erkennbare Wörter, um sich mitzuteilen?",
+          "alter": {
+            "minMonate": 18,
+            "unterMonate": 48
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "s_saetze",
+          "rolle": "weitere",
+          "kurz": "Spricht in kurzen Sätzen",
+          "textKind": "Verbindet Ihr Kind mehrere Wörter zu kurzen Sätzen?",
+          "textFremd": "Bildet das Kind Mehrwortäußerungen bzw. kurze Sätze?",
+          "alter": {
+            "minMonate": 36,
+            "unterMonate": 84
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "s_verstaendlich",
+          "rolle": "weitere",
+          "kurz": "Für Fremde verständlich",
+          "textKind": "Verstehen auch Menschen außerhalb der Familie meistens, was Ihr Kind sagt?",
+          "textFremd": "Ist die Sprache des Kindes für familienfremde Personen überwiegend verständlich?",
+          "alter": {
+            "minMonate": 42,
+            "unterMonate": 120
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "s_redefluss",
+          "rolle": "weitere",
+          "kurz": "Häufiges Hängenbleiben beim Sprechen",
+          "textKind": "Bleibt Ihr Kind beim Sprechen oft hängen, wiederholt es Laute oder Silben oder muss es sich beim Sprechen sichtlich anstrengen?",
+          "textFremd": "Fallen häufige Unterbrechungen des Redeflusses (Wiederholungen, Blockierungen, sichtbare Anstrengung) auf?",
+          "alter": {
+            "minMonate": 24,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ],
+          "hilfe": "Kurzes Wiederholen von Wörtern kommt bei kleinen Kindern häufig vor."
+        },
+        {
+          "id": "s_sorge",
+          "rolle": "sorge",
+          "kurz": "Sorge der Eltern",
+          "textKind": "Machen Sie sich Sorgen um die Sprache oder das Hören Ihres Kindes?",
+          "textFremd": "Äußern die Sorgeberechtigten Sorgen bezüglich Sprache oder Hören, oder bestehen eigene Bedenken?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja, ich mache mir Sorgen",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ],
+          "hilfe": "Ihr Eindruck als Eltern ist wichtig – auch wenn Sie ihn nicht genau begründen können."
+        }
+      ]
+    },
+    {
+      "id": "motorik",
+      "bezeichnung": "Grob- und Feinmotorik",
+      "beschreibung": "Laufen, Gleichgewicht, Greifen, Stift und Schere.",
+      "alter": {
+        "minMonate": 12,
+        "unterMonate": 216
+      },
+      "anlaufstellen": [
+        "kinderarzt",
+        "ergotherapie",
+        "physiotherapie"
+      ],
+      "foerderideen": [
+        "Viel Gelegenheit zum Bewegen geben, gern draußen: laufen, klettern, balancieren.",
+        "Im Alltag malen, kneten, bauen oder basteln."
+      ],
+      "fragen": [
+        {
+          "id": "m_koerperseiten",
+          "rolle": "kern",
+          "kurz": "Bewegt beide Körperseiten gleich",
+          "textKind": "Bewegt Ihr Kind Arme und Beine beider Körperseiten ungefähr gleich gut?",
+          "textFremd": "Werden beide Körperseiten (Arme, Beine) etwa seitengleich eingesetzt?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ]
+        },
+        {
+          "id": "m_laufen",
+          "rolle": "kern",
+          "kurz": "Läuft ohne Festhalten",
+          "textKind": "Läuft Ihr Kind ohne sich festzuhalten?",
+          "textFremd": "Läuft das Kind frei ohne Festhalten?",
+          "alter": {
+            "minMonate": 24,
+            "unterMonate": 72
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ]
+        },
+        {
+          "id": "m_greifen",
+          "rolle": "weitere",
+          "kurz": "Greift kleine Dinge gezielt",
+          "textKind": "Greift Ihr Kind kleine Dinge gezielt mit den Fingern?",
+          "textFremd": "Greift das Kind kleine Gegenstände gezielt mit den Fingern?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 48
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "m_bewegung",
+          "rolle": "weitere",
+          "kurz": "Rennen, Klettern, Gleichgewicht",
+          "textKind": "Kann Ihr Kind beim Spielen rennen, klettern und das Gleichgewicht halten – ungefähr so wie andere Kinder in seinem Alter?",
+          "textFremd": "Sind Rennen, Klettern und Gleichgewicht im Spiel nach Angabe bzw. Beobachtung ungefähr gleichaltrigen Kindern entsprechend?",
+          "alter": {
+            "minMonate": 36,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "m_stift",
+          "rolle": "weitere",
+          "kurz": "Umgang mit Stift und Schere",
+          "textKind": "Kann Ihr Kind mit Stift und Schere so umgehen, dass es damit malen und schneiden kann?",
+          "textFremd": "Ist der Umgang mit Stift und Schere für Malen und Schneiden ausreichend?",
+          "alter": {
+            "minMonate": 48,
+            "unterMonate": 120
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "m_sorge",
+          "rolle": "sorge",
+          "kurz": "Sorge der Eltern",
+          "textKind": "Machen Sie sich Sorgen um die Bewegung oder Geschicklichkeit Ihres Kindes?",
+          "textFremd": "Äußern die Sorgeberechtigten Sorgen bezüglich Bewegung oder Geschicklichkeit, oder bestehen eigene Bedenken?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja, ich mache mir Sorgen",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ],
+          "hilfe": "Ihr Eindruck als Eltern ist wichtig – auch wenn Sie ihn nicht genau begründen können."
+        }
+      ]
+    },
+    {
+      "id": "wahrnehmung",
+      "bezeichnung": "Wahrnehmung und Verarbeitung",
+      "beschreibung": "Sehen, Hören im Alltag, Empfindlichkeit für Reize.",
+      "alter": {
+        "minMonate": 12,
+        "unterMonate": 216
+      },
+      "anlaufstellen": [
+        "kinderarzt",
+        "augenarzt",
+        "hno_arzt",
+        "ergotherapie"
+      ],
+      "foerderideen": [
+        "Ruhige Rückzugsmöglichkeiten anbieten, wenn es zu viel wird.",
+        "Gemeinsam Geräusche, Farben und Dinge im Alltag entdecken und benennen."
+      ],
+      "fragen": [
+        {
+          "id": "w_sehen",
+          "rolle": "kern",
+          "kurz": "Auffälligkeiten beim Sehen",
+          "textKind": "Fällt Ihnen beim Sehen etwas auf – zum Beispiel, dass Ihr Kind schielt, Dinge sehr nah vor die Augen hält oder häufig die Augen zusammenkneift?",
+          "textFremd": "Bestehen Auffälligkeiten beim Sehen (z. B. Schielen, sehr nahes Heranhalten, häufiges Zusammenkneifen der Augen)?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ]
+        },
+        {
+          "id": "w_hoeren_alltag",
+          "rolle": "weitere",
+          "kurz": "Fragt oft nach oder stellt laut",
+          "textKind": "Fragt Ihr Kind auffällig oft nach („Was?“) oder stellt es Geräte deutlich lauter als andere?",
+          "textFremd": "Fragt das Kind auffällig häufig nach oder wählt es auffällig hohe Lautstärken?",
+          "alter": {
+            "minMonate": 36,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "w_reize",
+          "rolle": "weitere",
+          "kurz": "Starke Reaktion auf Reize",
+          "textKind": "Reagiert Ihr Kind auf Geräusche, Berührungen, Licht oder Kleidung so stark, dass der Alltag dadurch häufig schwierig ist?",
+          "textFremd": "Bestehen alltagsrelevante starke Reaktionen auf Geräusche, Berührung, Licht oder Kleidung?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "w_sorge",
+          "rolle": "sorge",
+          "kurz": "Sorge der Eltern",
+          "textKind": "Machen Sie sich Sorgen um das Sehen, Hören oder die Wahrnehmung Ihres Kindes?",
+          "textFremd": "Äußern die Sorgeberechtigten Sorgen bezüglich Sehen, Hören oder Wahrnehmung, oder bestehen eigene Bedenken?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja, ich mache mir Sorgen",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ],
+          "hilfe": "Ihr Eindruck als Eltern ist wichtig – auch wenn Sie ihn nicht genau begründen können."
+        }
+      ]
+    },
+    {
+      "id": "sozial",
+      "bezeichnung": "Sozial-emotionale Entwicklung und Verhalten",
+      "beschreibung": "Kontakt, Spiel, Gefühle, Aufmerksamkeit und Unruhe.",
+      "alter": {
+        "minMonate": 12,
+        "unterMonate": 216
+      },
+      "anlaufstellen": [
+        "kinderarzt",
+        "kjp_psychotherapie",
+        "kjp_psychiatrie",
+        "spz"
+      ],
+      "foerderideen": [
+        "Feste Abläufe und verlässliche Rituale im Tag geben Sicherheit.",
+        "Gemeinsam spielen und Gefühle in Worte fassen („Du bist gerade wütend“)."
+      ],
+      "fragen": [
+        {
+          "id": "v_kontakt",
+          "rolle": "kern",
+          "kurz": "Sucht Kontakt zu Vertrauten",
+          "textKind": "Sucht Ihr Kind von sich aus Kontakt zu vertrauten Menschen – zum Beispiel über Blickkontakt oder indem es Ihnen etwas zeigt oder bringt?",
+          "textFremd": "Nimmt das Kind von sich aus Kontakt zu Bezugspersonen auf (z. B. Blickkontakt, Zeigen, Bringen)?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ]
+        },
+        {
+          "id": "v_spiel",
+          "rolle": "weitere",
+          "kurz": "Spielt mit oder neben anderen Kindern",
+          "textKind": "Spielt Ihr Kind gern mit anderen Kindern oder zumindest in ihrer Nähe?",
+          "textFremd": "Spielt das Kind mit oder neben anderen Kindern?",
+          "alter": {
+            "minMonate": 24,
+            "unterMonate": 96
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "v_gefuehle",
+          "rolle": "weitere",
+          "kurz": "Belastende Wutanfälle oder Ängste",
+          "textKind": "Sind Wutanfälle oder Ängste Ihres Kindes so häufig oder so stark, dass Familie, Kita oder Schule deutlich darunter leiden?",
+          "textFremd": "Bestehen Wutanfälle oder Ängste in alltagsrelevantem Ausmaß (Familie, Kita, Schule)?",
+          "alter": {
+            "minMonate": 24,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "v_aufmerksamkeit",
+          "rolle": "weitere",
+          "kurz": "Schwierigkeiten, bei einer Sache zu bleiben",
+          "textKind": "Fällt es Ihrem Kind deutlich schwerer als anderen Kindern im gleichen Alter, bei einer Sache zu bleiben oder ruhig abzuwarten?",
+          "textFremd": "Bestehen nach Angabe deutlich mehr Schwierigkeiten mit Aufmerksamkeit oder Abwarten als bei Gleichaltrigen?",
+          "alter": {
+            "minMonate": 36,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "v_sorge",
+          "rolle": "sorge",
+          "kurz": "Sorge der Eltern",
+          "textKind": "Machen Sie sich Sorgen um das Verhalten oder die Gefühle Ihres Kindes?",
+          "textFremd": "Äußern die Sorgeberechtigten Sorgen bezüglich Verhalten oder emotionaler Entwicklung, oder bestehen eigene Bedenken?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja, ich mache mir Sorgen",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ],
+          "hilfe": "Ihr Eindruck als Eltern ist wichtig – auch wenn Sie ihn nicht genau begründen können."
+        }
+      ]
+    },
+    {
+      "id": "lernen",
+      "bezeichnung": "Lernen",
+      "beschreibung": "Lesen und Rechtschreibung, Rechnen, Konzentration (Schulalter).",
+      "alter": {
+        "minMonate": 72,
+        "unterMonate": 216
+      },
+      "anlaufstellen": [
+        "kinderarzt"
+      ],
+      "foerderideen": [
+        "Gemeinsam lesen oder vorlesen – auch kurze Texte zählen.",
+        "Zahlen im Alltag nutzen, zum Beispiel bei Würfel- oder Kartenspielen.",
+        "Im Gespräch mit der Lehrkraft bleiben."
+      ],
+      "fragen": [
+        {
+          "id": "l_lesen",
+          "rolle": "weitere",
+          "kurz": "Mehr Mühe beim Lesen oder Schreiben",
+          "textKind": "Hat Ihr Kind beim Lesen oder Schreiben deutlich mehr Mühe als andere Kinder seiner Klassenstufe?",
+          "textFremd": "Bestehen nach Angabe deutlich mehr Schwierigkeiten beim Lesen oder Schreiben als in der Klassenstufe üblich?",
+          "alter": {
+            "minMonate": 72,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "l_rechnen",
+          "rolle": "weitere",
+          "kurz": "Mehr Mühe beim Rechnen",
+          "textKind": "Hat Ihr Kind beim Rechnen deutlich mehr Mühe als andere Kinder seiner Klassenstufe?",
+          "textFremd": "Bestehen nach Angabe deutlich mehr Schwierigkeiten beim Rechnen als in der Klassenstufe üblich?",
+          "alter": {
+            "minMonate": 72,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "l_konzentration",
+          "rolle": "weitere",
+          "kurz": "Konzentration bei Schulaufgaben",
+          "textKind": "Fällt es Ihrem Kind bei Hausaufgaben oder im Unterricht deutlich schwer, sich zu konzentrieren?",
+          "textFremd": "Bestehen deutliche Konzentrationsschwierigkeiten bei Schulaufgaben?",
+          "alter": {
+            "minMonate": 72,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "l_sorge",
+          "rolle": "sorge",
+          "kurz": "Sorge der Eltern",
+          "textKind": "Machen Sie sich Sorgen um das Lernen Ihres Kindes?",
+          "textFremd": "Äußern die Sorgeberechtigten Sorgen bezüglich Lernen oder Schulleistungen, oder bestehen eigene Bedenken?",
+          "alter": {
+            "minMonate": 72,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja, ich mache mir Sorgen",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ],
+          "hilfe": "Ihr Eindruck als Eltern ist wichtig – auch wenn Sie ihn nicht genau begründen können."
+        }
+      ]
+    },
+    {
+      "id": "alltag",
+      "bezeichnung": "Schlaf, Essen, Sauberkeit",
+      "beschreibung": "Schlafen, Essen und Trinken, Toilette.",
+      "alter": {
+        "minMonate": 12,
+        "unterMonate": 216
+      },
+      "anlaufstellen": [
+        "kinderarzt"
+      ],
+      "foerderideen": [
+        "Regelmäßige Schlafenszeiten und ein ruhiges Abendritual.",
+        "Gemeinsame, entspannte Mahlzeiten ohne Druck."
+      ],
+      "fragen": [
+        {
+          "id": "a_schlaf",
+          "rolle": "weitere",
+          "kurz": "Belastender Schlaf",
+          "textKind": "Schläft Ihr Kind über längere Zeit so schlecht, dass es selbst oder die Familie tagsüber deutlich darunter leidet?",
+          "textFremd": "Bestehen länger anhaltende Schlafprobleme mit Auswirkungen am Tag?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "a_essen",
+          "rolle": "weitere",
+          "kurz": "Sehr wenig oder sehr einseitig essen",
+          "textKind": "Isst Ihr Kind über längere Zeit sehr wenig oder sehr einseitig, sodass Sie sich Gedanken machen?",
+          "textFremd": "Besteht ein länger anhaltendes, sehr eingeschränktes oder einseitiges Essverhalten?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "a_sauberkeit",
+          "rolle": "weitere",
+          "kurz": "Belastende Schwierigkeiten beim Toilettengang",
+          "textKind": "Gibt es beim Toilettengang (Sauberwerden, Einnässen oder Einkoten) Schwierigkeiten, die Ihr Kind oder Sie belasten?",
+          "textFremd": "Bestehen belastende Schwierigkeiten bei Blasen- oder Darmkontrolle?",
+          "alter": {
+            "minMonate": 48,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja",
+              "einstufung": "BEOBACHTEN"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "BEOBACHTEN"
+            }
+          ]
+        },
+        {
+          "id": "a_sorge",
+          "rolle": "sorge",
+          "kurz": "Sorge der Eltern",
+          "textKind": "Machen Sie sich Sorgen um den Schlaf, das Essen oder die Sauberkeit Ihres Kindes?",
+          "textFremd": "Äußern die Sorgeberechtigten Sorgen bezüglich Schlaf, Essen oder Sauberkeit, oder bestehen eigene Bedenken?",
+          "alter": {
+            "minMonate": 12,
+            "unterMonate": 216
+          },
+          "optionen": [
+            {
+              "id": "ja",
+              "bezeichnung": "Ja, ich mache mir Sorgen",
+              "einstufung": "ABKLAERUNG"
+            },
+            {
+              "id": "nein",
+              "bezeichnung": "Nein",
+              "einstufung": "ALTERSGERECHT"
+            },
+            {
+              "id": "unsicher",
+              "bezeichnung": "Unsicher / weiß ich nicht",
+              "einstufung": "ABKLAERUNG"
+            }
+          ],
+          "hilfe": "Ihr Eindruck als Eltern ist wichtig – auch wenn Sie ihn nicht genau begründen können."
+        }
+      ]
+    }
+  ]
+}

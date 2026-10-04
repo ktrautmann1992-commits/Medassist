@@ -1,0 +1,433 @@
+{
+  "art": "fragenkatalog",
+  "bereich": "KOERPERLICH",
+  "katalogVersion": "0.2.0",
+  "stand": "2026-10-03",
+  "hinweis": "Demo – nicht für den klinischen Einsatz. Generischer Anamnese-Katalog für Weg 2, körperlich (REQ-310). Alle Fragen sind eigene, fachlich ungeprüfte Formulierungen; regionsbezogene Zusatzfragen (k_seite, k_haut) nur minimal.",
+  "status": "ungeprüft",
+  "quelle": null,
+  "quelleHinweis": "Eigene Formulierungen des Projekts, keine validierten Fragebögen (Lizenz nicht geklärt). Fragen und Antwortoptionen fachlich prüfen lassen.",
+  "geprueftVon": null,
+  "schnellcheck": {
+    "titel": "Zuerst: Gibt es Warnzeichen?",
+    "text": "Trifft eines dieser Warnzeichen gerade zu?",
+    "textKind": "Trifft eines dieser Warnzeichen bei Ihrem Kind gerade zu?",
+    "textFremd": "Liegt bei der Patientin bzw. dem Patienten eines dieser Warnzeichen vor?",
+    "hilfe": "Bitte alles ankreuzen, was zutrifft. Wenn nichts davon zutrifft, kreuzen Sie „Nichts davon trifft zu“ an.",
+    "symptome": [
+      "bewusstlosigkeit",
+      "teilnahmslosigkeit",
+      "atemnot",
+      "blaue_lippen",
+      "brustschmerz_akut",
+      "laehmung_ploetzlich",
+      "sprachstoerung_ploetzlich",
+      "trinkschwaeche",
+      "verlust_erworbener_faehigkeiten",
+      "fieber"
+    ],
+    "messwerte": [
+      "temperatur_c"
+    ],
+    "keineText": "Nichts davon trifft zu"
+  },
+  "fragen": [
+    {
+      "id": "k_art",
+      "typ": "einfach",
+      "kurz": "Art der Beschwerden",
+      "text": "Welche Art von Beschwerden haben Sie dort?",
+      "textKind": "Welche Art von Beschwerden hat Ihr Kind dort?",
+      "textFremd": "Welche Art von Beschwerden gibt die Patientin bzw. der Patient an?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "schmerz",
+          "bezeichnung": "Schmerzen",
+          "fachbegriff": null
+        },
+        {
+          "id": "haut",
+          "bezeichnung": "Hautveränderung oder Juckreiz",
+          "fachbegriff": null
+        },
+        {
+          "id": "schwellung",
+          "bezeichnung": "Schwellung",
+          "fachbegriff": null
+        },
+        {
+          "id": "taubheit",
+          "bezeichnung": "Taubheitsgefühl",
+          "fachbegriff": "Hypästhesie"
+        },
+        {
+          "id": "kribbeln",
+          "bezeichnung": "Kribbeln oder Ameisenlaufen",
+          "fachbegriff": "Parästhesie"
+        },
+        {
+          "id": "bewegung",
+          "bezeichnung": "Eingeschränkte Beweglichkeit",
+          "fachbegriff": null
+        },
+        {
+          "id": "sonstiges",
+          "bezeichnung": "Etwas anderes",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "k_schmerzart",
+      "typ": "einfach",
+      "kurz": "Art des Schmerzes",
+      "text": "Wie fühlt sich der Schmerz an?",
+      "textKind": "Wie beschreibt Ihr Kind den Schmerz bzw. wie wirkt er auf Sie?",
+      "textFremd": "Wie wird der Schmerz beschrieben?",
+      "pflicht": false,
+      "bedingung": {
+        "antwort": "k_art",
+        "ist": "schmerz"
+      },
+      "optionen": [
+        {
+          "id": "stechend",
+          "bezeichnung": "Stechend",
+          "fachbegriff": null
+        },
+        {
+          "id": "drueckend",
+          "bezeichnung": "Dumpf oder drückend",
+          "fachbegriff": null
+        },
+        {
+          "id": "brennend",
+          "bezeichnung": "Brennend",
+          "fachbegriff": null
+        },
+        {
+          "id": "ziehend",
+          "bezeichnung": "Ziehend",
+          "fachbegriff": null
+        },
+        {
+          "id": "krampfartig",
+          "bezeichnung": "Krampfartig, in Wellen",
+          "fachbegriff": "Kolikartig"
+        },
+        {
+          "id": "pochend",
+          "bezeichnung": "Pochend",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "k_haut",
+      "typ": "einfach",
+      "kurz": "Aussehen der Haut",
+      "text": "Wie sieht die Haut an der Stelle aus?",
+      "textKind": "Wie sieht die Haut Ihres Kindes an der Stelle aus?",
+      "textFremd": "Wie sieht der Hautbefund nach Angabe aus?",
+      "pflicht": false,
+      "bedingung": {
+        "eines": [
+          {
+            "antwort": "k_art",
+            "ist": "haut"
+          },
+          {
+            "region": [
+              "haut_mehrere"
+            ]
+          }
+        ]
+      },
+      "optionen": [
+        {
+          "id": "roetung",
+          "bezeichnung": "Gerötet",
+          "fachbegriff": "Erythem"
+        },
+        {
+          "id": "blaeschen",
+          "bezeichnung": "Kleine Bläschen",
+          "fachbegriff": "Vesikel"
+        },
+        {
+          "id": "quaddeln",
+          "bezeichnung": "Erhabene, juckende Quaddeln",
+          "fachbegriff": null
+        },
+        {
+          "id": "schuppen",
+          "bezeichnung": "Schuppig oder trocken",
+          "fachbegriff": null
+        },
+        {
+          "id": "anders",
+          "bezeichnung": "Anders",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "k_seite",
+      "typ": "einfach",
+      "kurz": "Seite",
+      "text": "Sind die Beschwerden eher auf einer Seite oder auf beiden Seiten?",
+      "textKind": "Sind die Beschwerden Ihres Kindes eher auf einer Seite oder auf beiden Seiten?",
+      "textFremd": "Einseitige oder beidseitige Beschwerden?",
+      "pflicht": false,
+      "bedingung": {
+        "region": [
+          "kopf",
+          "brust",
+          "oberbauch",
+          "unterbauch",
+          "oberer_ruecken",
+          "unterer_ruecken"
+        ]
+      },
+      "optionen": [
+        {
+          "id": "links",
+          "bezeichnung": "Eher links",
+          "fachbegriff": null
+        },
+        {
+          "id": "rechts",
+          "bezeichnung": "Eher rechts",
+          "fachbegriff": null
+        },
+        {
+          "id": "beide",
+          "bezeichnung": "Beide Seiten oder mittig",
+          "fachbegriff": null
+        },
+        {
+          "id": "unklar",
+          "bezeichnung": "Kann ich nicht sagen",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "k_beginn",
+      "typ": "einfach",
+      "kurz": "Beginn",
+      "text": "Wie haben die Beschwerden begonnen?",
+      "textKind": "Wie haben die Beschwerden Ihres Kindes begonnen?",
+      "textFremd": "Wie haben die Beschwerden nach Angabe begonnen?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "ploetzlich",
+          "bezeichnung": "Plötzlich, innerhalb von Minuten",
+          "fachbegriff": null
+        },
+        {
+          "id": "stunden",
+          "bezeichnung": "Innerhalb von einigen Stunden",
+          "fachbegriff": null
+        },
+        {
+          "id": "allmaehlich",
+          "bezeichnung": "Allmählich, über Tage oder länger",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "k_dauer",
+      "typ": "dauer",
+      "kurz": "Dauer",
+      "text": "Seit wann haben Sie die Beschwerden?",
+      "textKind": "Seit wann hat Ihr Kind die Beschwerden?",
+      "textFremd": "Seit wann bestehen die Beschwerden?",
+      "pflicht": false,
+      "bedingung": null,
+      "einheiten": [
+        "stunden",
+        "tage",
+        "wochen",
+        "monate",
+        "jahre"
+      ],
+      "maxAnzahl": 99
+    },
+    {
+      "id": "k_verlauf",
+      "typ": "einfach",
+      "kurz": "Verlauf",
+      "text": "Wie haben sich die Beschwerden seitdem entwickelt?",
+      "textKind": "Wie haben sich die Beschwerden Ihres Kindes seitdem entwickelt?",
+      "textFremd": "Wie ist der bisherige Verlauf?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "schlechter",
+          "bezeichnung": "Sie werden schlimmer",
+          "fachbegriff": null
+        },
+        {
+          "id": "gleich",
+          "bezeichnung": "Sie bleiben gleich",
+          "fachbegriff": null
+        },
+        {
+          "id": "besser",
+          "bezeichnung": "Sie werden besser",
+          "fachbegriff": null
+        },
+        {
+          "id": "wechselnd",
+          "bezeichnung": "Sie kommen und gehen",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "k_staerke",
+      "typ": "skala",
+      "kurz": "Stärke",
+      "text": "Wie stark sind die Beschwerden im Moment?",
+      "textKind": "Wie stark wirken die Beschwerden Ihres Kindes im Moment?",
+      "textFremd": "Wie stark werden die Beschwerden aktuell angegeben?",
+      "pflicht": false,
+      "bedingung": null,
+      "min": 0,
+      "max": 10,
+      "minText": "0 = keine",
+      "maxText": "10 = die stärksten vorstellbaren"
+    },
+    {
+      "id": "k_ausloeser",
+      "typ": "mehrfach",
+      "kurz": "Auslöser",
+      "text": "Wodurch werden die Beschwerden ausgelöst oder stärker?",
+      "textKind": "Wodurch werden die Beschwerden Ihres Kindes ausgelöst oder stärker?",
+      "textFremd": "Gibt es Auslöser oder verstärkende Faktoren?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "bewegung",
+          "bezeichnung": "Bewegung oder Belastung",
+          "fachbegriff": null
+        },
+        {
+          "id": "ruhe",
+          "bezeichnung": "In Ruhe oder nachts",
+          "fachbegriff": null
+        },
+        {
+          "id": "essen",
+          "bezeichnung": "Essen oder Trinken",
+          "fachbegriff": null
+        },
+        {
+          "id": "atmen",
+          "bezeichnung": "Atmen oder Husten",
+          "fachbegriff": null
+        },
+        {
+          "id": "druck",
+          "bezeichnung": "Berührung oder Druck",
+          "fachbegriff": null
+        },
+        {
+          "id": "unfall",
+          "bezeichnung": "Nach einem Unfall oder Sturz",
+          "fachbegriff": "Trauma"
+        }
+      ],
+      "keineOption": "Kein Auslöser erkennbar"
+    },
+    {
+      "id": "k_begleitsymptome",
+      "typ": "mehrfach",
+      "kurz": "Weitere Beschwerden",
+      "text": "Haben Sie zusätzlich eine dieser Beschwerden?",
+      "textKind": "Hat Ihr Kind zusätzlich eine dieser Beschwerden?",
+      "textFremd": "Liegen zusätzlich folgende Beschwerden vor?",
+      "pflicht": true,
+      "bedingung": null,
+      "optionen": [
+        {
+          "symptom": "bewusstlosigkeit"
+        },
+        {
+          "symptom": "teilnahmslosigkeit"
+        },
+        {
+          "symptom": "atemnot"
+        },
+        {
+          "symptom": "blaue_lippen"
+        },
+        {
+          "symptom": "brustschmerz_akut"
+        },
+        {
+          "symptom": "laehmung_ploetzlich"
+        },
+        {
+          "symptom": "sprachstoerung_ploetzlich"
+        },
+        {
+          "symptom": "trinkschwaeche"
+        },
+        {
+          "symptom": "verlust_erworbener_faehigkeiten"
+        },
+        {
+          "symptom": "fieber"
+        }
+      ],
+      "keineOption": "Nichts davon"
+    },
+    {
+      "id": "k_vorbehandlung",
+      "typ": "einfach",
+      "kurz": "Bisherige Behandlung",
+      "text": "Wurden die Beschwerden schon behandelt?",
+      "textKind": "Wurden die Beschwerden Ihres Kindes schon behandelt?",
+      "textFremd": "Gab es bereits eine Behandlung?",
+      "pflicht": false,
+      "bedingung": null,
+      "optionen": [
+        {
+          "id": "nein",
+          "bezeichnung": "Nein",
+          "fachbegriff": null
+        },
+        {
+          "id": "aerztlich",
+          "bezeichnung": "Ja, ärztlich",
+          "fachbegriff": null
+        },
+        {
+          "id": "selbst",
+          "bezeichnung": "Ja, selbst (z. B. Hausmittel, rezeptfreie Mittel)",
+          "fachbegriff": null
+        }
+      ]
+    },
+    {
+      "id": "k_ergaenzung",
+      "typ": "freitext",
+      "kurz": "Ergänzung",
+      "text": "Möchten Sie noch etwas ergänzen? (kurz, bitte keine Namen)",
+      "textKind": "Möchten Sie zu Ihrem Kind noch etwas ergänzen? (kurz, bitte keine Namen)",
+      "textFremd": "Ergänzende Angaben (kurz, ohne Namen)",
+      "pflicht": false,
+      "bedingung": null,
+      "maxLaenge": 200
+    }
+  ]
+}
