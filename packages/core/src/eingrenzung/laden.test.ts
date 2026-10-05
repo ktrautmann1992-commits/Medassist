@@ -115,6 +115,10 @@ describe("REQ-301 Fragen und Optionen", () => {
     const d2 = kopie();
     frage(d2.seelisch, "s_ergaenzung").id = "krise_plaene";
     expect(fehlerVon(d2).message).toContain("bereits eine Krisenfrage");
+    // REQ-401: Schritt „beschreibung“ (Weg 1) ist ebenfalls reserviert.
+    const d3 = kopie();
+    frage(d3.koerperlich, "k_ergaenzung").id = "beschreibung";
+    expect(fehlerVon(d3).message).toContain("„beschreibung“ ist reserviert");
   });
 
   it("Symptom-Optionen übernehmen Bezeichnung, Fachbegriff und Warnzeichen aus dem Vokabular", () => {

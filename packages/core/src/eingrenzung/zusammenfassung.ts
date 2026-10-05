@@ -25,7 +25,7 @@ export interface ZusammenfassungEintrag {
 }
 
 export interface ZusammenfassungAbschnitt {
-  id: "krise" | "warnzeichen" | "region" | "bereiche" | "angaben";
+  id: "krise" | "warnzeichen" | "beschreibung" | "region" | "bereiche" | "angaben";
   titel: string;
   eintraege: ZusammenfassungEintrag[];
 }
@@ -108,6 +108,22 @@ export function erstelleZusammenfassung(
     warn.push({ id: `messwert.${mid}`, bezeichnung: m?.bezeichnung ?? mid, werte: werte.map((w) => ({ text: `${zahlDe(w)} ${m?.einheit ?? ""}`.trim(), fachbegriff: null })) });
   }
   if (warn.length) abschnitte.push({ id: "warnzeichen", titel: "Warnzeichen-Schnellcheck", eintraege: warn });
+
+  // REQ-403: Freie Beschreibung (Weg 1) – unverändert, ohne Auswertung (KI folgt in Meilenstein 6).
+  if (g.beschreibung) {
+    const b = g.beschreibung;
+    abschnitte.push({
+      id: "beschreibung",
+      titel: "Ihre Beschreibung",
+      eintraege: [
+        {
+          id: "beschreibung",
+          bezeichnung: b.quelle === "sprache" ? `Per Sprachaufnahme (Transkript ${b.korrigiert ? "korrigiert" : "unverändert übernommen"})` : "In eigenen Worten",
+          werte: [{ text: b.text, fachbegriff: null }],
+        },
+      ],
+    });
+  }
 
   if (stand.bereich === "KOERPERLICH" && g.region) {
     const r = k.koerperkarte.regionenById.get(g.region);

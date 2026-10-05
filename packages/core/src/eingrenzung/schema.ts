@@ -31,8 +31,8 @@ export type Bereich = (typeof BEREICHE)[number];
 /** Bereiche mit einer Datei vom Typ `fragenkatalog` (Weg 2). */
 export const GEFUEHRTE_BEREICHE = ["KOERPERLICH", "PSYCHISCH"] as const;
 
-/** REQ-301/REQ-323: Diese Schritt-IDs sind für den Ablauf reserviert und keine Frage-IDs. */
-export const RESERVIERTE_SCHRITTE = ["krise", "schnellcheck", "notfall_weiter", "region", "bereiche", "zusammenfassung"] as const;
+/** REQ-301/REQ-323/REQ-401: Diese Schritt-IDs sind für den Ablauf reserviert und keine Frage-IDs. */
+export const RESERVIERTE_SCHRITTE = ["krise", "schnellcheck", "notfall_weiter", "beschreibung", "region", "bereiche", "zusammenfassung"] as const;
 
 /** REQ-320: Altersbereich in vollen Monaten (`minMonate` inklusiv, `unterMonate` exklusiv). */
 export interface MonatsBereich {

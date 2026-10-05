@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import { bewerteFall, hinweisEskaliert, neuerFallStatus, type FallStatusWert } from "@/lib/eingrenzung/auswertung";
 import { ablaufAlterMonate, ladeFall } from "@/lib/eingrenzung/fall";
 import { notBewertung, SPEICHERN_FEHLGESCHLAGEN } from "@/lib/eingrenzung/notbewertung";
+import { ladeSprachTranskript } from "@/lib/medien/auftrag";
 import { absichern, kriseSignal, signalIstNeu, verarbeiteSchritt, warnSignal, type NeueEingabe } from "@/lib/eingrenzung/schritt";
 import type { RegelPruefState } from "@/lib/regeln/form";
 import type { FormState } from "@/lib/forms/state";
@@ -32,7 +33,9 @@ export async function starteFall(formData: FormData): Promise<void> {
   const { nutzer } = await requireUser();
   const profil = await findeZugaenglichesProfil(nutzer, String(formData.get("profilId") ?? ""));
   if (!profil) notFound();
-  const art = formData.get("art");
+  // REQ-400: Weg 1 „Beschwerden beschreiben“ – Art aus dem Häkchen „seelische Beschwerden“.
+  const freitext = formData.get("weg") === "FREITEXT";
+  const art = freitext ? (formData.get("seelisch") === "on" ? "PSYCHISCH" : "KOERPERLICH") : formData.get("art");
   if (art !== "KOERPERLICH" && art !== "PSYCHISCH" && art !== "ENTWICKLUNG") notFound();
   if (art === "ENTWICKLUNG") {
     const p = await ladeProfilFuerRegeln(nutzer, profil.id);
@@ -43,7 +46,7 @@ export async function starteFall(formData: FormData): Promise<void> {
       profilId: profil.id,
       erstelltVonId: nutzer.id,
       art,
-      weg: art === "ENTWICKLUNG" ? "ENTWICKLUNG" : "GEFUEHRT",
+      weg: freitext ? "FREITEXT" : art === "ENTWICKLUNG" ? "ENTWICKLUNG" : "GEFUEHRT",
       status: "ENTWURF",
       regelVersion: standardRegelwerk().version,
       katalogVersion: standardFragenkataloge().version,
@@ -78,6 +81,11 @@ export async function beantworteSchritt(_vorher: SchrittState, formData: FormDat
   const regelwerk = standardRegelwerk();
   const kataloge = standardFragenkataloge();
   const stichtag = stichtagHeute();
+  // REQ-407: Roh-Transkript (nur Hash) der Sprachaufnahme – nur eigener Auftrag für diesen Fall.
+  const sprache =
+    formData.get("schritt") === "beschreibung" && formData.get("quelle") === "sprache"
+      ? await ladeSprachTranskript(nutzer.id, fall.id, formData.get("sprachAuftrag"))
+      : null;
   const kontext = {
     regelwerk,
     kataloge,
@@ -86,6 +94,7 @@ export async function beantworteSchritt(_vorher: SchrittState, formData: FormDat
     rolle: nutzer.rolle,
     stichtag,
     alterMonate: ablaufAlterMonate(fall.bereich, fall.profil, stichtag),
+    weg: fall.weg,
   };
 
   /**
@@ -125,6 +134,7 @@ export async function beantworteSchritt(_vorher: SchrittState, formData: FormDat
               inhalt: e.inhalt,
               frageId: e.frageId,
               koerperregion: e.koerperregion,
+              korrigiert: e.korrigiert ?? false,
               strukturiert: e.strukturiert as unknown as DbPrisma.InputJsonValue,
             },
           });
@@ -180,7 +190,7 @@ export async function beantworteSchritt(_vorher: SchrittState, formData: FormDat
       // QA E2: festgehaltenes Entwicklungsalter (erste Bereichsauswahl) oder – vor der ersten Auswahl – das aktuelle.
       const aktuell = fall.bereich === "ENTWICKLUNG" ? entwicklungsAlter(fall.profil, stichtag) : null;
       const eAlter = vorher.gesammelt.entwicklungsAlter ?? (aktuell ? { monate: aktuell.monate, korrigiert: aktuell.korrigiert } : null);
-      const v = verarbeiteSchritt(kataloge, regelwerk, fall.bereich, schritt, formData, eAlter);
+      const v = verarbeiteSchritt(kataloge, regelwerk, fall.bereich, schritt, formData, eAlter, sprache);
       const nachher = v.eingaben.length ? await speichere(v.eingaben, !v.fehler) : vorher;
       if (v.fehler) return { art: "fehler", state: { fehler: v.fehler, feldFehler: v.feldFehler }, neuLaden: v.eingaben.length > 0 };
       return { art: "weiter", ziel: `/eingrenzung/${fall.id}${hinweisEskaliert(vorher, nachher) ? "?hinweis=neu" : ""}` };

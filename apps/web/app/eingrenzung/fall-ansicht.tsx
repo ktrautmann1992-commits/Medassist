@@ -8,6 +8,9 @@ import type { RegelPruefState } from "@/lib/regeln/form";
  * Rein darstellend (ohne Hooks).
  */
 
+/** REQ-400: Kennzeichnung von Weg 1 in Fallliste und Fallansicht. */
+export const FREITEXT_TEXT = "Freie Beschreibung";
+
 export const ART_TEXT = { KOERPERLICH: "Körperliche Beschwerden", PSYCHISCH: "Seelische Beschwerden", ENTWICKLUNG: "Entwicklungs-Check" } as const;
 
 
@@ -21,7 +24,7 @@ export interface ProfilKopf {
 }
 
 /** REQ-304, RISK-019: Für wen wird gerade eingegrenzt – Avatar, Name, Alter, „Kinderprofil“ als Text. */
-export function ProfilZeile({ profil, art }: { profil: ProfilKopf; art?: keyof typeof ART_TEXT }) {
+export function ProfilZeile({ profil, art, freitext = false }: { profil: ProfilKopf; art?: keyof typeof ART_TEXT; freitext?: boolean }) {
   return (
     <p className="profile-row" data-testid="profil" style={{ margin: 0 }}>
       <Avatar initialen={profil.initialen} kind={profil.istKinderprofil} />
@@ -30,6 +33,7 @@ export function ProfilZeile({ profil, art }: { profil: ProfilKopf; art?: keyof t
         {profil.entwicklungsalter && ` · Entwicklungsalter ${profil.entwicklungsalter}`}
         {profil.istKinderprofil && " · Kinderprofil"}
         {art && ` · ${ART_TEXT[art]}`}
+        {freitext && ` · ${FREITEXT_TEXT}`}
       </span>
     </p>
   );

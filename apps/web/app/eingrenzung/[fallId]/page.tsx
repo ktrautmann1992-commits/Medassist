@@ -1,4 +1,4 @@
-import { fortschritt, naechsterSchritt, erlaubterSchritt, schrittId, vorherigerSchritt, type Schritt } from "@medassist/core";
+import { fortschritt, medienErlaubt, naechsterSchritt, erlaubterSchritt, schrittId, vorherigerSchritt, type Schritt } from "@medassist/core";
 import { KrisenKontakte, Panel, Schrittanzeige, UngeprueftKennzeichen } from "@medassist/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -10,6 +10,8 @@ import { fallKontext } from "@/lib/eingrenzung/kontext";
 import { EntwicklungErgebnis, EntwicklungKrisenKontakte, RegressionUnsicherHinweis, VolljaehrigHinweis } from "../entwicklung-ergebnis";
 import { FallZusammenfassung, ProfilZeile, UnvollstaendigHinweis } from "../fall-ansicht";
 import { FokusRahmen } from "../fokus-rahmen";
+import { MedienBereich } from "../medien-bereich";
+import { BeschreibungProvider } from "./beschreibung-feld";
 import { NichtGespeichertHinweis, SchrittFormular } from "./schritt-formular";
 
 export const dynamic = "force-dynamic";
@@ -66,9 +68,11 @@ export default async function Eingrenzung({
               : "Entwicklung prüfen"
             : fertig
               ? "Zusammenfassung"
-              : "Beschwerden eingrenzen"}
+              : fall.weg === "FREITEXT"
+                ? "Beschwerden beschreiben"
+                : "Beschwerden eingrenzen"}
       </h1>
-      <ProfilZeile profil={ctx.profilKopf} art={fall.bereich} />
+      <ProfilZeile profil={ctx.profilKopf} art={fall.bereich} freitext={fall.weg === "FREITEXT"} />
       {ctx.entwicklungHinweise?.volljaehrig && <VolljaehrigHinweis />}
       {/* Entwicklungs-Check: Gesamtzahl erst nach der Bereichsauswahl bekannt */}
       {!fertig && pos && !(entwicklung && !b.stand.bereiche?.length) && <Schrittanzeige nummer={pos.nummer} gesamt={pos.gesamt} />}
@@ -115,7 +119,7 @@ export default async function Eingrenzung({
         </>
       )}
 
-      {ansicht && (
+      {ansicht && ansicht.art !== "beschreibung" && (
         <SchrittFormular
           // Neuer Schritt bzw. neue Eingabe ⇒ frisches Formular
           // QA N5: nur vom Schritt abhängig – Fehlermeldungen bleiben nach refresh() erhalten
@@ -127,6 +131,22 @@ export default async function Eingrenzung({
           ansicht={ansicht}
           zurueckHref={zurueck ? `/eingrenzung/${fall.id}?schritt=${encodeURIComponent(zurueck)}` : null}
         />
+      )}
+
+      {ansicht?.art === "beschreibung" && (
+        // REQ-402 – REQ-410: Freitext mit Sprachaufnahme und Fotos (Weg 1) – erst nach dem Schnellcheck.
+        <BeschreibungProvider key={id} vorher={ansicht.vorher?.text ?? ""}>
+          <SchrittFormular
+            fallId={fall.id}
+            bereich={fall.bereich}
+            rolle={nutzer.rolle}
+            schrittId={id}
+            ansicht={ansicht}
+            zurueckHref={zurueck ? `/eingrenzung/${fall.id}?schritt=${encodeURIComponent(zurueck)}` : null}
+            // QA M5: „Weiter“ steht hinter Sprachaufnahme und Fotos.
+            nachFormular={<MedienBereich fallId={fall.id} nutzerId={nutzer.id} erlaubt={medienErlaubt(b.stand)} sprache />}
+          />
+        </BeschreibungProvider>
       )}
 
       {fall.bereich === "PSYCHISCH" && <KrisenKontakte />}

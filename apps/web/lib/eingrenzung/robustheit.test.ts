@@ -41,7 +41,8 @@ describe("QA N1 Schreiben: nur lesbare Eingaben, Warnzeichen bleiben", () => {
       strukturiert: { v: 1, katalogVersion: "0.1.0", schritt: "schnellcheck", teilweise: false, wert: { typ: "schnellcheck", symptome: ["atemnot"], keine: false, messwerte: { temperatur_c: Array.from({ length: 50 }, (_, i) => 36 + i / 10) } } },
     };
     const e = absichern(kaputt)!;
-    expect(e.inhalt).toHaveLength(1000);
+    // REQ-402: Schreib-Obergrenze für `inhalt` seit Meilenstein 5 = 2000 Zeichen (längste Beschreibung).
+    expect(e.inhalt).toHaveLength(2000);
     expect(e.strukturiert).toMatchObject({ teilweise: true, wert: { symptome: ["atemnot"] } });
     expect((e.strukturiert.wert as { messwerte: Record<string, number[]> }).messwerte.temperatur_c).toHaveLength(20);
     expect(gespeicherteEingabeSchema.safeParse(e.strukturiert).success).toBe(true);

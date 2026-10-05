@@ -14,12 +14,13 @@ import {
   UngeprueftKennzeichen,
 } from "@medassist/ui";
 import Link from "next/link";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { VORRANG_ZIEL_ID, type SchrittAnsicht } from "@/lib/eingrenzung/ansicht";
 import { VorrangHinweise } from "@/app/regeln/pruefen/vorrang-hinweise";
 import { useFormular } from "@/lib/forms/use-formular";
 import { beantworteSchritt, type SchrittState } from "../actions";
+import { BeschreibungFeld } from "./beschreibung-feld";
 
 /**
  * REQ-305 – REQ-311: Formular des aktuellen Schritts. Hält keinen sicherheitsrelevanten
@@ -32,6 +33,12 @@ interface Props {
   schrittId: string;
   ansicht: SchrittAnsicht;
   zurueckHref: string | null;
+  /**
+   * QA M5: Inhalt zwischen Formular und Schaltflächen (z. B. Sprachaufnahme und Fotos im
+   * Beschreibungsschritt). Er steht **außerhalb** des Formulars (eigene Formulare darin), die
+   * Schaltflächen sind über das `form`-Attribut verbunden.
+   */
+  nachFormular?: ReactNode;
 }
 
 const KRISE_OPTIONEN = [
@@ -108,7 +115,8 @@ export function NichtGespeichertHinweis({ fallId }: { fallId: string }) {
   );
 }
 
-export function SchrittFormular({ fallId, bereich, rolle, schrittId, ansicht, zurueckHref }: Props) {
+export function SchrittFormular({ fallId, bereich, rolle, schrittId, ansicht, zurueckHref, nachFormular }: Props) {
+  const formId = useId();
   const { state, onSubmit: absenden, laeuft } = useFormular<SchrittState>(beantworteSchritt, {});
   // Neuer Versuch ⇒ Merker zurücksetzen; scheitert er erneut, wird er wieder gesetzt.
   const onSubmit: typeof absenden = (e) => {
@@ -137,9 +145,35 @@ export function SchrittFormular({ fallId, bereich, rolle, schrittId, ansicht, zu
   const ziel = vorrang && typeof document !== "undefined" ? document.getElementById(VORRANG_ZIEL_ID) : null;
 
   const ueberspringbar = ansicht.art === "frage" && !ansicht.pflicht;
+  // Ohne `nachFormular` stehen die Schaltflächen im Formular; mit wird `form` gesetzt (Zuordnung außerhalb).
+  const zuForm = nachFormular === undefined ? undefined : formId;
 
-  return (
-    <form className="panel stack" onSubmit={onSubmit} noValidate={ansicht.art !== "krise"} aria-label="Schritt beantworten" data-schritt={schrittId}>
+  const aktionen = (
+    <div className="actions" data-testid="schritt-aktionen">
+      {/* REQ-308: Bei NOTFALL ist „Fortsetzen“ bewusst nur sekundär – vorrangig ist der Notruf. */}
+      <Button form={zuForm} type="submit" variante={ansicht.art === "notfall_weiter" ? "secondary" : "primary"} disabled={laeuft}>
+        {laeuft ? "Wird gespeichert …" : ansicht.art === "notfall_weiter" ? "Fragen trotzdem fortsetzen" : "Weiter"}
+      </Button>
+      {ansicht.art === "bereiche" && (
+        <Button form={zuForm} type="submit" variante="secondary" name="aktion" value="alle" disabled={laeuft}>
+          Alle Bereiche prüfen
+        </Button>
+      )}
+      {ueberspringbar && (
+        <Button form={zuForm} type="submit" variante="secondary" name="aktion" value="ueberspringen" disabled={laeuft}>
+          Überspringen
+        </Button>
+      )}
+      {zurueckHref && (
+        <Link className="btn btn-secondary" href={zurueckHref}>
+          Zurück
+        </Link>
+      )}
+    </div>
+  );
+
+  const formular = (
+    <form id={formId} className="panel stack" onSubmit={onSubmit} noValidate={ansicht.art !== "krise"} aria-label="Schritt beantworten" data-schritt={schrittId}>
       <input type="hidden" name="fallId" value={fallId} />
       <input type="hidden" name="schritt" value={schrittId} />
       {vorrang && (ziel ? createPortal(vorrang, ziel) : vorrang)}
@@ -219,6 +253,11 @@ export function SchrittFormular({ fallId, bereich, rolle, schrittId, ansicht, zu
             fehler={f("bestaetigt")}
           />
         </div>
+      )}
+
+      {ansicht.art === "beschreibung" && (
+        // REQ-402/REQ-403: freie Beschreibung – Zähler, keine stille Kürzung, Krisen-Kontakte am Feld.
+        <BeschreibungFeld maxLaenge={ansicht.maxLaenge} fehler={f} />
       )}
 
       {ansicht.art === "region" && (
@@ -343,27 +382,15 @@ export function SchrittFormular({ fallId, bereich, rolle, schrittId, ansicht, zu
         </>
       )}
 
-      <div className="actions">
-        {/* REQ-308: Bei NOTFALL ist „Fortsetzen“ bewusst nur sekundär – vorrangig ist der Notruf. */}
-        <Button type="submit" variante={ansicht.art === "notfall_weiter" ? "secondary" : "primary"} disabled={laeuft}>
-          {laeuft ? "Wird gespeichert …" : ansicht.art === "notfall_weiter" ? "Fragen trotzdem fortsetzen" : "Weiter"}
-        </Button>
-        {ansicht.art === "bereiche" && (
-          <Button type="submit" variante="secondary" name="aktion" value="alle" disabled={laeuft}>
-            Alle Bereiche prüfen
-          </Button>
-        )}
-        {ueberspringbar && (
-          <Button type="submit" variante="secondary" name="aktion" value="ueberspringen" disabled={laeuft}>
-            Überspringen
-          </Button>
-        )}
-        {zurueckHref && (
-          <Link className="btn btn-secondary" href={zurueckHref}>
-            Zurück
-          </Link>
-        )}
-      </div>
+      {nachFormular === undefined && aktionen}
     </form>
+  );
+  if (nachFormular === undefined) return formular;
+  return (
+    <>
+      {formular}
+      {nachFormular}
+      {aktionen}
+    </>
   );
 }

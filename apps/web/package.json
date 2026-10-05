@@ -17,6 +17,8 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.1146.0",
+    "@aws-sdk/s3-request-presigner": "3.1146.0",
     "@medassist/core": "workspace:*",
     "@medassist/ui": "workspace:*",
     "@node-rs/argon2": "^2.0.2",

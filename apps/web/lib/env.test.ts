@@ -106,3 +106,75 @@ describe("REQ-013 Basis-URL für Bestätigungslinks (APP_URL nur in Production n
     expect(envSchema.safeParse({ ...basis, APP_URL: "http://localhost:3000" }).success).toBe(true);
   });
 });
+
+describe("REQ-412 Objektspeicher und STT: Konfiguration und Startprüfung", () => {
+  const db = { DATABASE_URL: "postgresql://test@localhost/test" };
+  const s3 = {
+    STORAGE_BUCKET: "medassist",
+    STORAGE_REGION: "eu-central-1",
+    STORAGE_ENDPOINT: "https://s3.eu-central-1.example.org",
+    STORAGE_ACCESS_KEY_ID: "id",
+    STORAGE_SECRET_ACCESS_KEY: "geheim",
+  };
+  const pfade = (r: ReturnType<typeof envSchema.safeParse>) => r.error?.issues.map((i) => i.path.join(".")) ?? [];
+
+  it.each([undefined, ""])("Standard (%j): Speicher und STT aus", (wert) => {
+    const r = envSchema.parse({ ...db, STORAGE_ANBIETER: wert, STT_ANBIETER: wert, NODE_ENV: "production" });
+    expect(r.STORAGE_ANBIETER).toBe("aus");
+    expect(r.STT_ANBIETER).toBe("aus");
+    expect(r.TESTADAPTER_ERLAUBT).toBe(false);
+  });
+
+  it.each([
+    ["STORAGE_ANBIETER", "gcs"],
+    ["STORAGE_ANBIETER", "AUS"],
+    ["STT_ANBIETER", "webspeech"],
+    ["TESTADAPTER_ERLAUBT", "ja"],
+  ])("ungültiger Wert %s=%j ⇒ Start bricht ab", (name, wert) => {
+    expect(pfade(envSchema.safeParse({ ...db, [name]: wert }))).toContain(name);
+  });
+
+  it("s3 vollständig ⇒ gültig; jede fehlende Variable ⇒ Abbruch mit Namen", () => {
+    expect(envSchema.safeParse({ ...db, ...s3, STORAGE_ANBIETER: "s3", NODE_ENV: "production" }).success).toBe(true);
+    for (const name of Object.keys(s3)) {
+      const r = envSchema.safeParse({ ...db, ...s3, [name]: "", STORAGE_ANBIETER: "s3" });
+      expect(r.success, name).toBe(false);
+      expect(pfade(r)).toContain(name);
+    }
+  });
+
+  it("s3 nur mit https-Endpunkt", () => {
+    expect(pfade(envSchema.safeParse({ ...db, ...s3, STORAGE_ANBIETER: "s3", STORAGE_ENDPOINT: "http://s3.example.org" }))).toContain("STORAGE_ENDPOINT");
+  });
+
+  it("lokal/test in Entwicklung erlaubt", () => {
+    expect(envSchema.safeParse({ ...db, STORAGE_ANBIETER: "lokal", STT_ANBIETER: "test", NODE_ENV: "development" }).success).toBe(true);
+    expect(envSchema.safeParse({ ...db, STORAGE_ANBIETER: "lokal", STT_ANBIETER: "test" }).success).toBe(true);
+  });
+
+  it("lokal/test in Production ⇒ Abbruch, außer mit TESTADAPTER_ERLAUBT=true (E2E)", () => {
+    const prod = { ...db, NODE_ENV: "production" };
+    expect(pfade(envSchema.safeParse({ ...prod, STORAGE_ANBIETER: "lokal" }))).toContain("STORAGE_ANBIETER");
+    expect(pfade(envSchema.safeParse({ ...prod, STT_ANBIETER: "test" }))).toContain("STT_ANBIETER");
+    expect(envSchema.safeParse({ ...prod, STORAGE_ANBIETER: "lokal", STT_ANBIETER: "test", TESTADAPTER_ERLAUBT: "true" }).success).toBe(true);
+  });
+
+  it("auf Vercel sind Test-Adapter und TESTADAPTER_ERLAUBT nie zulässig", () => {
+    const vercel = { ...db, NODE_ENV: "production", VERCEL: "1" };
+    const r = envSchema.safeParse({ ...vercel, STORAGE_ANBIETER: "lokal", STT_ANBIETER: "test", TESTADAPTER_ERLAUBT: "true" });
+    expect(pfade(r)).toEqual(expect.arrayContaining(["STORAGE_ANBIETER", "STT_ANBIETER", "TESTADAPTER_ERLAUBT"]));
+    expect(pfade(envSchema.safeParse({ ...vercel, NODE_ENV: "development", STORAGE_ANBIETER: "lokal" }))).toContain("STORAGE_ANBIETER");
+    expect(envSchema.safeParse({ ...vercel, ...s3, STORAGE_ANBIETER: "s3" }).success).toBe(true);
+  });
+
+  it("STORAGE_LOKAL_SCHLUESSEL muss mindestens 32 Byte haben", () => {
+    expect(pfade(envSchema.safeParse({ ...db, STORAGE_LOKAL_SCHLUESSEL: Buffer.alloc(16).toString("base64") }))).toContain("STORAGE_LOKAL_SCHLUESSEL");
+    expect(envSchema.safeParse({ ...db, STORAGE_LOKAL_SCHLUESSEL: Buffer.alloc(32).toString("base64") }).success).toBe(true);
+  });
+
+  it("Fehlermeldungen enthalten keine Werte (Secrets)", () => {
+    const r = envSchema.safeParse({ ...db, ...s3, STORAGE_ANBIETER: "s3", STORAGE_BUCKET: "", NODE_ENV: "production", STT_ANBIETER: "test" });
+    const text = r.error?.issues.map((i) => i.message).join(" ") ?? "";
+    expect(text).not.toContain("geheim");
+  });
+});

@@ -3,6 +3,7 @@ import { pruefeRegelEingabe } from "../regeln/eingabe";
 import { normalisiereAntwort } from "../regeln/engine";
 import type { Regelwerk } from "../regeln/laden";
 import { ANTWORTEN, type Antwort } from "../regeln/schema";
+import { MAX_BESCHREIBUNG } from "../freitext/beschreibung";
 import { DAUER_EINHEITEN, type DauerEinheit, katalogIdSchema } from "./schema";
 import type { Frage, Katalog, Koerperkarte } from "./typen";
 
@@ -57,6 +58,18 @@ export const bereicheWertSchema = z.strictObject({
   korrigiert: z.boolean(),
 });
 
+/**
+ * REQ-402/REQ-407: Freie Beschreibung (Weg 1) – Text oder (korrigiertes) Transkript einer
+ * Sprachaufnahme. `korrigiert` ermittelt der Server (Vergleich mit dem Roh-Transkript).
+ */
+export const beschreibungWertSchema = z.strictObject({
+  typ: z.literal("beschreibung"),
+  quelle: z.enum(["text", "sprache"]),
+  text: z.string().min(1).max(MAX_BESCHREIBUNG),
+  korrigiert: z.boolean(),
+});
+export type BeschreibungWert = z.infer<typeof beschreibungWertSchema>;
+
 /** REQ-313: Inhalt von `Eingabe.strukturiert` – wird beim Lesen erneut streng geprüft. */
 export const gespeicherteEingabeSchema = z.strictObject({
   v: z.literal(1),
@@ -64,7 +77,7 @@ export const gespeicherteEingabeSchema = z.strictObject({
   schritt: id,
   /** Ungültige Antwort, von der nur sicherheitsrelevante gültige Teile gespeichert wurden. */
   teilweise: z.boolean(),
-  wert: z.union([antwortWertSchema, schnellcheckWertSchema, kriseWertSchema, regionWertSchema, notfallBestaetigungSchema, bereicheWertSchema]),
+  wert: z.union([antwortWertSchema, schnellcheckWertSchema, kriseWertSchema, regionWertSchema, notfallBestaetigungSchema, bereicheWertSchema, beschreibungWertSchema]),
 });
 export type GespeicherteEingabe = z.infer<typeof gespeicherteEingabeSchema>;
 

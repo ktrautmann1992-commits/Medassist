@@ -123,9 +123,19 @@ async function ProfilWahl({ nutzer, gewaehlt }: { nutzer: Nutzer; gewaehlt: stri
               Profil ansehen
             </Link>
           </div>
-          {auswahl.istKinderprofil && (
-            // REQ-329: Entwicklungs-Check nur beim Kinderprofil (wie docs/design-vorschau.html)
-            <div className="grid">
+          <div className="grid">
+            {/* REQ-400: Weg 1 „Beschwerden beschreiben“ (wie docs/design-vorschau.html) */}
+            <Link className="entry-option" href={`/eingrenzung?profil=${encodeURIComponent(auswahl.id)}&weg=freitext`}>
+              <strong className="entry-title">Beschwerden beschreiben</strong>
+              <span className="text-soft">Erzählen Sie in eigenen Worten, was los ist. Ein Foto hilft bei Hautveränderungen.</span>
+              <span className="methods">
+                <span className="method-tag">Text</span>
+                <span className="method-tag">Sprachaufnahme</span>
+                <span className="method-tag">Foto</span>
+              </span>
+            </Link>
+            {auswahl.istKinderprofil && (
+              // REQ-329: Entwicklungs-Check nur beim Kinderprofil (wie docs/design-vorschau.html)
               <Link className="entry-option" href={`/eingrenzung?profil=${encodeURIComponent(auswahl.id)}&weg=entwicklung`}>
                 <strong className="entry-title">Entwicklung prüfen</strong>
                 <span className="text-soft">
@@ -138,9 +148,8 @@ async function ProfilWahl({ nutzer, gewaehlt }: { nutzer: Nutzer; gewaehlt: stri
                   <span className="method-tag">Verhalten</span>
                 </span>
               </Link>
-            </div>
-          )}
-          <p className="text-soft">Freie Beschreibung (Text, Sprache, Foto) folgt in einem nächsten Meilenstein.</p>
+            )}
+          </div>
         </div>
       ) : (
         <p className="text-soft">Legen Sie zuerst Ihr eigenes Profil oder ein Kinderprofil an.</p>

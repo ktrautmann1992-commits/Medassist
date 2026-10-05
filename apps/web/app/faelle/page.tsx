@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { ladeFaelle } from "@/lib/eingrenzung/fall";
 import { fallKontext } from "@/lib/eingrenzung/kontext";
 import { stichtagHeute } from "@/lib/profile/format";
-import { ART_TEXT } from "../eingrenzung/fall-ansicht";
+import { ART_TEXT, FREITEXT_TEXT } from "../eingrenzung/fall-ansicht";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +56,7 @@ export default async function Faelle() {
               {liste.map((f) => {
                 const { anzeige, entwicklung } = fallKontext(nutzer, f);
                 const offen = anzeige.offen;
-                const art = ART_TEXT[f.bereich];
+                const art = f.weg === "FREITEXT" ? `${ART_TEXT[f.bereich]} · ${FREITEXT_TEXT}` : ART_TEXT[f.bereich];
                 const datum = ZEIT.format(f.erstelltAm);
                 return (
                   <li key={f.id} data-fall-id={f.id}>

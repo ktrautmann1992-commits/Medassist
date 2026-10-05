@@ -12,3 +12,5 @@ export * from "./profile/anzeige";
 export * from "./regeln";
 export * from "./eingrenzung";
 export * from "./entwicklung";
+export * from "./freitext";
+export * from "./medien";

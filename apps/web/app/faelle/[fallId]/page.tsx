@@ -1,3 +1,4 @@
+import { medienErlaubt } from "@medassist/core";
 import { DringlichkeitKurz, KrisenKontakte } from "@medassist/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,6 +9,7 @@ import { fallKontext } from "@/lib/eingrenzung/kontext";
 import { EntwicklungErgebnis, EntwicklungKrisenKontakte, RegressionUnsicherHinweis } from "../../eingrenzung/entwicklung-ergebnis";
 import { FallZusammenfassung, ProfilZeile, UnvollstaendigHinweis } from "../../eingrenzung/fall-ansicht";
 import { FokusRahmen } from "../../eingrenzung/fokus-rahmen";
+import { MedienBereich } from "../../eingrenzung/medien-bereich";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +31,7 @@ export default async function FallAnsicht({ params }: { params: Promise<{ fallId
         {ctx.entwicklungHinweise?.regressionUnsicher && <RegressionUnsicherHinweis />}
       </FokusRahmen>
       <h1>Fall</h1>
-      <ProfilZeile profil={ctx.profilKopf} art={fall.bereich} />
+      <ProfilZeile profil={ctx.profilKopf} art={fall.bereich} freitext={fall.weg === "FREITEXT"} />
       <p className="fall-meta" style={{ margin: 0 }}>
         <span data-testid="fall-status">Status: {ctx.anzeige.text}</span>
         <DringlichkeitKurz stufe={ctx.anzeige.dringlichkeit} ohneStufe={ctx.anzeige.ohneDringlichkeit} />
@@ -52,6 +54,8 @@ export default async function FallAnsicht({ params }: { params: Promise<{ fallId
         fragenUngeprueft={ctx.fragenUngeprueft}
         abgeschlossen={Boolean(fall.abgeschlossenAm)}
       />
+      {/* REQ-410: Fotos von Weg 1 (Anzeige, Löschen, Verlaufsfotos) – nur nach Schnellcheck, nicht nach Krise */}
+      {fall.weg === "FREITEXT" && <MedienBereich fallId={fall.id} nutzerId={nutzer.id} erlaubt={medienErlaubt(b.stand)} sprache={false} />}
       {fall.bereich === "PSYCHISCH" && <KrisenKontakte />}
       {ctx.entwicklungHinweise?.krisenKontakte && <EntwicklungKrisenKontakte profilId={fall.profil.id} />}
       <p>

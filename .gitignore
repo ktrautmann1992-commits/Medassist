@@ -10,6 +10,9 @@ next-env.d.ts
 # Prisma-Client (wird generiert)
 apps/web/generated/
 
+# Lokaler Objektspeicher (nur Entwicklung/Test, REQ-408) – enthält hochgeladene Testfotos
+.lokaler-speicher/
+
 # Secrets – niemals committen (REQ-005)
 .env
 .env.*
